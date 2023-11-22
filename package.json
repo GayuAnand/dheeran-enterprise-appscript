@@ -1,0 +1,49 @@
+{
+  "name": "cap-webview",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "build:prod": "ng build --configuration production",
+    "publish:ghpages": "npm run build:prod && node bin/publish-ghpages.js",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "android:add": "npx cap add android",
+    "android:run": "npx cap run android",
+    "sync": "npx cap sync"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/animations": "^16.2.0",
+    "@angular/cdk": "^16.2.5",
+    "@angular/common": "^16.2.0",
+    "@angular/compiler": "^16.2.0",
+    "@angular/core": "^16.2.0",
+    "@angular/forms": "^16.2.0",
+    "@angular/material": "^16.2.5",
+    "@angular/platform-browser": "^16.2.0",
+    "@angular/platform-browser-dynamic": "^16.2.0",
+    "@angular/router": "^16.2.0",
+    "@capacitor/android": "^5.4.1",
+    "@capacitor/core": "^5.4.1",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.13.0"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^16.2.3",
+    "@angular/cli": "~16.2.3",
+    "@angular/compiler-cli": "^16.2.0",
+    "@capacitor/cli": "^5.4.1",
+    "@types/jasmine": "~4.3.0",
+    "gh-pages": "^6.1.0",
+    "jasmine-core": "~4.6.0",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.2.0",
+    "karma-coverage": "~2.2.0",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "~2.1.0",
+    "typescript": "~5.1.3"
+  }
+}

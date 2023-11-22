@@ -1,0 +1,13 @@
+@use './reusable-styles/common.scss';
+@use './reusable-styles/flex.scss';
+@use './reusable-styles/spacing.scss';
+@use './reusable-styles/sizing.scss';
+
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+html, body { height: 100vh; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.mat-form-field {
+  background: rgb(245, 245, 245) !important;
+}
