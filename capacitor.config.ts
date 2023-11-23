@@ -6,6 +6,11 @@ const config: CapacitorConfig = {
   webDir: 'dist/cap-webview',
   server: {
     androidScheme: 'https'
+  },
+  plugins: {
+    CapacitorUpdater: {
+			autoUpdate: false,
+		}
   }
 };
 

@@ -4,12 +4,12 @@ var ghpages = require("gh-pages");
 var basePath = "dist/cap-webview";
 
 // Target directory in gh-pages branch under which the documentation will be published.
-var targetDir = "de/latest";
+var targetDir = "";
 
 var publishOptions = {
   add: true,
   dest: targetDir,
-  repo: 'git@github.com:GayuAnand/dheeran-enterprise-appscript.git'
+  repo: 'git@gayu.github.com:GayuAnand/dheeran-enterprise-appscript.git'
 };
 
 ghpages.publish(basePath, publishOptions, (err) =>

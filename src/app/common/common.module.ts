@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -20,6 +20,7 @@ import { EmptyLayoutComponent, IframeComponent, PageLayoutComponent } from './co
 @NgModule({
   imports: [
     CommonModule,
+    FormsModule,
     ReactiveFormsModule,
 
     MatButtonModule,
@@ -40,8 +41,9 @@ import { EmptyLayoutComponent, IframeComponent, PageLayoutComponent } from './co
     IframeComponent,
     PageLayoutComponent,
 
-    ReactiveFormsModule,
     CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
 
     MatButtonModule,
     MatCardModule,
