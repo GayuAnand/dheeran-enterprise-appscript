@@ -1,0 +1,58 @@
+.de-block {
+  display: block;
+}
+
+.de-inline {
+  display: inline;
+}
+
+.de-inlineblock {
+  display: inline-block;
+}
+
+.de-hide {
+  display: none;
+}
+
+.de-hidden {
+  visibility: hidden;
+}
+
+.de-breakall {
+  word-break: break-all;
+}
+
+.de-relative {
+  position: relative;
+}
+
+.de-absolute {
+  position: absolute;
+}
+
+.de-cursorpointer {
+  cursor: pointer;
+}
+
+.de-m-0 {
+  margin: 0;
+}
+
+.de-p-0 {
+  padding: 0;
+}
+
+.de-breakword {
+  word-break: break-word;
+}
+
+.de-truncated-text {
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.de-required::after {
+  color: var(--danger-base);
+  content: '*';
+}

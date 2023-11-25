@@ -1,0 +1,19 @@
+<div class="de-f-column">
+  <div>
+    <p>version: 0.0.1-beta</p>
+    <input [(ngModel)]="name" />
+    <input [(ngModel)]="version" />
+    <button (click)="downloadApk()">Download App.apk</button>
+    <button (click)="downloadFile()">Download File</button>
+    <button (click)="readFile()">Read File</button>
+    <button (click)="readdir()">ReadDir</button>
+    <button (click)="mkdir()">MakeDir</button>
+    <button (click)="getFilePath()">FilePath</button>
+    <button (click)="openFile()">OpenFile</button>
+    <button (click)="cleandir()">CleanDir</button>
+    <button (click)="listPackages()">ListPackages</button>
+    <div>{{msg}}</div>
+    <p *ngFor="let l of logs">{{l}}</p>
+  </div>
+  <router-outlet></router-outlet>
+</div>

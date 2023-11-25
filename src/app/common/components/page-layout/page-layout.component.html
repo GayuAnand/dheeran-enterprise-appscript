@@ -1,0 +1,41 @@
+<mat-toolbar color="primary" [style]="{ height: '50px', paddingLeft: '0px' }">
+  <button mat-icon-button (click)="toggleSidenav()">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <span class="de-p-lsmall">{{settingsService.pageTitle}}</span>
+
+  <div class="de-f-grow"></div>
+
+  <div [matMenuTriggerFor]="menu" class="profile-menu">
+    <span class="avatar">{{authService.user.Username.slice(0, 2).toUpperCase()}}</span>
+  </div>
+</mat-toolbar>
+
+<mat-menu #menu="matMenu">
+  <button mat-menu-item (click)="signOut()">{{TKey.COMMON.LOGOUT}}</button>
+</mat-menu>
+
+<mat-sidenav-container class="de-f-grow">
+  <mat-sidenav>
+    <mat-tree [dataSource]="settingsService.navigationData" [treeControl]="settingsService.navigationTreeControl">
+      <mat-tree-node [style.paddingLeft]="(24 * node.index + 12) + 'px'" *matTreeNodeDef="let node" matTreeNodeToggle [routerLink]="node.routerLink" routerLinkActive="active-route">{{node.name}}</mat-tree-node>
+
+      <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild">
+        <div class="mat-tree-node de-p-hbase" [style.paddingLeft]="(24 * node.index + 12) + 'px'" matTreeNodeToggle>
+          <span class="de-f-grow">{{node.name}}</span>
+          <mat-icon class="de-p-lsmall">
+            {{settingsService.navigationTreeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+          </mat-icon>
+        </div>
+
+        <div [class.de-hide]="!settingsService.navigationTreeControl.isExpanded(node)" role="group">
+          <ng-container matTreeNodeOutlet></ng-container>
+        </div>
+      </mat-nested-tree-node>
+    </mat-tree>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>
