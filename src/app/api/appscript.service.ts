@@ -1,10 +1,15 @@
-import { Observable, Subject, map, throwError } from 'rxjs';
+import { Observable, Subject, map } from 'rxjs';
 import { Injectable, NgZone } from '@angular/core';
+
+import { environment } from './../../environments/environment';
 
 @Injectable()
 export class ApiAppScriptService {
-  // latestDeployId = 'AKfycbwXGymXyx7sQjCVwqZVvkP6nMiRfAA_cVZ_YCiuiJs'; // dev
-  latestDeployId = 'AKfycbyiCXSgdMRM_X6pscDtIbHvWR2PaBT5q8Cf2x2HFSc17lRczg9HvF2-PmOwpFqZ3SQG';
+  useProd = environment.production;
+
+  devDeployId = 'AKfycbwXGymXyx7sQjCVwqZVvkP6nMiRfAA_cVZ_YCiuiJs';
+
+  prodDeployId = 'AKfycbyiCXSgdMRM_X6pscDtIbHvWR2PaBT5q8Cf2x2HFSc17lRczg9HvF2-PmOwpFqZ3SQG';
 
   execPromises: Record<string, { subject: Subject<any>, observable?: Observable<any> }> = {};
 
@@ -41,7 +46,7 @@ export class ApiAppScriptService {
 
     if (functionName) {
       let s = document.createElement('script');
-      s.setAttribute('src', `https://script.google.com/macros/s/${this.latestDeployId}/exec?api=1&functionName=${functionName}&functionParameters=${encodeURIComponent(JSON.stringify(parameters))}&callbackId=${callbackId}&token=${localStorage.getItem('x-auth-token') || ''}`);
+      s.setAttribute('src', `https://script.google.com/macros/s/${this.useProd ? this.prodDeployId : this.devDeployId}/${this.useProd ? 'exec' : 'dev'}?api=1&functionName=${functionName}&functionParameters=${encodeURIComponent(JSON.stringify(parameters))}&callbackId=${callbackId}&token=${localStorage.getItem('x-auth-token') || ''}`);
       s.setAttribute('id', callbackId);
       document.head.appendChild(s);
     } else {

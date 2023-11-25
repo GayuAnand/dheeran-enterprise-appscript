@@ -14,6 +14,10 @@ const routes: Routes = [
         loadChildren: () => import('./modules/dashboard').then((m) => m.DashboardModule),
       },
       {
+        path: 'cable-list',
+        loadChildren: () => import('./modules/cable-list').then((m) => m.CableListModule),
+      },
+      {
         path: 'search',
         component: IframeComponent,
         data: {
@@ -31,7 +35,7 @@ const routes: Routes = [
       },
       {
         path: '**',
-        redirectTo: 'dashboard',
+        redirectTo: 'cable-list',
       },
     ],
   },

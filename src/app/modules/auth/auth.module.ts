@@ -5,7 +5,7 @@ import { SignInComponent } from './signin/signin.component';
 import { AuthRoutingModule } from './auth-routing.module';
 
 @NgModule({
-  imports: [AppCommonModule, AuthRoutingModule],
+  imports: [AppCommonModule.forChild(), AuthRoutingModule],
   declarations: [SignInComponent],
 })
 export class AuthModule {}

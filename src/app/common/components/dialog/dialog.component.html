@@ -1,0 +1,14 @@
+<ng-template cdkPortal>
+  <div class="dialog">
+    <div class="dialog__header mat-h2 de-f-aligncenter de-p-small de-p-hbase de-nm--force">
+      <span class="de-m-rmedium"><ng-content select="[de-dialog-header]"></ng-content></span>
+      <mat-icon class="de-cursorpointer" (click)="closeDialog.emit()">close</mat-icon>
+    </div>
+    <div class="dialog__body de-p-base">
+      <ng-content select="[de-dialog-body]"></ng-content>
+    </div>
+    <div class="dialog__footer">
+      <ng-content select="[de-dialog-footer]"></ng-content>
+    </div>
+  </div>
+</ng-template>

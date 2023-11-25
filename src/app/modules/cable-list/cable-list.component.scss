@@ -1,0 +1,17 @@
+.filter-row {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  flex-wrap: wrap;
+
+  > * {
+    display: flex;
+    flex-grow: 1;
+    margin: 6px;
+    min-width: 180px;
+  }
+}
+
+.select-all {
+  padding: 6px;
+}

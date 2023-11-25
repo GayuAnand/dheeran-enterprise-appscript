@@ -1,0 +1,23 @@
+.dialog {
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  &__header {
+    background-color: var(--primary);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  &__body {
+    flex: 1;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+}

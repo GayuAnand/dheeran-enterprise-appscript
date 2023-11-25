@@ -1,7 +1,10 @@
+@use 'normalize.css/normalize.css';
+@use './reusable-styles/material.scss';
 @use './reusable-styles/common.scss';
 @use './reusable-styles/flex.scss';
-@use './reusable-styles/spacing.scss';
 @use './reusable-styles/sizing.scss';
+@use './reusable-styles/spacing.scss';
+@use './reusable-styles/typography.scss';
 
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
 
@@ -10,4 +13,14 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 .mat-form-field {
   background: rgb(245, 245, 245) !important;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --primary: #3f51b5;
+  --success: green;
+  --danger: red;
 }

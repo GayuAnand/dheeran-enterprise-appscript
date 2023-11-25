@@ -19,7 +19,14 @@ export class ApiAuthService {
   }
 
   discoveryInfo(): Observable<IMetadata & { activeUser: IUser }> {
-    return this.apiAppScriptService.exec('discoveryInfo', [localStorage.getItem(this.authTokenName)]);
+    // return of({ activeUser: { Username: 'Anand' }});
+    return this.apiAppScriptService.exec('discoveryInfo', [localStorage.getItem(this.authTokenName)])
+      .pipe(
+        map((res) => {
+          this.apiAppScriptService.prodDeployId = res?.deployIds?.[0] || this.apiAppScriptService.prodDeployId;
+          return res;
+        })
+      );
   }
 
   signIn(username: string, password: string) {

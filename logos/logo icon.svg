@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <text style="fill: rgba(193, 32, 32, 0); fill-opacity: 0; font-family: Arial, sans-serif; font-size: 17.5px; stroke-width: 10.1429px; white-space: pre;" transform="matrix(2.303731, 0, 0, 3.020188, -236.680206, -422.328979)" x="42.525" y="229.818" dx="120.035" dy="-13.99"> </text>
+  <ellipse style="stroke-width: 27px; stroke: rgb(0, 44, 255); fill: rgba(193, 32, 32, 0); fill-opacity: 0;" cx="134.206" cy="335.694" rx="104.018" ry="112.124"/>
+  <path style="stroke-width: 27px; stroke-linecap: round; stroke-linejoin: bevel; stroke: rgb(0, 44, 255); fill: rgba(193, 32, 32, 0); fill-opacity: 0;" d="M 236.625 189.482 C 241.031 93.39 179.556 42.906 105.56 58.308 C 61.144 67.553 30.188 114.358 30.188 169.725"/>
+  <line style="stroke-width: 27px; stroke-linejoin: bevel; stroke: rgb(0, 44, 255); fill: rgba(193, 32, 32, 0); fill-opacity: 0;" x1="236.843" y1="184.715" x2="238.224" y2="340.863"/>
+  <text style="fill: rgba(193, 32, 32, 0); fill-opacity: 0; font-family: Arial, sans-serif; font-size: 17.5px; stroke-width: 10.1429px; white-space: pre; transform-box: fill-box; transform-origin: 2.43163px 9.86614px;" transform="matrix(-2.303731, 0, 0, -3.020188, 193.059448, 82.748619)" x="42.525" y="229.818" dx="120.035" dy="-13.99"> </text>
+  <ellipse style="stroke-width: 27px; stroke: rgb(187, 0, 255); transform-box: fill-box; transform-origin: 50% 50%; fill: rgba(193, 32, 32, 0); fill-opacity: 0;" cx="-366.261" cy="-167.698" rx="104.018" ry="112.124" transform="matrix(-1, 0, 0, -1, 732.52198, 335.395988)"/>
+  <path style="stroke-width: 27px; stroke-linecap: round; stroke-linejoin: bevel; stroke: rgb(187, 0, 255); transform-box: fill-box; transform-origin: 50% 50%; fill: rgba(193, 32, 32, 0); fill-opacity: 0;" d="M 470.056 447.818 C 474.462 351.726 412.987 301.242 338.991 316.644 C 294.575 325.889 263.619 372.694 263.619 428.061" transform="matrix(-1, 0, 0, -1, 0.000061, 0.000015)"/>
+  <line style="stroke-width: 27px; stroke-linejoin: bevel; stroke: rgb(187, 0, 255); transform-box: fill-box; transform-origin: 50% 50%; fill: rgba(193, 32, 32, 0); fill-opacity: 0;" x1="262.243" y1="162.53" x2="263.624" y2="318.678" transform="matrix(-1, 0, 0, -1, 0.000061, 0.000015)"/>
+</svg>
