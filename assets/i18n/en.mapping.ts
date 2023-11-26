@@ -2,6 +2,7 @@ export const EN_MAPPING = {
   COMMON: {
     ABOUT: 'About',
     AREA: 'Area',
+    BSNL_CONNECT: 'BSNL Connect',
     CABLE: 'Cable',
     DASHBOARD: 'Dashboard',
     HIDE_ADVANCED_FILTERS: 'Hide Advanced Filters',
