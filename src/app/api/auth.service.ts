@@ -15,6 +15,7 @@ export class ApiAuthService {
 
   signOut() {
     localStorage.removeItem(this.authTokenName);
+    localStorage.clear();
     this.router.navigate(['/auth']);
   }
 

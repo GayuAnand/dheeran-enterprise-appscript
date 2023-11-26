@@ -1,4 +1,16 @@
-mat-cell.align-center {
-  text-align: center !important;
-  justify-content: center !important;
+mat-table {
+  max-width: 100px;
+
+  mat-header-row {
+    background-color: #d2d8ff;
+  }
+
+  mat-row mat-cell {
+    padding: 12px;
+  }
+
+  mat-cell.align-center {
+    text-align: center !important;
+    justify-content: center !important;
+  }
 }

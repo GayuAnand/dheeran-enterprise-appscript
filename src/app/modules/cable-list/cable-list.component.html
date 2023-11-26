@@ -1,6 +1,6 @@
-<div class="filter-row de-p-tbase">
+<div class="filter-row de-p-vbase">
   <mat-form-field class="example-form-field">
-    <mat-label>Search</mat-label>
+    <mat-label>{{TKey.COMMON.SEARCH}}</mat-label>
     <input matInput type="text" [(ngModel)]="searchText" (ngModelChange)="onFilterChange()">
     <button *ngIf="searchText" matSuffix mat-icon-button (click)="searchText=''">
       <mat-icon>close</mat-icon>
@@ -8,31 +8,56 @@
   </mat-form-field>
 
   <mat-form-field>
-    <mat-label>Status</mat-label>
-    <mat-select [formControl]="statusControl" multiple>
+    <mat-label>{{TKey.COMMON.STATUS}}</mat-label>
+    <mat-select [formControl]="statusFilter.control" multiple>
       <div class="select-all">
-        <mat-checkbox [(ngModel)]="selectAllStatus"
+        <mat-checkbox [(ngModel)]="statusFilter.selectAll"
                       [ngModelOptions]="{ standalone: true }"
-                      (change)="toggleAllStatusSelection()">Select All</mat-checkbox>
+                      (change)="statusFilter.toggleSelectAll()">Select All</mat-checkbox>
       </div>
-      <mat-option *ngFor="let status of statusControlOptions" [value]="status" (click)="onStatusSelectionChange()">{{status}}</mat-option>
+      <mat-option *ngFor="let status of statusFilter.controlOptions" [value]="status" (click)="statusFilter.onSelectionChange()">{{status}}</mat-option>
     </mat-select>
   </mat-form-field>
 
   <mat-form-field>
-    <mat-label>Area</mat-label>
-    <mat-select [formControl]="areaControl" multiple>
+    <mat-label>{{TKey.COMMON.AREA}}</mat-label>
+    <mat-select [formControl]="areaFilter.control" multiple>
       <div class="select-all">
-        <mat-checkbox [(ngModel)]="selectAllArea"
+        <mat-checkbox [(ngModel)]="areaFilter.selectAll"
                       [ngModelOptions]="{ standalone: true }"
-                      (change)="toggleAllAreaSelection()">Select All</mat-checkbox>
+                      (change)="areaFilter.toggleSelectAll()">Select All</mat-checkbox>
       </div>
-      <mat-option *ngFor="let area of areaControlOptions" [value]="area" (click)="onAreaSelectionChange()">{{area}}</mat-option>
+      <mat-option *ngFor="let area of areaFilter.controlOptions" [value]="area" (click)="areaFilter.onSelectionChange()">{{area}}</mat-option>
     </mat-select>
   </mat-form-field>
+
+  <p class="advanced-filter-label" (click)="toggleAdvancedFilters()">{{showAdvancedFilters ? TKey.COMMON.HIDE_ADVANCED_FILTERS : TKey.COMMON.SHOW_ADVANCED_FILTERS}}</p>
+
+  <ng-container *ngIf="showAdvancedFilters">
+    <mat-slide-toggle class="de-m-bmedium--force" [(ngModel)]="showPendingSettlement" (ngModelChange)="onFilterChange()">
+      {{TKey.CUSTOMERS.SHOW_PENDING_SETTLEMENT}} {{showPendingSettlement ? '(Rs.' + pendingSettlementAmount + '/-)' : ''}}
+    </mat-slide-toggle>
+
+    <div class="collection-filter">
+      <label>Collection Filter</label>
+      <mat-slide-toggle [(ngModel)]="showCollectedCustomers" (ngModelChange)="onFilterChange()">{{showCollectedCustomers ? TKey.CUSTOMERS.SHOW_COLLECTED : TKey.CUSTOMERS.SHOW_PENDING_COLLECTION}}</mat-slide-toggle>
+
+      <mat-form-field>
+        <mat-label>{{TKey.COMMON.MONTHS}}</mat-label>
+        <mat-select [formControl]="monthsFilter.control" multiple>
+          <div class="select-all">
+            <mat-checkbox [(ngModel)]="monthsFilter.selectAll"
+                          [ngModelOptions]="{ standalone: true }"
+                          (change)="monthsFilter.toggleSelectAll()">Select All</mat-checkbox>
+          </div>
+          <mat-option *ngFor="let area of monthsFilter.controlOptions" [value]="area" (click)="monthsFilter.onSelectionChange()">{{area}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </ng-container>
 </div>
 
-<mat-table [dataSource]="data" class="mat-elevation-z8">
+<mat-table [dataSource]="data" class="mat-elevation-z8" multiTemplateDataRows>
   <ng-container matColumnDef="{{column}}" *ngFor="let column of displayedColumns">
     <mat-header-cell *matHeaderCellDef [ngClass]="'de-f-justifycenter'">{{column}}</mat-header-cell>
 
@@ -41,16 +66,26 @@
         <ng-container *ngSwitchCase="settingsService.getCustomerCols()?.STATUS?.label">
           <mat-icon>toggle_on</mat-icon>
         </ng-container>
+        <ng-container *ngSwitchCase="settingsService.getCustomerCols()?.NAME?.label">
+          {{element[column]}} {{showPendingSettlement ? '(' + element.getPendingSettlement(true) + ')' : ''}}
+        </ng-container>
         <ng-container *ngSwitchCase="settingsService.getCustomerCols()?.MOBILE?.label">
-          <a *ngFor="let mobile of getMobileNumbers(element[column])" href="tel:{{mobile}}">{{mobile}}</a>
+          <a *ngFor="let mobile of element.getMobileNumbers()" href="tel:{{mobile}}">{{mobile}}</a>
         </ng-container>
         <ng-container *ngSwitchDefault>{{element[column]}}</ng-container>
       </ng-container>
     </mat-cell>
   </ng-container>
 
+  <ng-container matColumnDef="expandedDetail">
+    <mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length" class="expanded-detail-cell" [ngClass]="element !== expandedElement ? 'de-noborder--force' : ''">
+      <de-customer-card [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'" [customer]="element"></de-customer-card>
+    </mat-cell>
+  </ng-container>
+
   <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
-  <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  <mat-row *matRowDef="let row; columns: displayedColumns;" mat-ripple (click)="expandedElement = expandedElement === row ? null : row"></mat-row>
+  <mat-row mat-row *matRowDef="let row; columns: ['expandedDetail']" class="expanded-detail-row"></mat-row>
 </mat-table>
 
 <mat-paginator [pageSizeOptions]="[25, 50, 100, 20]" pageSize="50" showFirstLastButtons></mat-paginator>

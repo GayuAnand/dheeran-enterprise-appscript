@@ -42,6 +42,14 @@
   word-break: break-word;
 }
 
+.de-noborder {
+  border: 0px;
+}
+
+.de-noborder--force {
+  border: 0px !important;
+}
+
 .de-truncated-text {
   overflow-x: hidden;
   text-overflow: ellipsis;

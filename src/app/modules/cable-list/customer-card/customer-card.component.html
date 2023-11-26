@@ -1,0 +1,33 @@
+<div class="detail-section">
+  <div>STB:</div>
+  <div (click)="utilService.copyToClipboard(customer.STB)" class="copyable-text">{{customer.STB}}</div>
+</div>
+
+<div class="detail-section">
+  <div>Conection On:</div>
+  <div>{{customer['Connection On'] ? utilService.moment(customer['Connection On']) : ''}}</div>
+</div>
+
+<div class="detail-section">
+  <div>Notes:</div>
+  <div>{{customer['Own Notes'] || customer.Notes}}</div>
+</div>
+
+<div class="table-wrapper">
+  <table>
+    <tr>
+      <th>Month</th>
+      <th>Collected</th>
+      <th>Amount</th>
+      <th>Settled</th>
+      <th>Notes</th>
+    </tr>
+    <tr *ngFor="let month of customer.getMonthsInOrder()">
+      <td>{{month}}</td>
+      <td>{{customer.getCollectionDate(month)}}</td>
+      <td>{{customer.get(month)}}</td>
+      <td>{{customer.getSettlementDate(month)}}</td>
+      <td>{{customer.getNotes(month)}}</td>
+    </tr>
+  </table>
+</div>

@@ -5,6 +5,7 @@ import { ApiAuthService } from './auth.service';
 import { AuthHttpInterceptor } from './interceptor.service';
 import { ApiAppScriptService } from './appscript.service';
 import { ApiGSheetDataService } from './gsheetdata.service';
+import { FileSystemService } from './filesystem.service';
 
 @NgModule({
   imports: [HttpClientModule],
@@ -18,6 +19,7 @@ export class ApiModule {
         ApiAppScriptService,
         ApiAuthService,
         ApiGSheetDataService,
+        FileSystemService,
         { provide: HTTP_INTERCEPTORS, useClass: AuthHttpInterceptor, multi: true },
       ],
     };

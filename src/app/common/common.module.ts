@@ -15,14 +15,17 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatRippleModule } from '@angular/material/core';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTreeModule } from '@angular/material/tree';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS, MatFormFieldModule } from '@angular/material/form-field';
 
-import { AuthService, EventService, FileSystemService, SettingsService, UiBundleUpdaterService } from './services';
 import { DialogComponent, EmptyLayoutComponent, IframeComponent, PageLayoutComponent } from './components';
-import { MatSelectModule } from '@angular/material/select';
+import { AuthService, EventService, SettingsService, UiBundleUpdaterService, UtilService } from './services';
 
 @NgModule({
   imports: [
@@ -41,7 +44,10 @@ import { MatSelectModule } from '@angular/material/select';
     MatInputModule,
     MatListModule,
     MatMenuModule,
+    MatRippleModule,
+    MatSnackBarModule,
     MatSidenavModule,
+    MatSlideToggleModule,
     MatPaginatorModule,
     MatSelectModule,
     MatTableModule,
@@ -70,7 +76,10 @@ import { MatSelectModule } from '@angular/material/select';
     MatInputModule,
     MatListModule,
     MatMenuModule,
+    MatRippleModule,
+    MatSnackBarModule,
     MatSidenavModule,
+    MatSlideToggleModule,
     MatPaginatorModule,
     MatSelectModule,
     MatTableModule,
@@ -91,9 +100,9 @@ export class AppCommonModule {
       providers: [
         AuthService,
         EventService,
-        FileSystemService,
         SettingsService,
         UiBundleUpdaterService,
+        UtilService,
         {
           provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
           useValue: { appearance: 'outline' },

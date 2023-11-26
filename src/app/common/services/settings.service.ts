@@ -68,21 +68,13 @@ export class SettingsService {
   constructor(private eventService: EventService) {
     this.init();
     this.navigationData = [
-      // {
-      //   name: EN_MAPPING.COMMON.DASHBOARD,
-      //   routerLink: ['/app/dashboard']
-      // },
+      {
+        name: EN_MAPPING.COMMON.DASHBOARD,
+        routerLink: ['/app/dashboard']
+      },
       {
         name: EN_MAPPING.COMMON.CABLE,
         routerLink: ['/app/cable-list']
-      },
-      {
-        name: EN_MAPPING.COMMON.SEARCH,
-        routerLink: ['/app/search']
-      },
-      {
-        name: EN_MAPPING.COMMON.TASKS,
-        routerLink: ['/app/tasks']
       },
     ];
   }

@@ -1,0 +1,56 @@
+:host {
+  display: flex;
+  flex-grow: 1;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.detail-section {
+  display: flex;
+  flex-grow: 1;
+  margin-bottom: 6px;
+
+  > div:first-child {
+    display: flex;
+    font-style: italic;
+    padding-right: 6px;
+  }
+
+  > div:nth-child(2) {
+    display: flex;
+  }
+}
+
+.copyable-text {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.table-wrapper {
+  display: flex;
+  flex-grow: 1;
+  justify-content: center;
+  width: 100%;
+
+  table {
+    border-collapse: collapse;
+    border-color: rgb(222, 226, 230);
+    display: table;
+    margin-top: 12px;
+    margin-bottom: 12px;
+    max-width: 400px;
+    text-align: center;
+    width: 100%;
+
+    th {
+      background-color: #d2d8ff;
+      font-weight: 500;
+    }
+
+    th, td {
+      border: 1px solid rgb(222, 226, 230);
+      border-collapse: collapse;
+      padding: 6px;
+    }
+  }
+}

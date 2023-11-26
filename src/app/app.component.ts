@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
-import { BaseComponent, FileSystemService } from './common';
-import { UiBundleUpdaterService } from './common/services/uibundle-updater.service';
+import { FileSystemService } from './api';
+import { BaseComponent, UiBundleUpdaterService } from './common';
 
 @Component({
   selector: 'de-root',

@@ -6,7 +6,7 @@ import { BaseComponent } from './../../../../../src/app/common';
 @Component({
   selector: 'de-signin',
   templateUrl: './signin.component.html',
-  styleUrls: ['./signin.component.scss'],
+  styleUrls: ['./../../../../reusable-styles/page-component.scss', './signin.component.scss'],
 })
 export class SignInComponent extends BaseComponent {
   signInForm = this.fb.group({

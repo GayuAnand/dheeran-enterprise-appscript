@@ -18,22 +18,6 @@ const routes: Routes = [
         loadChildren: () => import('./modules/cable-list').then((m) => m.CableListModule),
       },
       {
-        path: 'search',
-        component: IframeComponent,
-        data: {
-          title: 'Search',
-          redirectPath: 'search',
-        }
-      },
-      {
-        path: 'tasks',
-        component: IframeComponent,
-        data: {
-          title: 'Tasks',
-          redirectPath: 'tasks',
-        }
-      },
-      {
         path: '**',
         redirectTo: 'cable-list',
       },
