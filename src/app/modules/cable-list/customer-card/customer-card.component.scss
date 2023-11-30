@@ -21,12 +21,15 @@
   }
 }
 
-.copyable-text {
-  cursor: pointer;
-  text-decoration: underline;
+.customer-details {
+  width: 100%;
+
+  td:first-child {
+    max-width: 150px;
+  }
 }
 
-.table-wrapper {
+.customer-card-wrapper {
   display: flex;
   flex-grow: 1;
   justify-content: center;

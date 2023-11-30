@@ -13,25 +13,8 @@ export class ApiAuthService {
     (window as any).ApiAuthService = this;
   }
 
-  signOut() {
-    localStorage.removeItem(this.authTokenName);
-    localStorage.clear();
-    this.router.navigate(['/auth']);
-  }
-
-  discoveryInfo(): Observable<IMetadata & { activeUser: IUser }> {
-    // return of({ activeUser: { Username: 'Anand' }});
-    return this.apiAppScriptService.exec('discoveryInfo', [localStorage.getItem(this.authTokenName)])
-      .pipe(
-        map((res) => {
-          this.apiAppScriptService.prodDeployId = res?.deployIds?.[0] || this.apiAppScriptService.prodDeployId;
-          return res;
-        })
-      );
-  }
-
   signIn(username: string, password: string) {
-    return this.apiAppScriptService.exec('login', [username, password])
+    return this.apiAppScriptService.exec<string>('login', [username, password])
       .pipe(
         map((token) => {
           if (token) {
@@ -40,6 +23,27 @@ export class ApiAuthService {
             localStorage.removeItem(this.authTokenName);
           }
           return token;
+        })
+      );
+  }
+
+  signOut() {
+    localStorage.removeItem(this.authTokenName);
+    localStorage.clear();
+    this.router.navigate(['/auth']);
+  }
+
+  getAuthToken() {
+    return localStorage.getItem(this.authTokenName);
+  }
+
+  discoveryInfo(): Observable<IMetadata & { activeUser: IUser } | null> {
+    // return of({ activeUser: { Username: 'Anand' }});
+    return this.apiAppScriptService.exec<IMetadata & { activeUser: IUser }>('discoveryInfo', [localStorage.getItem(this.authTokenName)])
+      .pipe(
+        map((res) => {
+          this.apiAppScriptService.prodDeployId = res?.deployIds?.[0] || this.apiAppScriptService.prodDeployId;
+          return res;
         })
       );
   }

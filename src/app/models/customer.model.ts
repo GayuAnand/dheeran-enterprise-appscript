@@ -58,18 +58,16 @@ export class CustomerModel extends BaseModel implements Record<string, any> {
     return withCurrency ? `Rs.${pendingSettlement}/-` : pendingSettlement;
   }
 
-  formatDetailDate(date: string) {
-    if (!date) return '';
-    const momentDate = moment(date);
-    return momentDate.isValid() ? momentDate.format("DD MMM'YY") : '';
+  getConnectionDate(format = true) {
+    return this.formatDate(this['Connection On'] || '');
   }
-
+  
   getCollectionDate(month: string) {
-    return this.formatDetailDate((this as any)[`${month} Collection Date`]);
+    return this.formatDate((this as any)[`${month} Collection Date`]);
   }
 
   getSettlementDate(month: string) {
-    return this.formatDetailDate((this as any)[`${month} Settlement Date`]);
+    return this.formatDate((this as any)[`${month} Settlement Date`]);
   }
 
   getNotes(month: string) {

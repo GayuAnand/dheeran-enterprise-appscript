@@ -23,4 +23,41 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   --primary: #3f51b5;
   --success: green;
   --danger: red;
+  --border: #e4e4e4;
+}
+
+.min-w360 {
+  min-width: 360px;
+}
+
+.filter-row {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  flex-wrap: wrap;
+
+  > * {
+    display: flex;
+    flex-grow: 1;
+    margin: 6px;
+    min-width: 180px;
+  }
+
+  > button {
+    flex-grow: 0;
+    min-width: auto;
+  }
+
+  mat-form-field {
+    width: auto;
+
+    .mat-mdc-form-field-subscript-wrapper {
+      display: none;
+    }
+  }
+}
+
+.canvasjs-chart-credit {
+  display: none;
 }

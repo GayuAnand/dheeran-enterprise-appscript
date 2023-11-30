@@ -1,8 +1,8 @@
 <div class="filter-row de-p-vbase">
-  <mat-form-field class="example-form-field">
+  <mat-form-field>
     <mat-label>{{TKey.COMMON.SEARCH}}</mat-label>
     <input matInput type="text" [(ngModel)]="searchText" (ngModelChange)="onFilterChange()">
-    <button *ngIf="searchText" matSuffix mat-icon-button (click)="searchText=''">
+    <button *ngIf="searchText" matSuffix mat-icon-button (click)="searchText=''; onFilterChange();">
       <mat-icon>close</mat-icon>
     </button>
   </mat-form-field>
@@ -63,15 +63,31 @@
 
     <mat-cell *matCellDef="let element" [ngClass]="getCellClassNames(element, column)">
       <ng-container [ngSwitch]="column">
-        <ng-container *ngSwitchCase="settingsService.getCustomerCols()?.STATUS?.label">
+
+        <ng-container *ngSwitchCase="customerColumns?.STATUS?.label">
           <mat-icon>toggle_on</mat-icon>
         </ng-container>
-        <ng-container *ngSwitchCase="settingsService.getCustomerCols()?.NAME?.label">
+
+        <ng-container *ngSwitchCase="customerColumns?.STB?.label">
+          <de-copyable-text [text]="element[column]"></de-copyable-text>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="customerColumns?.NAME?.label">
           {{element[column]}} {{showPendingSettlement ? '(' + element.getPendingSettlement(true) + ')' : ''}}
         </ng-container>
-        <ng-container *ngSwitchCase="settingsService.getCustomerCols()?.MOBILE?.label">
-          <a *ngFor="let mobile of element.getMobileNumbers()" href="tel:{{mobile}}">{{mobile}}</a>
+
+        <ng-container *ngSwitchCase="customerColumns?.MOBILE?.label">
+          <ng-container *ngFor="let mobile of element.getMobileNumbers()">
+            <div class="mobile-cell de-sm-rsmall-nolast" *ngIf="mobile">
+              <de-copyable-text [text]="mobile"></de-copyable-text>
+              <div class="de-f-aligncenter de-sm-rbase-nolast">
+                <de-mobile-number [mobile]="mobile" displayType="CALL"></de-mobile-number>
+                <de-mobile-number [mobile]="mobile" displayType="WHATSAPP"></de-mobile-number>
+              </div>
+            </div>
+          </ng-container>
         </ng-container>
+
         <ng-container *ngSwitchDefault>{{element[column]}}</ng-container>
       </ng-container>
     </mat-cell>
@@ -79,7 +95,7 @@
 
   <ng-container matColumnDef="expandedDetail">
     <mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length" class="expanded-detail-cell" [ngClass]="element !== expandedElement ? 'de-noborder--force' : ''">
-      <de-customer-card [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'" [customer]="element"></de-customer-card>
+      <de-customer-card *ngIf="element === expandedElement" [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'" [customer]="element"></de-customer-card>
     </mat-cell>
   </ng-container>
 

@@ -1,3 +1,4 @@
+import { NEVER, catchError } from 'rxjs';
 import { Component } from '@angular/core';
 import { Validators } from '@angular/forms';
 
@@ -16,6 +17,10 @@ export class SignInComponent extends BaseComponent {
 
   showPassword = false;
 
+  errorMsg = '';
+
+  loading = false;
+
   constructor() {
     super();
     (window as any)['s'] = this;
@@ -24,11 +29,23 @@ export class SignInComponent extends BaseComponent {
   onFormSubmit() {
     if (this.signInForm.valid) {
       const { username, password } = this.signInForm.value;
+      this.errorMsg = '';
+      this.loading = true;
       this.apiServices.auth
         .signIn(username as string, password as string)
-        .subscribe(() => {
-          console.log('Sign in successful');
-          this.router.navigate(['/app']);
+        .pipe(
+          catchError((err) => {
+            this.loading = false;
+            this.errorMsg = err.message;
+            return NEVER;
+          })
+        )
+        .subscribe({
+          next: () => {
+            console.log('Sign in successful');
+            this.loading = false;
+            this.router.navigate(['/app']);
+          },
         });
     }
   }

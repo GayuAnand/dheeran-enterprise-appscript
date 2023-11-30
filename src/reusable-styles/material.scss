@@ -1,8 +1,17 @@
+mat-form-field {
+  min-width: 200px;
+  width: 100%;
+}
+
 mat-table {
   max-width: 100px;
 
   mat-header-row {
     background-color: #d2d8ff;
+  }
+
+  mat-header-cell, mat-cell {
+    padding: 0px 12px !important;
   }
 
   mat-row mat-cell {

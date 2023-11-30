@@ -1,12 +1,13 @@
-import { Injectable } from '@angular/core';
+import { Capacitor } from '@capacitor/core';
+import { Network } from '@capacitor/network';
 import { NestedTreeControl } from '@angular/cdk/tree';
+import { Injectable, NgZone, OnDestroy } from '@angular/core';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
 
 import { IMetadata } from '../interfaces';
 import { EventService } from './event.service';
 import versionInfo from './../../../versionInfo.json';
 import { EN_MAPPING } from './../../../../src/assets/i18n/en.mapping';
-import { Capacitor } from '@capacitor/core';
 
 export interface NavMenuItem {
   name: string;
@@ -17,7 +18,7 @@ export interface NavMenuItem {
 }
 
 @Injectable()
-export class SettingsService {
+export class SettingsService implements OnDestroy {
   private _pageTitle = EN_MAPPING.COMMON.HOME;
 
   currentVersion = versionInfo.latest;
@@ -27,6 +28,8 @@ export class SettingsService {
   isMobile = false;
 
   isNative = Capacitor.isNativePlatform();
+
+  isOnline = false;
 
   /**
    * Metadata from Google sheet
@@ -65,7 +68,7 @@ export class SettingsService {
     this._navigationData.data = data;
   }
 
-  constructor(private eventService: EventService) {
+  constructor(private eventService: EventService, private ngZone: NgZone) {
     this.init();
     this.navigationData = [
       {
@@ -76,11 +79,29 @@ export class SettingsService {
         name: EN_MAPPING.COMMON.CABLE,
         routerLink: ['/app/cable-list']
       },
+      {
+        name: EN_MAPPING.COMMON.BSNL_CONNECT,
+        routerLink: ['/app/bsnl-connect']
+      },
+      {
+        name: EN_MAPPING.COMMON.UG_PATROL,
+        routerLink: ['/app/ug-patrol']
+      },
     ];
   }
 
-  private init() {
+  ngOnDestroy(): void {
+    Network.removeAllListeners();
+  }
+
+  private async init() {
     this.eventService.isMobile.subscribe((isMobile) => (this.isMobile = isMobile));
+    await this.getNetworkStatus();
+    Network.addListener('networkStatusChange', (status) => this.ngZone.run(() => this.isOnline = status.connected));
+  }
+
+  async getNetworkStatus() {
+    return this.isOnline = (await Network.getStatus()).connected;
   }
 
   getGhPageAssetUrl(filename: string) {

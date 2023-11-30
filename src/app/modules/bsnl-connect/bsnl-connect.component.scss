@@ -1,0 +1,16 @@
+.bsnl-connect-input-container {
+  align-items: center;
+  display: flex;
+  flex-grow: 1;
+  flex-wrap: wrap;
+
+  > mat-form-field {
+    display: flex;
+    flex-grow: 1;
+    min-width: 200px;
+
+    ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+      display: none;
+    }
+  }
+}

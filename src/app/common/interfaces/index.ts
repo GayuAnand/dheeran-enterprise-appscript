@@ -97,6 +97,18 @@ export interface ISheetsInfo {
       DEC2023_MARKED_IN_NOTE: { label: 'Marked in note Dec2023' },
     }
   },
+  UG_PATROL: {
+    label: 'UG Patrol',
+    cols: {
+      ID: { label: 'ID' },
+      DATE: { label: 'Date' },
+      LOCATION: { label: 'Location' },
+      ROUTE: { label: 'Route' },
+      WORK_TYPE: { label: 'WorkType' },
+      PATROL_COUNT: { label: 'PatrolCount' },
+      REMARKS: { label: 'Remarks' },
+    }
+  },
   REFERENCE_DATA: {
     label: 'Reference Data',
     cols: {
@@ -108,6 +120,7 @@ export interface ISheetsInfo {
       TASKPRIORITY: { label: 'TaskPriority' },
       TASKSTATUS: { label: 'TaskStatus' },
       DEPLOYID: { label: 'DeployID' },
+      UGWorkType: { label: 'UGWorkType' },
     }
   },
   TASKS: {

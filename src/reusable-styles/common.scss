@@ -60,3 +60,14 @@
   color: var(--danger-base);
   content: '*';
 }
+
+.de-copyable-text {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

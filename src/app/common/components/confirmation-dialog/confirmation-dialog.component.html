@@ -1,0 +1,19 @@
+<de-dialog (closeDialog)="onCancel.emit()">
+  <ng-container de-dialog-header>{{title}}</ng-container>
+  <ng-container de-dialog-body>{{content}}</ng-container>
+  <ng-container de-dialog-footer>
+    <button mat-raised-button color="warn" (click)="onCancel.emit()">
+      <div class="de-f-aligncenter de-sm-rsmall-nolast">
+        <mat-icon>close</mat-icon>
+        <span>{{TKey.COMMON.CANCEL}}</span>
+      </div>
+    </button>
+    <button mat-raised-button color="primary" (click)="onSuccess.emit()">
+      <div class="de-f-aligncenter de-sm-rsmall-nolast">
+        <mat-icon *ngIf="!processing">check</mat-icon>
+        <de-spinner *ngIf="processing" [size]="16" color="white"></de-spinner>
+        <span>{{TKey.COMMON.OK}}</span>
+      </div>
+    </button>
+  </ng-container>
+</de-dialog>

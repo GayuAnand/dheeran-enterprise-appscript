@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PortalModule } from '@angular/cdk/portal';
 import { OverlayModule } from '@angular/cdk/overlay';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -15,16 +16,21 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatRippleModule } from '@angular/material/core';
+import { MatRippleModule, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTreeModule } from '@angular/material/tree';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS, MatFormFieldModule } from '@angular/material/form-field';
+import { CanvasJSAngularChartsModule } from '@canvasjs/angular-charts';
 
-import { DialogComponent, EmptyLayoutComponent, IframeComponent, PageLayoutComponent } from './components';
+import { AutocompleteComponent, CopyableTextComponent, DialogComponent, EmptyLayoutComponent, ConfirmationDialogComponent,
+         IframeComponent, MobileNumberComponent, PageLayoutComponent, SpinnerComponent } from './components';
 import { AuthService, EventService, SettingsService, UiBundleUpdaterService, UtilService } from './services';
 
 @NgModule({
@@ -35,19 +41,25 @@ import { AuthService, EventService, SettingsService, UiBundleUpdaterService, Uti
     PortalModule,
     ReactiveFormsModule,
 
+    CanvasJSAngularChartsModule,
+
+    MatAutocompleteModule,
     MatButtonModule,
     MatCardModule,
     MatCheckboxModule,
     MatChipsModule,
+    MatDatepickerModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
     MatListModule,
+    MatNativeDateModule,
     MatMenuModule,
     MatRippleModule,
     MatSnackBarModule,
     MatSidenavModule,
     MatSlideToggleModule,
+    MatProgressSpinnerModule,
     MatPaginatorModule,
     MatSelectModule,
     MatTableModule,
@@ -58,28 +70,39 @@ import { AuthService, EventService, SettingsService, UiBundleUpdaterService, Uti
     RouterModule.forChild([]),
   ],
   exports: [
+    AutocompleteComponent,
+    ConfirmationDialogComponent,
+    CopyableTextComponent,
     DialogComponent,
     EmptyLayoutComponent,
     IframeComponent,
+    MobileNumberComponent,
     PageLayoutComponent,
+    SpinnerComponent,
 
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
 
+    CanvasJSAngularChartsModule,
+
+    MatAutocompleteModule,
     MatButtonModule,
     MatCardModule,
     MatCheckboxModule,
     MatChipsModule,
+    MatDatepickerModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
     MatListModule,
     MatMenuModule,
+    MatNativeDateModule,
     MatRippleModule,
     MatSnackBarModule,
     MatSidenavModule,
     MatSlideToggleModule,
+    MatProgressSpinnerModule,
     MatPaginatorModule,
     MatSelectModule,
     MatTableModule,
@@ -87,10 +110,15 @@ import { AuthService, EventService, SettingsService, UiBundleUpdaterService, Uti
     MatTreeModule,
   ],
   declarations: [
+    AutocompleteComponent,
+    ConfirmationDialogComponent,
+    CopyableTextComponent,
     DialogComponent,
     EmptyLayoutComponent,
     IframeComponent,
-    PageLayoutComponent
+    MobileNumberComponent,
+    PageLayoutComponent,
+    SpinnerComponent,
   ],
 })
 export class AppCommonModule {
@@ -107,6 +135,7 @@ export class AppCommonModule {
           provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
           useValue: { appearance: 'outline' },
         },
+        { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }
       ],
     };
   }

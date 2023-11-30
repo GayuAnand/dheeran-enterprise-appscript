@@ -1,0 +1,15 @@
+:host {
+  display: flex;
+  justify-content: center;
+}
+
+.signin-button {
+  de-spinner {
+    margin-left: 6px;
+  }
+
+  ::ng-deep .mdc-button__label {
+    align-items: center;
+    display: flex;
+  }
+}

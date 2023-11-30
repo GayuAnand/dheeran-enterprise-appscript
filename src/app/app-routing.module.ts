@@ -18,6 +18,14 @@ const routes: Routes = [
         loadChildren: () => import('./modules/cable-list').then((m) => m.CableListModule),
       },
       {
+        path: 'bsnl-connect',
+        loadChildren: () => import('./modules/bsnl-connect').then((m) => m.BSNLConnectModule),
+      },
+      {
+        path: 'ug-patrol',
+        loadChildren: () => import('./modules/ug-patrol').then((m) => m.UGPatrolModule),
+      },
+      {
         path: '**',
         redirectTo: 'cable-list',
       },

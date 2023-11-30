@@ -1,0 +1,108 @@
+<!-- <canvasjs-chart [options]="chartOptions" [styles]="{width: '100%', height:'360px'}"></canvasjs-chart>     -->
+
+<div class="filter-row de-p-vbase">
+  <mat-form-field>
+    <mat-label>{{TKey.COMMON.SEARCH}}</mat-label>
+    <input matInput type="text" [(ngModel)]="searchText" (ngModelChange)="onFilterChange()">
+    <button *ngIf="searchText" matSuffix mat-icon-button (click)="searchText=''; onFilterChange();">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>{{TKey.COMMON.ROUTE}}</mat-label>
+    <mat-select [formControl]="routeFilter.control" multiple>
+      <div class="select-all">
+        <mat-checkbox [(ngModel)]="routeFilter.selectAll"
+                      [ngModelOptions]="{ standalone: true }"
+                      (change)="routeFilter.toggleSelectAll()">Select All</mat-checkbox>
+      </div>
+      <mat-option *ngFor="let status of routeFilter.controlOptions" [value]="status" (click)="routeFilter.onSelectionChange()">{{status}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>{{TKey.UG_PATROL.WORK_TYPE}}</mat-label>
+    <mat-select [formControl]="workTypeFilter.control" multiple>
+      <div class="select-all">
+        <mat-checkbox [(ngModel)]="workTypeFilter.selectAll"
+                      [ngModelOptions]="{ standalone: true }"
+                      (change)="workTypeFilter.toggleSelectAll()">Select All</mat-checkbox>
+      </div>
+      <mat-option *ngFor="let status of workTypeFilter.controlOptions" [value]="status" (click)="workTypeFilter.onSelectionChange()">{{status}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <button mat-raised-button color="accent" (click)="createRecord()"><mat-icon>add</mat-icon>{{TKey.COMMON.ADD}}</button>
+</div>
+
+<mat-table [dataSource]="data" class="mat-elevation-z8">
+  <ng-container matColumnDef="{{column}}" *ngFor="let column of displayedColumns">
+    <mat-header-cell *matHeaderCellDef [ngClass]="'de-f-justifycenter'">{{column}}</mat-header-cell>
+
+    <mat-cell *matCellDef="let element" [ngClass]="getCellClassNames(element, column)">
+      <ng-container [ngSwitch]="column">
+        <ng-container *ngSwitchCase="ugPatrolColumns?.DATE?.label">{{element.getPatrolDateStr()}}</ng-container>
+
+        <ng-container *ngSwitchDefault>{{element[column]}}</ng-container>
+      </ng-container>
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="ACTIONS">
+    <mat-header-cell *matHeaderCellDef [ngClass]="'de-f-justifycenter'"></mat-header-cell>
+    <mat-cell *matCellDef="let element" [ngClass]="getCellClassNames(element, 'ACTIONS')">
+      <ng-container *ngIf="element?.ID">
+        <mat-icon color="primary" class="de-cursorpointer de-m-rbase" (click)="editRecord(element)">edit</mat-icon>
+        <mat-icon color="warn" class="de-cursorpointer" (click)="recordToDelete = element">delete</mat-icon>
+      </ng-container>
+    </mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="displayedColumnsWithAction; sticky: true"></mat-header-row>
+  <mat-row *matRowDef="let row; columns: displayedColumnsWithAction;"></mat-row>
+</mat-table>
+
+<mat-paginator [pageSizeOptions]="[25, 50, 100, 20]" pageSize="50" showFirstLastButtons></mat-paginator>
+
+<de-dialog *ngIf="recordToEdit" classNames="min-w360" (closeDialog)="recordToEdit = null">
+  <ng-container de-dialog-header>{{recordToEdit.ID ? TKey.UG_PATROL.EDIT_PATROL : TKey.UG_PATROL.ADD_PATROL}}</ng-container>
+  <ng-container de-dialog-body>
+    <div class="de-p-vbase"></div>
+
+    <mat-form-field>
+      <mat-label>{{TKey.COMMON.DATE}}</mat-label>
+      <input matInput [matDatepicker]="picker" [(ngModel)]="recordToEdit.Date">
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+    <de-autocomplete [label]="TKey.COMMON.LOCATION" [(ngModel)]="recordToEdit.Location" [options]="options.location"></de-autocomplete>
+
+    <de-autocomplete [label]="TKey.COMMON.ROUTE" [(ngModel)]="recordToEdit.Route" [options]="options.route"></de-autocomplete>
+
+    <de-autocomplete [label]="TKey.UG_PATROL.WORK_TYPE" [(ngModel)]="recordToEdit.WorkType" [options]="options.workType"></de-autocomplete>
+
+    <mat-form-field>
+      <mat-label>{{TKey.UG_PATROL.PATROL_COUNT}}</mat-label>
+      <input matInput type="number" [(ngModel)]="recordToEdit.PatrolCount">
+    </mat-form-field>
+  </ng-container>
+  <ng-container de-dialog-footer>
+    <button mat-raised-button color="warn" (click)="recordToEdit = null"><mat-icon>close</mat-icon>{{TKey.COMMON.CANCEL}}</button>
+    <button mat-raised-button color="primary" (click)="updateRecord()">
+      <div class="de-f-aligncenter de-sm-rsmall-nolast">
+        <mat-icon *ngIf="!processingData">save</mat-icon>
+        <de-spinner *ngIf="processingData" [size]="16" color="white"></de-spinner>
+        <span>{{TKey.COMMON.SAVE}}</span>
+      </div>
+    </button>
+  </ng-container>
+</de-dialog>
+
+<de-confirmation-dialog *ngIf="recordToDelete"
+  [title]="'Delete Patrol?'"
+  [content]="'Are you sure you want to delete patrol \'' + recordToDelete.Route + '\'?'"
+  [processing]="processingData"
+  (onSuccess)="deleteRecord()" (onCancel)="recordToDelete = null">
+</de-confirmation-dialog>

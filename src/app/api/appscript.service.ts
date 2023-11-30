@@ -32,7 +32,7 @@ export class ApiAppScriptService {
     }
   }
 
-  exec(functionName: string, parameters: any[] = [], callbackId = Date.now().toString()): Observable<any> {
+  exec<T>(functionName: string, parameters: any[] = [], callbackId = Date.now().toString()): Observable<T> {
     this.execPromises[callbackId] = { subject: new Subject() };
     this.execPromises[callbackId].observable = this.execPromises[callbackId].subject.pipe(
       map((res) => {

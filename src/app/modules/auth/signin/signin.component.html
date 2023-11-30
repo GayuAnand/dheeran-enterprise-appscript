@@ -2,7 +2,7 @@
   <mat-form-field [hideRequiredMarker]="true">
     <mat-label>Username</mat-label>
     <mat-icon matPrefix>person</mat-icon>
-    <input matInput placeholder="Ex. dheeran" formControlName="username">
+    <input matInput placeholder="Ex. Pradeep" formControlName="username">
   </mat-form-field>
 
   <mat-form-field [hideRequiredMarker]="true">
@@ -11,9 +11,10 @@
     <input matInput placeholder="Password" [type]="showPassword ? 'text' : 'password'" formControlName="password">
   </mat-form-field>
 
-  <div></div>
-
-  <button mat-raised-button color="primary">
+  <button mat-raised-button color="primary" class="signin-button">
     {{TKey.COMMON.SIGNIN}}
+    <de-spinner [size]="16" color="white" *ngIf="loading"></de-spinner>
   </button>
+
+  <p *ngIf="errorMsg" class="danger-text de-m-tbase--force">{{errorMsg}}</p>
 </form>

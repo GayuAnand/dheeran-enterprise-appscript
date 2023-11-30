@@ -5,7 +5,9 @@ import { ApiAuthService } from './auth.service';
 import { AuthHttpInterceptor } from './interceptor.service';
 import { ApiAppScriptService } from './appscript.service';
 import { ApiGSheetDataService } from './gsheetdata.service';
-import { FileSystemService } from './filesystem.service';
+import { ApiFileSystemService } from './filesystem.service';
+import { ApiStorageService } from './storage.service';
+import { ApiBSNLConnectService } from './bsnl-connect.service';
 
 @NgModule({
   imports: [HttpClientModule],
@@ -18,8 +20,10 @@ export class ApiModule {
       providers: [
         ApiAppScriptService,
         ApiAuthService,
+        ApiBSNLConnectService,
         ApiGSheetDataService,
-        FileSystemService,
+        ApiFileSystemService,
+        ApiStorageService,
         { provide: HTTP_INTERCEPTORS, useClass: AuthHttpInterceptor, multi: true },
       ],
     };

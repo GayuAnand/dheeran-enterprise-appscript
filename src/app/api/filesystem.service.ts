@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Directory, Encoding, Filesystem, GetUriOptions } from '@capacitor/filesystem';
 
 @Injectable()
-export class FileSystemService {
+export class ApiFileSystemService {
   dataDir = Directory.Data;
 
   infoJsonName = 'info.json';

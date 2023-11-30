@@ -1,4 +1,5 @@
 import { FormControl } from '@angular/forms';
+import { debounce } from 'typescript-debounce-decorator';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
@@ -26,12 +27,16 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
 
   expandedElement!: CustomerModel;
 
-  displayedColumns: string[] = [
-    this.settingsService.getCustomerCols()?.NAME?.label as string,
-    this.settingsService.getCustomerCols()?.AREA?.label as string,
-    this.settingsService.getCustomerCols()?.MOBILE?.label as string,
-    // this.settingsService.getCustomerCols()?.STB?.label as string,
+  customerColumns = this.settingsService.metadata.sheetsInfo?.CUSTOMERS?.cols;
+
+  allColumns = [
+    this.customerColumns?.NAME?.label || '',
+    this.customerColumns?.AREA?.label || '',
+    this.customerColumns?.MOBILE?.label || '',
+    this.customerColumns?.STB?.label || '',
   ];
+
+  displayedColumns: string[] = [];
 
   searchText = '';
 
@@ -58,46 +63,31 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     this.filterCollection = this.filterCollection.bind(this);
     this.filterPendingSettlement = this.filterPendingSettlement.bind(this);
 
+    this._subscriptions.push(this.eventService.isMobile.subscribe(() => this.refreshDisplayedColumns()));
+
     this.settingsService.pageTitle = this.TKey.COMMON.CABLE;
   }
 
   ngAfterViewInit() {
     this.data.paginator = this.paginator;
+    this.refreshDisplayedColumns();
     this.refreshData();
   }
 
+  refreshDisplayedColumns() {
+    if (this.settingsService.isMobile) {
+      this.displayedColumns = this.allColumns.slice(0, 2);
+    } else {
+      this.displayedColumns = this.allColumns.slice(0, 4);
+    }
+  }
+
   refreshData() {
-    this.apiGSheetDataService.getSheetData(this.settingsService.metadata.sheetsInfo?.CUSTOMERS.label as string, true)
+    this.apiGSheetDataService.getSheetData<CustomerModel>(this.settingsService.metadata.sheetsInfo?.CUSTOMERS.label as string, CustomerModel, true)
       .subscribe((data) => {
         this.fullData = data;
         this.initializeFilters();
       });
-  }
-
-  getNewFilterControl(defaultValue: string[] = [], options: string[] = []) {
-    const self = this;
-
-    return {
-      control: new FormControl<string[]>(defaultValue),
-      controlOptions: options,
-      selectAll: false,
-      _selectedObj: {},
-      toggleSelectAll() {
-        this.control.setValue(this.selectAll ? this.controlOptions.slice() : []);
-        self.onFilterChange();
-      },
-      onSelectionChange() {
-        this.selectAll = this.control.value?.length === this.controlOptions?.length;
-        self.onFilterChange();
-      }
-    } as {
-      control: FormControl<string[]>,
-      controlOptions: string[],
-      selectAll: boolean,
-      _selectedObj: Record<string, boolean>,
-      toggleSelectAll: () => void,
-      onSelectionChange: () => void,
-    };
   }
 
   initializeFilters() {
@@ -105,8 +95,8 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     this.fullData.forEach(d => area[d.Area] = true);
     this.areaFilter.controlOptions = Object.keys(area);
     this.areaFilter.controlOptions.sort();
-    this.areaFilter.control.setValue(this.areaFilter.controlOptions.slice());
-    this.areaFilter.selectAll = true;
+    this.areaFilter.control.setValue([]);
+    this.areaFilter.selectAll = false;
     this.monthsFilter.controlOptions = this.fullData[0].getMonthsInOrder();
     this.onFilterChange();
   }
@@ -119,7 +109,8 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     this.onFilterChange();
   }
 
-  onFilterChange() {
+  @debounce(500)
+  override onFilterChange() {
     const byPassFilter = (data: CustomerModel) => true;
     let filterArea = this.filterArea;
     let filterStatus = this.filterStatus;
@@ -204,10 +195,10 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
   }
 
   getCellClassNames(data: any, columnName: string) {
-    const centerAlign = ((columnName === this.settingsService.getCustomerCols()?.NAME?.label) || 
-                         (columnName === this.settingsService.getCustomerCols()?.AREA?.label)) ? '' : 'align-center';
-    const isActiveCustomer = (columnName === this.settingsService.getCustomerCols()?.NAME?.label) ? (data.isActive() ? 'success-text' : 'danger-text') : '';
-    const mobileColumnFlow = (columnName === this.settingsService.getCustomerCols()?.MOBILE?.label) ? 'de-f-column' : '';
+    const centerAlign = ((columnName === this.customerColumns?.NAME?.label) || 
+                         (columnName === this.customerColumns?.AREA?.label)) ? '' : 'align-center';
+    const isActiveCustomer = (columnName === this.customerColumns?.NAME?.label) ? (data.isActive() ? 'success-text' : 'danger-text') : '';
+    const mobileColumnFlow = (columnName === this.customerColumns?.MOBILE?.label) ? 'de-f-column' : '';
     const showBorder = (data === this.expandedElement) ? 'de-noborder--force' : '';
     return `${isActiveCustomer} ${centerAlign} ${mobileColumnFlow} ${showBorder}`;
   }

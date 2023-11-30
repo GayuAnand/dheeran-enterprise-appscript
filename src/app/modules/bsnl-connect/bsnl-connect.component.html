@@ -1,0 +1,44 @@
+<section class="bsnl-connect-input-container de-sm-small">
+  <mat-form-field>
+    <mat-label>{{TKey.COMMON.STD_CODE}}</mat-label>
+    <input matInput type="number" [(ngModel)]="stdCode">
+    <button matSuffix mat-icon-button [ngClass]="stdCode ? '' : 'de-hidden'" (click)="stdCode=''">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>{{TKey.COMMON.PHONE_NUMBER}}</mat-label>
+    <input matInput type="number" [(ngModel)]="phoneNumber">
+    <button matSuffix mat-icon-button [ngClass]="phoneNumber ? '' : 'de-hidden'" (click)="phoneNumber=''">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <div class="de-f-grow de-f-wrap de-sm-hxsmall">
+    <button mat-raised-button color="primary" [disabled]="!phoneNumber" (click)="getBillView()" class="de-f-grow">
+      <mat-icon matPrefix>payments</mat-icon>
+      {{TKey.BSNL_CONNECT.BILL_VIEW}}
+    </button>
+
+    <button mat-raised-button color="accent" [disabled]="!phoneNumber" (click)="getVLANInfo()" class="de-f-grow">
+      <mat-icon>lan</mat-icon>
+      {{TKey.BSNL_CONNECT.VLAN_INFO}}
+    </button>
+  </div>
+</section>
+
+<ng-container *ngIf="information">
+  <p class="bold-text de-m-vbase--force mat-headline-6">{{informationType}} - {{informationFor}}</p>
+  <table>
+    <tr *ngFor="let infoKey of utilService.getObjectKeys(information)">
+      <td class="italic-text">{{infoKey}}: </td>
+      <td>{{information[infoKey]}}</td>
+    </tr>
+  </table>
+</ng-container>
+
+<div class="de-m-vlarge de-f-aligncenter de-sm-rbase-nolast de-f-justifycenter" *ngIf="informationType && !information">
+  <de-spinner></de-spinner>
+  <span>Fetching {{informationType}}</span>
+</div>

@@ -13,7 +13,7 @@ export const AuthGuard = () => {
   const settingsService = inject(SettingsService);
 
   return apiAuthService.discoveryInfo().pipe(
-    map((res) => {
+    map((res: any) => {
       authService.user = res.activeUser;
       settingsService.metadata = res;
       return true;

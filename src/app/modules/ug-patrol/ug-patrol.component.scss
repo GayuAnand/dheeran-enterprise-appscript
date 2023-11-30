@@ -1,0 +1,6 @@
+mat-table ::ng-deep {
+  mat-header-row mat-header-cell:last-child, mat-row mat-cell:last-child {
+    max-width: 90px;
+    min-width: 90px;
+  }
+}

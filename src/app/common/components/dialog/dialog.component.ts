@@ -21,6 +21,8 @@ import { BaseComponent } from '../base.component';
 export class DialogComponent extends BaseComponent implements AfterViewInit {
   @Input() closeOnBackdropClick = false;
 
+  @Input() classNames = '';
+
   @ViewChild(CdkPortal) public readonly portal: CdkPortal | undefined;
 
   // the parent is in charge of destroying this component (usually through ngIf or route change)
@@ -50,7 +52,8 @@ export class DialogComponent extends BaseComponent implements AfterViewInit {
     }
   }
 
-  public ngOnDestroy(): void {
+  public override ngOnDestroy(): void {
+    super.ngOnDestroy();
     // parent destroys this component, this component destroys the overlayRef
     this.overlayRef?.detach();
     this.overlayRef?.dispose();
