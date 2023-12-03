@@ -13,6 +13,7 @@ export const EN_MAPPING = {
     HOME: 'Home',
     LOCATION: 'Location',
     LOGOUT: 'Logout',
+    MAINTENANCE: 'Maintenance',
     MONTHS: 'Months',
     OK: 'Ok',
     PHONE_NUMBER: 'Phone Number',
