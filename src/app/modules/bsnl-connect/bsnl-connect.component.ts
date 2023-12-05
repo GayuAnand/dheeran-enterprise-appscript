@@ -20,6 +20,8 @@ export class BSNLConnectComponent extends BaseComponent implements OnInit {
 
   information: any = null;
 
+  faults = [];
+
   get fullPhoneNumber() {
     return `${this.stdCode}${this.phoneNumber}`;
   }
@@ -34,12 +36,14 @@ export class BSNLConnectComponent extends BaseComponent implements OnInit {
 
   getBillView() {
     if (this.fullPhoneNumber) {
+      this.information = null;
       this.processResponse(this.bsnlConnectService.getBillView(this.fullPhoneNumber), 'Bill View', this.fullPhoneNumber);
     }
   }
-
+  
   getVLANInfo() {
     if (this.fullPhoneNumber) {
+      this.information = null;
       this.processResponse(this.bsnlConnectService.getVLANInfo(this.fullPhoneNumber), 'VLAN Info', this.fullPhoneNumber);
     }
   }

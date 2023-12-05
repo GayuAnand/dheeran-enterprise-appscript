@@ -4,10 +4,11 @@ import { NestedTreeControl } from '@angular/cdk/tree';
 import { Injectable, NgZone, OnDestroy } from '@angular/core';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
 
-import { IMetadata } from '../interfaces';
+import { IApps, IMetadata } from '../interfaces';
 import { EventService } from './event.service';
 import versionInfo from './../../../versionInfo.json';
 import { EN_MAPPING } from './../../../../src/assets/i18n/en.mapping';
+import { AuthService } from './auth.service';
 
 export interface NavMenuItem {
   name: string;
@@ -29,7 +30,7 @@ export class SettingsService implements OnDestroy {
 
   isNative = Capacitor.isNativePlatform();
 
-  isOnline = false;
+  isOnline = true;
 
   /**
    * Metadata from Google sheet
@@ -68,26 +69,12 @@ export class SettingsService implements OnDestroy {
     this._navigationData.data = data;
   }
 
-  constructor(private eventService: EventService, private ngZone: NgZone) {
+  constructor(
+    private ngZone: NgZone,
+    private authService: AuthService,
+    private eventService: EventService,
+  ) {
     this.init();
-    this.navigationData = [
-      {
-        name: EN_MAPPING.COMMON.DASHBOARD,
-        routerLink: ['/app/dashboard']
-      },
-      {
-        name: EN_MAPPING.COMMON.CABLE,
-        routerLink: ['/app/cable-list']
-      },
-      {
-        name: EN_MAPPING.COMMON.BSNL_CONNECT,
-        routerLink: ['/app/bsnl-connect']
-      },
-      {
-        name: EN_MAPPING.COMMON.UG_PATROL,
-        routerLink: ['/app/ug-patrol']
-      },
-    ];
   }
 
   ngOnDestroy(): void {
@@ -95,6 +82,7 @@ export class SettingsService implements OnDestroy {
   }
 
   private async init() {
+    this.checkAndPopulateNavigationData();
     this.eventService.isMobile.subscribe((isMobile) => (this.isMobile = isMobile));
     await this.getNetworkStatus();
     Network.addListener('networkStatusChange', (status) => this.ngZone.run(() => this.isOnline = status.connected));
@@ -102,6 +90,44 @@ export class SettingsService implements OnDestroy {
 
   async getNetworkStatus() {
     return this.isOnline = (await Network.getStatus()).connected;
+  }
+
+  checkAndPopulateNavigationData() {
+    const navigationData = [
+      {
+        name: EN_MAPPING.COMMON.DASHBOARD,
+        routerLink: ['/app/dashboard']
+      },
+    ];
+    
+    if (this.authService.hasAnyPermission(IApps.CABLE)) {
+      navigationData.push({
+        name: EN_MAPPING.COMMON.CABLE,
+        routerLink: ['/app/cable-list']
+      });
+    }
+
+    if (this.authService.hasAnyPermission(IApps.BSNL)) {
+      navigationData.push({
+        name: EN_MAPPING.COMMON.BSNL_CONNECT,
+        routerLink: ['/app/bsnl-connect']
+      });
+    }
+
+    if (this.authService.hasAnyPermission(IApps.UG)) {
+      navigationData.push({
+        name: EN_MAPPING.COMMON.UG_PATROL,
+        routerLink: ['/app/ug-patrol']
+      });
+    }
+
+    if (this.authService.hasAnyPermission(IApps.ADMIN)) {
+      navigationData.push({
+        name: EN_MAPPING.COMMON.MAINTENANCE,
+        routerLink: ['/app/maintenance']
+      });
+    }
+    this.navigationData = navigationData;
   }
 
   getGhPageAssetUrl(filename: string) {

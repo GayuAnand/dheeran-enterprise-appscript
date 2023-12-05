@@ -31,13 +31,13 @@ export class ApiBSNLConnectService {
       DUE_IN_DAYS: number,
       ACCOUNT_NO: string,
       TOTAL_AMOUNT: number
-    }>('getBillView', [phonenumber, this.apiAuthService.getAuthToken()]);
+    }>('getBillView', [phonenumber, this.apiAuthService.authToken]);
   }
 
   /**
    * @param phonenumber Format 04286-225678 or 04286225678
    */
   getVLANInfo(phonenumber: string) {
-    return this.apiAppScriptService.exec<any>('getVLANInfo', [phonenumber, this.apiAuthService.getAuthToken()]);
+    return this.apiAppScriptService.exec<any>('getVLANInfo', [phonenumber, this.apiAuthService.authToken]);
   }
 }

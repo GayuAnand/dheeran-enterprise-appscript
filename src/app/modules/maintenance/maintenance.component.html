@@ -1,0 +1,30 @@
+<ng-container *ngIf="!storageService.isNative">
+  <button mat-raised-button color="primary" class="de-m-bbase" (click)="clearData()">Clear Data</button>
+</ng-container>
+
+<ng-container *ngIf="storageService.isNative">
+  <button mat-raised-button color="primary" class="de-m-bbase" (click)="listDir()">List</button>
+
+  <mat-tree *ngIf="dataSource?.data?.length" [dataSource]="dataSource" [treeControl]="treeControl">
+    <!-- This is the tree node template for leaf nodes -->
+    <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
+      <!-- use a disabled button to provide padding for tree leaf -->
+      <button mat-icon-button disabled></button>
+      <ng-container *ngTemplateOutlet="treeNodeTemplate; context: { $implicit: node };"></ng-container>
+    </mat-tree-node>
+    <!-- This is the tree node template for expandable nodes -->
+    <mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding>
+      <button mat-icon-button matTreeNodeToggle>
+        <mat-icon class="mat-icon-rtl-mirror">{{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}</mat-icon>
+      </button>
+      <ng-container *ngTemplateOutlet="treeNodeTemplate; context: { $implicit: node };"></ng-container>
+    </mat-tree-node>
+  </mat-tree>
+</ng-container>
+
+<ng-template #treeNodeTemplate let-node>
+  <div class="de-f-justifyspacebetween de-p-rbase de-w-full">
+    <span class="de-f-grow">{{node.name}}</span>
+    <mat-icon class="danger-text" (click)="deleteFileOrFolder(node)">delete</mat-icon>
+  </div>
+</ng-template>

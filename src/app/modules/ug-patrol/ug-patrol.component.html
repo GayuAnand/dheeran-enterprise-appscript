@@ -33,28 +33,27 @@
     </mat-select>
   </mat-form-field>
 
-  <button mat-raised-button color="accent" (click)="createRecord()"><mat-icon>add</mat-icon>{{TKey.COMMON.ADD}}</button>
+  <button mat-raised-button color="accent" *ngIf="settingsService.isOnline" (click)="createRecord()"><mat-icon>add</mat-icon>{{TKey.COMMON.ADD}}</button>
 </div>
 
+<de-refresh-data [cacheInfo]="cacheInfo" (refresh)="refreshData(true)"></de-refresh-data>
+
 <mat-table [dataSource]="data" class="mat-elevation-z8">
-  <ng-container matColumnDef="{{column}}" *ngFor="let column of displayedColumns">
-    <mat-header-cell *matHeaderCellDef [ngClass]="'de-f-justifycenter'">{{column}}</mat-header-cell>
+  <ng-container matColumnDef="{{column}}" *ngFor="let column of displayedColumnsWithAction">
+    <mat-header-cell *matHeaderCellDef [ngClass]="'de-f-justifycenter'">{{column === 'ACTIONS' ? '' : column}}</mat-header-cell>
 
     <mat-cell *matCellDef="let element" [ngClass]="getCellClassNames(element, column)">
       <ng-container [ngSwitch]="column">
         <ng-container *ngSwitchCase="ugPatrolColumns?.DATE?.label">{{element.getPatrolDateStr()}}</ng-container>
 
-        <ng-container *ngSwitchDefault>{{element[column]}}</ng-container>
-      </ng-container>
-    </mat-cell>
-  </ng-container>
+        <ng-container *ngSwitchCase="'ACTIONS'">
+          <ng-container *ngIf="element?.ID">
+            <mat-icon color="primary" class="de-cursorpointer de-m-rbase" (click)="editRecord(element)">edit</mat-icon>
+            <mat-icon color="warn" class="de-cursorpointer" (click)="recordToDelete = element">delete</mat-icon>
+          </ng-container>
+        </ng-container>
 
-  <ng-container matColumnDef="ACTIONS">
-    <mat-header-cell *matHeaderCellDef [ngClass]="'de-f-justifycenter'"></mat-header-cell>
-    <mat-cell *matCellDef="let element" [ngClass]="getCellClassNames(element, 'ACTIONS')">
-      <ng-container *ngIf="element?.ID">
-        <mat-icon color="primary" class="de-cursorpointer de-m-rbase" (click)="editRecord(element)">edit</mat-icon>
-        <mat-icon color="warn" class="de-cursorpointer" (click)="recordToDelete = element">delete</mat-icon>
+        <ng-container *ngSwitchDefault>{{element[column]}}</ng-container>
       </ng-container>
     </mat-cell>
   </ng-container>

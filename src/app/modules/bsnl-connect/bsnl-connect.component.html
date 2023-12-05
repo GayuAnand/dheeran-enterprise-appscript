@@ -1,7 +1,7 @@
 <section class="bsnl-connect-input-container de-sm-small">
   <mat-form-field>
     <mat-label>{{TKey.COMMON.STD_CODE}}</mat-label>
-    <input matInput type="number" [(ngModel)]="stdCode">
+    <input matInput type="text" pattern="[0-9]*" [(ngModel)]="stdCode">
     <button matSuffix mat-icon-button [ngClass]="stdCode ? '' : 'de-hidden'" (click)="stdCode=''">
       <mat-icon>close</mat-icon>
     </button>
@@ -9,7 +9,7 @@
 
   <mat-form-field>
     <mat-label>{{TKey.COMMON.PHONE_NUMBER}}</mat-label>
-    <input matInput type="number" [(ngModel)]="phoneNumber">
+    <input matInput type="text" pattern="[0-9]*" [(ngModel)]="phoneNumber">
     <button matSuffix mat-icon-button [ngClass]="phoneNumber ? '' : 'de-hidden'" (click)="phoneNumber=''">
       <mat-icon>close</mat-icon>
     </button>
@@ -29,8 +29,8 @@
 </section>
 
 <ng-container *ngIf="information">
-  <p class="bold-text de-m-vbase--force mat-headline-6">{{informationType}} - {{informationFor}}</p>
-  <table>
+  <p class="bold-text de-m-hsmall--force de-m-vbase--force mat-headline-6">{{informationType}} - {{informationFor}}</p>
+  <table class="de-m-hsmall">
     <tr *ngFor="let infoKey of utilService.getObjectKeys(information)">
       <td class="italic-text">{{infoKey}}: </td>
       <td>{{information[infoKey]}}</td>
@@ -38,7 +38,7 @@
   </table>
 </ng-container>
 
-<div class="de-m-vlarge de-f-aligncenter de-sm-rbase-nolast de-f-justifycenter" *ngIf="informationType && !information">
+<div class="de-m-vlarge de-m-hsmall de-f-aligncenter de-sm-rbase-nolast de-f-justifycenter" *ngIf="informationType && !information">
   <de-spinner></de-spinner>
   <span>Fetching {{informationType}}</span>
 </div>

@@ -26,6 +26,10 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   --border: #e4e4e4;
 }
 
+.min-w24 {
+  min-width: 24px;
+}
+
 .min-w360 {
   min-width: 360px;
 }
@@ -36,6 +40,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   flex-direction: row;
   flex-grow: 1;
   flex-wrap: wrap;
+  justify-content: flex-end;
 
   > * {
     display: flex;

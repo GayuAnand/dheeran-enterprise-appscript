@@ -1,4 +1,4 @@
-package com.dheeranent.cable;
+package com.depco.management;
 
 import com.getcapacitor.BridgeActivity;
 

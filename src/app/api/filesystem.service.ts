@@ -1,5 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Directory, Encoding, Filesystem, GetUriOptions } from '@capacitor/filesystem';
+import { Directory, Encoding, FileInfo, Filesystem, GetUriOptions } from '@capacitor/filesystem';
+import { environment } from 'src/environments/environment';
+
+export interface IInfoJson {
+  [key: string]: { lastUpdatedAt: number } | null
+}
 
 @Injectable()
 export class ApiFileSystemService {
@@ -7,16 +12,29 @@ export class ApiFileSystemService {
 
   infoJsonName = 'info.json';
 
-  async cleanupUnknownFiles() {
+  async cleanupUnknownFiles(includeDataDir = false) {
     (await Filesystem.readdir({ path: '', directory: this.dataDir })).files
-      .forEach((file) => {
+      .forEach(async (file) => {
         if (file.type === 'file') {
           Filesystem.deleteFile({ path: file.name, directory: this.dataDir });
         } else if (file.type === 'directory') {
-          // Skip data and versions (used by CapacitorUpdater) directory
-          if ((file.name !== 'data') && (file.name !== 'versions')) {
-            Filesystem.rmdir({ path: file.name, directory: this.dataDir, recursive: true });
+          // Skip versions (used by CapacitorUpdater) directory
+          if (file.name === 'versions') return;
+
+          // Skip data files
+          if (file.name === 'data') {
+            if (includeDataDir) {
+              const infoJson = await this.readInfoJson();
+              const newInfoJson = { prodDeployId: infoJson?.prodDeployId || null };
+              const token = await this.readDataFromFile('x-auth-token');
+              await Filesystem.rmdir({ path: file.name, directory: this.dataDir, recursive: true });
+              if (token) await this.writeDataToFile('x-auth-token', token);
+              this.writeInfoJson(newInfoJson);
+            }
+            return;
           }
+
+          Filesystem.rmdir({ path: file.name, directory: this.dataDir, recursive: true });
         }
       })
   }
@@ -25,38 +43,48 @@ export class ApiFileSystemService {
     return 'data/' + filename;
   }
 
-  async writeDataToFile(filename: string, data: string | any) {
+  async writeDataToFile<T>(filename: string, data: string | any): Promise<T> {
+    if (!environment.production) console.log(`Writing ${JSON.stringify(data)} to ${filename}...`);
     data = data || '';
-    const dataStr = (typeof data === 'string') ? data : data.toString()
-    return (await Filesystem.writeFile({ path: this.getDataFilePath(filename), directory: this.dataDir, encoding: Encoding.UTF8, data: dataStr, recursive: true })).uri || '';
+    await Filesystem.writeFile({ path: this.getDataFilePath(filename), directory: this.dataDir, encoding: Encoding.UTF8, data: JSON.stringify(data), recursive: true });
+    return this.readDataFromFile<T>(filename);
   }
 
-  async readDataFromFile(filename: string) {
+  async readDataFromFile<T>(filename: string): Promise<T> {
     if (await this.checkFileExists(filename)) {
-      return JSON.parse((await Filesystem.readFile({ path: this.getDataFilePath(filename), directory: this.dataDir, encoding: Encoding.UTF8 })).data.toString() || '""');
+      let fileData: any = (await Filesystem.readFile({ path: this.getDataFilePath(filename), directory: this.dataDir, encoding: Encoding.UTF8 })).data as string;
+      try {
+        fileData = JSON.parse(fileData);
+      } catch(e) {
+        console.error(`Parsing error while reading file data '${filename}'.`);
+      }
+      if (!environment.production) console.log(`Read ${JSON.stringify(fileData)} from ${filename}...`);
+      return Promise.resolve(fileData);
     }
-    return null;
+    return Promise.resolve(null as T);
   }
 
-  async readGSheetData(sheetName: string) {
-    if (await this.checkFileExists(sheetName)) {
-      return (await this.readInfoJson())[sheetName] || null;
+  async deleteDataFile(filename: string) {
+    if (await this.checkFileExists(filename)) {
+      await Filesystem.deleteFile({ path: this.getDataFilePath(filename), directory: this.dataDir });
     }
-    return null;
+    return Promise.resolve(true);
   }
 
-  async writeGSheetData(sheetName: string, data: any) {
-    await this.writeDataToFile(sheetName, data);
-    const infoJson = await this.readInfoJson();
-    infoJson[sheetName] = { timestamp: Date.now() };
-    await this.writeDataToFile(this.infoJsonName, infoJson);
-  }
-
-  async readInfoJson() {
+  async readInfoJson(): Promise<IInfoJson> {
     if (!(await this.checkFileExists(this.infoJsonName))) {
       await this.writeDataToFile(this.infoJsonName, {});
     }
     return this.readDataFromFile(this.infoJsonName);
+  }
+
+  async writeInfoJson(info: any): Promise<IInfoJson> {
+    return this.writeDataToFile(this.infoJsonName, info);
+  }
+
+  async updateInfoJson(infoPatch: IInfoJson) {
+    const infoObj = await this.readInfoJson();
+    return this.writeInfoJson(Object.assign({}, infoObj || {}, infoPatch));
   }
 
   async checkFileExists(filename: string): Promise<boolean> {
@@ -72,7 +100,27 @@ export class ApiFileSystemService {
     }
   }
 
-  async listDir(path = '') {
-    return (await Filesystem.readdir({ path, directory: this.dataDir })).files;
+  async deleteFileOrFolder(filePath: string, isDir = false) {
+    if (isDir) {
+      return await Filesystem.rmdir({ path: filePath, directory: this.dataDir, recursive: true });
+    } else {
+      return await Filesystem.deleteFile({ path: filePath, directory: this.dataDir });
+    }
+  }
+
+  async listDir(path = '', recursive = false) {
+    const files = (await Filesystem.readdir({ path, directory: this.dataDir })).files;
+    files.forEach((f) => (f as any).path = `${path ? path + '/' : ''}${f.name}`);
+
+    if (recursive) {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (file.type === 'directory') {
+          (file as any).children = await this.listDir(`${path ? path + '/' : ''}${file.name}`, true);
+        }
+      }
+    }
+
+    return files;
   }
 }

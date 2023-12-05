@@ -1,10 +1,11 @@
-import { FormControl } from '@angular/forms';
+import { concatMap, map } from 'rxjs';
 import { debounce } from 'typescript-debounce-decorator';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 
+import { IInfoJson } from 'src/app/api';
 import { BaseComponent } from 'src/app/common';
 import { CustomerModel } from 'src/app/models';
 
@@ -20,7 +21,7 @@ import { CustomerModel } from 'src/app/models';
     ]),
   ],
 })
-export class CableListComponent extends BaseComponent implements OnInit, AfterViewInit {
+export class CableListComponent extends BaseComponent implements OnInit, AfterViewInit, OnDestroy {
   data = new MatTableDataSource<CustomerModel>([]);
 
   fullData: CustomerModel[] = [];
@@ -44,6 +45,8 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
 
   areaFilter = this.getNewFilterControl([], []);
 
+  agentsFilter = this.getNewFilterControl([], []);
+
   monthsFilter = this.getNewFilterControl([], []);
 
   showAdvancedFilters = false;
@@ -53,6 +56,8 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
   showPendingSettlement = false;
 
   pendingSettlementAmount = 0;
+
+  cacheInfo: any = null;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -74,6 +79,11 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     this.refreshData();
   }
 
+  override ngOnDestroy(): void {
+    super.ngOnDestroy();
+    this.cacheInfo?.destroy();
+  }
+
   refreshDisplayedColumns() {
     if (this.settingsService.isMobile) {
       this.displayedColumns = this.allColumns.slice(0, 2);
@@ -82,8 +92,17 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     }
   }
 
-  refreshData() {
-    this.apiGSheetDataService.getSheetData<CustomerModel>(this.settingsService.metadata.sheetsInfo?.CUSTOMERS.label as string, CustomerModel, true)
+  refreshData(force = false) {
+    this.apiGSheetDataService.getSheetData<CustomerModel>(this.settingsService.metadata.sheetsInfo?.CUSTOMERS.label as string, CustomerModel, force)
+      .pipe(
+        concatMap((res) => this.getRefreshCacheInfo(`SHEET_${this.settingsService.metadata.sheetsInfo?.CUSTOMERS.label}` as string, this.cacheInfo)
+          .pipe(
+            map((value) => {
+              this.cacheInfo = value;
+              return res;
+            }))
+          )
+      )
       .subscribe((data) => {
         this.fullData = data;
         this.initializeFilters();
@@ -97,7 +116,18 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     this.areaFilter.controlOptions.sort();
     this.areaFilter.control.setValue([]);
     this.areaFilter.selectAll = false;
+
     this.monthsFilter.controlOptions = this.fullData[0].getMonthsInOrder();
+
+    let agents: any = {};
+    this.fullData.forEach((data) => agents = Object.assign(agents, data.getCollectionAgents()));
+    this.agentsFilter.controlOptions = Object.keys(agents);
+    this.agentsFilter.controlOptions.sort();
+    if (this.authService.hasPermission(this.METADATA.APPS.CABLE, this.METADATA.ROLES.ADMIN)) {
+      this.agentsFilter.control.setValue([]);
+    } else {
+      this.agentsFilter.control.setValue([this.authService.user?.Username as string]);
+    }
     this.onFilterChange();
   }
 
@@ -157,10 +187,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     this.data.data = this.fullData.filter(filterArea).filter(filterStatus).filter(filterSearch).filter(filterCollection).filter(filterPendingSettlement);
 
     if (this.showPendingSettlement) {
-      this.pendingSettlementAmount = this.data.data.reduce((acc, d) => {
-        acc += d.getPendingSettlement() as number;
-        return acc;
-      }, 0);
+      this.data.data.forEach((d) => this.pendingSettlementAmount += d.getPendingSettlement(false, this.agentsFilter.control.value) as number);
     }
   }
 
@@ -189,7 +216,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
 
   filterPendingSettlement(data: CustomerModel) {
     if (this.showPendingSettlement) {
-      return !!data.getPendingSettlement();
+      return !!data.getPendingSettlement(false, this.agentsFilter.control.value);
     }
     return true;
   }

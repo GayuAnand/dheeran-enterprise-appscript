@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">dheeran-enterprise</string>
-    <string name="title_activity_main">dheeran-enterprise</string>
-    <string name="package_name">com.dheeranent.cable</string>
-    <string name="custom_url_scheme">com.dheeranent.cable</string>
+    <string name="app_name">depco-management</string>
+    <string name="title_activity_main">depco-management</string>
+    <string name="package_name">com.depco.management</string>
+    <string name="custom_url_scheme">com.depco.management</string>
 </resources>

@@ -2,6 +2,8 @@ import { Observable, Subject, map } from 'rxjs';
 import { Injectable, NgZone } from '@angular/core';
 
 import { environment } from './../../environments/environment';
+import { ApiStorageService } from './storage.service';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class ApiAppScriptService {
@@ -9,18 +11,22 @@ export class ApiAppScriptService {
 
   devDeployId = 'AKfycbwXGymXyx7sQjCVwqZVvkP6nMiRfAA_cVZ_YCiuiJs';
 
-  prodDeployId = 'AKfycbyiCXSgdMRM_X6pscDtIbHvWR2PaBT5q8Cf2x2HFSc17lRczg9HvF2-PmOwpFqZ3SQG';
+  prodDeployId = 'AKfycbxaHURFyPc0eLPB0Uq1GmXZLzC8aAgds2qZk6o7IwQvrpSQS278POH-sk6CQzY6k8hQ';
 
   execPromises: Record<string, { subject: Subject<any>, observable?: Observable<any> }> = {};
 
-  constructor(private ngZone: NgZone) {
+  constructor(
+    private ngZone: NgZone,
+    private router: Router,
+    private storageService: ApiStorageService,
+  ) {
     this.callback = this.callback.bind(this);
     (window as any).ApiAppScriptService = this;
     (window as any).callback = this.callback;
   }
 
   callback(args: any) {
-    console.log('Callback: ', args);
+    if (!environment.production) console.log('Callback: ', args);
     if (this.execPromises[args?.callbackId]) {
       this.ngZone.run(() => {
         const sub = this.execPromises[args.callbackId];
@@ -36,6 +42,11 @@ export class ApiAppScriptService {
     this.execPromises[callbackId] = { subject: new Subject() };
     this.execPromises[callbackId].observable = this.execPromises[callbackId].subject.pipe(
       map((res) => {
+        if (!res.auth) {
+          this.storageService.clearData(); // If auth failure, clear all data except 'prodDeployId'
+          setTimeout(() => this.router.navigate(['/auth']), 1000);
+        }
+
         if (res.success) {
           return res.data;
         } else {
@@ -45,10 +56,13 @@ export class ApiAppScriptService {
     );
 
     if (functionName) {
-      let s = document.createElement('script');
-      s.setAttribute('src', `https://script.google.com/macros/s/${this.useProd ? this.prodDeployId : this.devDeployId}/${this.useProd ? 'exec' : 'dev'}?api=1&functionName=${functionName}&functionParameters=${encodeURIComponent(JSON.stringify(parameters))}&callbackId=${callbackId}&token=${localStorage.getItem('x-auth-token') || ''}`);
-      s.setAttribute('id', callbackId);
-      document.head.appendChild(s);
+      this.storageService.getData('x-auth-token')
+        .subscribe(token => {
+          let s = document.createElement('script');
+          s.setAttribute('src', `https://script.google.com/macros/s/${this.useProd ? this.prodDeployId : this.devDeployId}/${this.useProd ? 'exec' : 'dev'}?api=1&functionName=${functionName}&functionParameters=${encodeURIComponent(JSON.stringify(parameters))}&callbackId=${callbackId}&token=${token}`);
+          s.setAttribute('id', callbackId);
+          document.head.appendChild(s);
+        });
     } else {
       this.execPromises[callbackId].subject.next({ success: false, error: 'Invalid AppScript function name.' });
       setTimeout(() => this.execPromises[callbackId].subject.complete());

@@ -1,3 +1,4 @@
+import { concatMap, map } from 'rxjs';
 import { debounce } from 'typescript-debounce-decorator';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
@@ -49,6 +50,8 @@ export class UGPatrolComponent extends BaseComponent implements OnInit, AfterVie
 
   processingData = false;
 
+  cacheInfo: any = null;
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   chartOptions = {
@@ -66,7 +69,6 @@ export class UGPatrolComponent extends BaseComponent implements OnInit, AfterVie
 
   constructor() {
     super();
-    console.log(this);
     this.filterRoute = this.filterRoute.bind(this);
     this.filterWorkType = this.filterWorkType.bind(this);
 
@@ -88,18 +90,28 @@ export class UGPatrolComponent extends BaseComponent implements OnInit, AfterVie
 
   refreshDisplayedColumns() {
     if (this.settingsService.isMobile) {
-      this.displayedColumns = this.allColumns.slice(0, 5);
+      this.displayedColumns = this.allColumns.slice(0, 3);
     } else {
       this.displayedColumns = this.allColumns.slice(0, 6);
     }
     this.displayedColumnsWithAction = [...this.displayedColumns, 'ACTIONS'];
   }
 
-  refreshData() {
-    this.apiGSheetDataService.getSheetData<UGPatrolModel>(this.settingsService.metadata.sheetsInfo?.UG_PATROL.label as string, UGPatrolModel, true)
+  refreshData(force = false) {
+    this.apiGSheetDataService.getSheetData<UGPatrolModel>(this.settingsService.metadata.sheetsInfo?.UG_PATROL.label as string, UGPatrolModel, force)
+      .pipe(
+        concatMap((res) => this.getRefreshCacheInfo(`SHEET_${this.settingsService.metadata.sheetsInfo?.UG_PATROL.label}` as string, this.cacheInfo)
+          .pipe(
+            map((value) => {
+              this.cacheInfo = value;
+              return res;
+            }))
+          )
+      )
       .subscribe({
         next: (data) => {
           this.fullData = data;
+          // https://canvasjs.com/angular-charts/line-chart-with-date-time-axis/
           // const dates = this.fullData.map((d) => ({ x: this.utilService.moment(d.Date).valueOf(), y: 1 }));
           // this.chartOptions.data[0].dataPoints = dates.sort(this.utilService.sortObjectsByProperty('x'));
           this.options.location = Object.keys(this.fullData.reduce((acc, data) => { acc[data.Location] = true; return acc; }, {} as Record<string, boolean>));
@@ -133,7 +145,7 @@ export class UGPatrolComponent extends BaseComponent implements OnInit, AfterVie
       [this.ugPatrolColumns?.ID?.label as string],
       recordToEdit as UGPatrolModel
     ).subscribe({
-      next: () => this.refreshData(),
+      next: () => this.refreshData(true),
       error: (err) => {
         this.processingData = false;
         this.utilService.openSnackBar(err, 'Close');
@@ -147,7 +159,7 @@ export class UGPatrolComponent extends BaseComponent implements OnInit, AfterVie
       [this.ugPatrolColumns?.ID?.label as string],
       this.recordToDelete as UGPatrolModel
     ).subscribe({
-      next: () => this.refreshData(),
+      next: () => this.refreshData(true),
       error: (err) => {
         this.processingData = false;
         this.utilService.openSnackBar(err, 'Close');

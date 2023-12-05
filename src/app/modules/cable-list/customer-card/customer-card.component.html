@@ -17,7 +17,7 @@
   </tr>
   <tr>
     <td>Conection On:</td>
-    <td>{{customer.getConnectionDate(true)}}</td>
+    <td>{{customer.getConnectionDate()}}</td>
   </tr>
   <tr>
     <td>Notes:</td>
@@ -36,9 +36,9 @@
     </tr>
     <tr *ngFor="let month of customer.getMonthsInOrder()">
       <td>{{month}}</td>
-      <td>{{customer.getCollectionDate(month)}}</td>
+      <td>{{customer.getCollectionDateStrFormat(month)}}</td>
       <td>{{customer.get(month)}}</td>
-      <td>{{customer.getSettlementDate(month)}}</td>
+      <td>{{customer.getSettlementDateStrFormat(month)}}</td>
       <td>{{customer.getNotes(month)}}</td>
     </tr>
   </table>

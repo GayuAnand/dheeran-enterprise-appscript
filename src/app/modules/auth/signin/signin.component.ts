@@ -2,6 +2,7 @@ import { NEVER, catchError } from 'rxjs';
 import { Component } from '@angular/core';
 import { Validators } from '@angular/forms';
 
+import versionInfo from './../../../../versionInfo.json';
 import { BaseComponent } from './../../../../../src/app/common';
 
 @Component({
@@ -20,6 +21,8 @@ export class SignInComponent extends BaseComponent {
   errorMsg = '';
 
   loading = false;
+
+  versionInfo = versionInfo;
 
   constructor() {
     super();
@@ -43,7 +46,6 @@ export class SignInComponent extends BaseComponent {
         .subscribe({
           next: () => {
             console.log('Sign in successful');
-            this.loading = false;
             this.router.navigate(['/app']);
           },
         });

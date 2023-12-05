@@ -4,3 +4,5 @@
   <ng-container de-dialog-header>{{TKey.COMMON.ABOUT}}</ng-container>
   <ng-container de-dialog-body>{{TKey.COMMON.VERSION}}: {{settingsService.currentVersion}}</ng-container>
 </de-dialog>
+
+<div *ngIf="!settingsService.isOnline" class="offline-indicator">No internet.</div>

@@ -1,5 +1,26 @@
+export enum IRoleValue {
+  ADMIN = 'admin',
+  STAFF = 'staff',
+  AGENT = 'agent',
+}
+
+export enum IApps {
+  ADMIN = 'admin',
+  BSNL = 'bsnl',
+  CABLE = 'cable',
+  UG = 'ug',
+}
+
+export interface IRole {
+  [IApps.ADMIN]: IRoleValue,
+  [IApps.BSNL]: IRoleValue,
+  [IApps.CABLE]: IRoleValue,
+  [IApps.UG]: IRoleValue,
+}
+
 export interface IUser {
   Username: string;
+  Role: IRole;
 }
 
 export interface ISheetsInfo {

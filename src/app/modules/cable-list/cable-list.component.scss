@@ -1,8 +1,9 @@
 .filter-row {
   .advanced-filter-label {
     color: var(--primary);
-    cursor: pointer;
     justify-content: end;
+    margin-top: 6px;
+    margin-bottom: 6px;
     text-decoration: underline;
     width: 100%;
   }
@@ -16,7 +17,7 @@
   min-height: 0px;
 }
 
-.collection-filter {
+.collection-filter, .pending-settlement-filter {
   align-items: flex-start;
   border: 1px solid rgba(0, 0, 0, 0.38);
   border-radius: 4px;

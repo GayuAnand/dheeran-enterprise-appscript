@@ -1,21 +1,29 @@
 .dialog {
   background: #fff;
+  border-radius: 6px;
   display: flex;
   flex-direction: column;
   margin: auto;
+  max-height: 95vh;
   max-width: 90%;
   width: 100%;
 
   &__header {
     background-color: var(--primary);
+    border-top-right-radius: 6px;
+    border-top-left-radius: 6px;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
     color: white;
     display: flex;
+    line-height: 40px !important;
     justify-content: space-between;
     width: 100%;
   }
 
   &__body {
     flex: 1;
+    overflow: auto;
   }
 
   &__footer {

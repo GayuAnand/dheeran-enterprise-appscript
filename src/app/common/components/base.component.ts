@@ -1,11 +1,12 @@
-import { Subscription } from 'rxjs';
+import { Subscription, map } from 'rxjs';
 import { Router } from '@angular/router';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { Component, NgZone, OnDestroy, inject } from '@angular/core';
 
 import { EN_MAPPING } from './../../../assets/i18n/en.mapping';
-import { ApiAppScriptService, ApiGSheetDataService, ApiAuthService, ApiFileSystemService } from './../../../../src/app/api';
+import { IApps, IRoleValue } from '../interfaces';
 import { AuthService, EventService, SettingsService, UtilService } from '../services';
+import { ApiAppScriptService, ApiGSheetDataService, ApiAuthService, ApiFileSystemService, ApiStorageService } from './../../../../src/app/api';
 
 @Component({
   selector: 'de-base-component',
@@ -13,6 +14,11 @@ import { AuthService, EventService, SettingsService, UtilService } from '../serv
 })
 export class BaseComponent implements OnDestroy {
   TKey = EN_MAPPING;
+
+  METADATA = {
+    APPS: IApps,
+    ROLES: IRoleValue,
+  };
 
   ngZone: NgZone = inject(NgZone);
 
@@ -23,6 +29,8 @@ export class BaseComponent implements OnDestroy {
   eventService: EventService = inject(EventService);
 
   authService: AuthService = inject(AuthService);
+
+  storageService: ApiStorageService = inject(ApiStorageService);
 
   settingsService: SettingsService = inject(SettingsService);
 
@@ -42,6 +50,21 @@ export class BaseComponent implements OnDestroy {
   ngOnDestroy(): void {
     this._subscriptions.forEach((subscription) => subscription.unsubscribe());
   }
+
+  getRefreshCacheInfo(filename: string, cacheInfo: any) {
+    return this.storageService.getInfoJson()
+      .pipe(
+        map((infoJson) => {
+          const info = infoJson?.[filename];
+
+          if (info?.lastUpdatedAt) {
+            cacheInfo?.destroy();
+            cacheInfo = this.eventService.getTimeDifferenceObservable(info?.lastUpdatedAt);
+          }
+          return cacheInfo;
+        })
+      );
+  };
 
   getNewFilterControl(defaultValue: string[] = [], options: string[] = []) {
     const self = this;

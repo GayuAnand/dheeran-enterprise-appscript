@@ -1,50 +1,42 @@
-import { Injectable } from '@angular/core';
+import { concatMap } from 'rxjs';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, map, of } from 'rxjs';
+import { Injectable } from '@angular/core';
 
-import { IMetadata, IUser } from '../common/interfaces';
+import { ApiStorageService } from './storage.service';
 import { ApiAppScriptService } from './appscript.service';
 
 @Injectable()
 export class ApiAuthService {
   authTokenName = 'x-auth-token';
 
-  constructor(private apiAppScriptService: ApiAppScriptService, private router: Router) {
+  authToken = '';
+
+  constructor(
+    private apiAppScriptService: ApiAppScriptService,
+    private storageService: ApiStorageService,
+    private router: Router,
+  ) {
     (window as any).ApiAuthService = this;
   }
 
   signIn(username: string, password: string) {
     return this.apiAppScriptService.exec<string>('login', [username, password])
       .pipe(
-        map((token) => {
+        concatMap((token) => {
+          this.authToken = token;
           if (token) {
-            localStorage.setItem(this.authTokenName, token);
-          } else {
-            localStorage.removeItem(this.authTokenName);
+            return this.storageService.setData(this.authTokenName, token);
           }
-          return token;
+          return this.storageService.removeData(this.authTokenName, token);
         })
       );
   }
 
   signOut() {
-    localStorage.removeItem(this.authTokenName);
-    localStorage.clear();
-    this.router.navigate(['/auth']);
-  }
-
-  getAuthToken() {
-    return localStorage.getItem(this.authTokenName);
-  }
-
-  discoveryInfo(): Observable<IMetadata & { activeUser: IUser } | null> {
-    // return of({ activeUser: { Username: 'Anand' }});
-    return this.apiAppScriptService.exec<IMetadata & { activeUser: IUser }>('discoveryInfo', [localStorage.getItem(this.authTokenName)])
-      .pipe(
-        map((res) => {
-          this.apiAppScriptService.prodDeployId = res?.deployIds?.[0] || this.apiAppScriptService.prodDeployId;
-          return res;
-        })
-      );
+    return this.storageService.removeData(this.authTokenName)
+      .subscribe(() => {
+        this.storageService.clearData();
+        this.router.navigate(['/auth']);
+      });
   }
 }

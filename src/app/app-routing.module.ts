@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { AppCommonModule, PageLayoutComponent, AuthGuard, NonauthGuard, IframeComponent } from './common';
+import { AppCommonModule, PageLayoutComponent, AuthGuard, NonauthGuard, RoleGuard } from './common';
+import { IApps, IRoleValue } from './common/interfaces';
 
 const routes: Routes = [
   {
@@ -16,18 +17,26 @@ const routes: Routes = [
       {
         path: 'cable-list',
         loadChildren: () => import('./modules/cable-list').then((m) => m.CableListModule),
+        canActivate: [RoleGuard(IApps.CABLE)],
       },
       {
         path: 'bsnl-connect',
         loadChildren: () => import('./modules/bsnl-connect').then((m) => m.BSNLConnectModule),
+        canActivate: [RoleGuard(IApps.BSNL)],
       },
       {
         path: 'ug-patrol',
         loadChildren: () => import('./modules/ug-patrol').then((m) => m.UGPatrolModule),
+        canActivate: [RoleGuard(IApps.UG)],
+      },
+      {
+        path: 'maintenance',
+        loadChildren: () => import('./modules/maintenance').then((m) => m.MaintenanceModule),
+        canActivate: [RoleGuard(IApps.ADMIN)],
       },
       {
         path: '**',
-        redirectTo: 'cable-list',
+        redirectTo: 'dashboard',
       },
     ],
   },

@@ -24,13 +24,15 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTreeModule } from '@angular/material/tree';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS, MatFormFieldModule } from '@angular/material/form-field';
 import { CanvasJSAngularChartsModule } from '@canvasjs/angular-charts';
 
 import { AutocompleteComponent, CopyableTextComponent, DialogComponent, EmptyLayoutComponent, ConfirmationDialogComponent,
-         IframeComponent, MobileNumberComponent, PageLayoutComponent, SpinnerComponent } from './components';
+         IframeComponent, MobileNumberComponent, PageLayoutComponent, SpinnerComponent, RefreshDataComponent } from './components';
 import { AuthService, EventService, SettingsService, UiBundleUpdaterService, UtilService } from './services';
 
 @NgModule({
@@ -49,6 +51,7 @@ import { AuthService, EventService, SettingsService, UiBundleUpdaterService, Uti
     MatCheckboxModule,
     MatChipsModule,
     MatDatepickerModule,
+    MatExpansionModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
@@ -63,6 +66,7 @@ import { AuthService, EventService, SettingsService, UiBundleUpdaterService, Uti
     MatPaginatorModule,
     MatSelectModule,
     MatTableModule,
+    MatTabsModule,
     MatToolbarModule,
     MatTreeModule,
 
@@ -78,6 +82,7 @@ import { AuthService, EventService, SettingsService, UiBundleUpdaterService, Uti
     IframeComponent,
     MobileNumberComponent,
     PageLayoutComponent,
+    RefreshDataComponent,
     SpinnerComponent,
 
     CommonModule,
@@ -92,6 +97,7 @@ import { AuthService, EventService, SettingsService, UiBundleUpdaterService, Uti
     MatCheckboxModule,
     MatChipsModule,
     MatDatepickerModule,
+    MatExpansionModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
@@ -106,6 +112,7 @@ import { AuthService, EventService, SettingsService, UiBundleUpdaterService, Uti
     MatPaginatorModule,
     MatSelectModule,
     MatTableModule,
+    MatTabsModule,
     MatToolbarModule,
     MatTreeModule,
   ],
@@ -118,6 +125,7 @@ import { AuthService, EventService, SettingsService, UiBundleUpdaterService, Uti
     IframeComponent,
     MobileNumberComponent,
     PageLayoutComponent,
+    RefreshDataComponent,
     SpinnerComponent,
   ],
 })
