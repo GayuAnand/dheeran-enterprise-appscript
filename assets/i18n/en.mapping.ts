@@ -10,8 +10,11 @@ export const EN_MAPPING = {
     DASHBOARD: 'Dashboard',
     DATE: 'Date',
     EDIT: 'Edit',
+    FAULTS: 'Faults',
     HIDE_ADVANCED_FILTERS: 'Hide Advanced Filters',
     HOME: 'Home',
+    INFO: 'Info',
+    INFORMATION: 'Information',
     LOCATION: 'Location',
     LOGOUT: 'Logout',
     MAINTENANCE: 'Maintenance',
@@ -43,5 +46,5 @@ export const EN_MAPPING = {
     EDIT_PATROL: 'Edit Patrol',
     PATROL_COUNT: 'Patrol Count',
     WORK_TYPE: 'Work Type',
-  }
+  },
 };
