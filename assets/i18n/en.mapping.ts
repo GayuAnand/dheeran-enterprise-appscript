@@ -7,6 +7,7 @@ export const EN_MAPPING = {
     BSNL_CONNECT: 'BSNL Connect',
     CABLE: 'Cable',
     CANCEL: 'Cancel',
+    CLEAR_DATA: 'Clear Data',
     CONNECTION_ON: 'Connection On',
     DASHBOARD: 'Dashboard',
     DATE: 'Date',
