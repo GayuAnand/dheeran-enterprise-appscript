@@ -33,7 +33,7 @@ import { CanvasJSAngularChartsModule } from '@canvasjs/angular-charts';
 
 import { AutocompleteComponent, CopyableTextComponent, DialogComponent, EmptyLayoutComponent, ConfirmationDialogComponent,
          IframeComponent, MobileNumberComponent, PageLayoutComponent, SpinnerComponent, RefreshDataComponent } from './components';
-import { AuthService, EventService, SettingsService, UiBundleUpdaterService, UtilService } from './services';
+import { AuthService, EventService, GeoLocationService, SettingsService, UiBundleUpdaterService, UtilService } from './services';
 
 @NgModule({
   imports: [
@@ -136,6 +136,7 @@ export class AppCommonModule {
       providers: [
         AuthService,
         EventService,
+        GeoLocationService,
         SettingsService,
         UiBundleUpdaterService,
         UtilService,

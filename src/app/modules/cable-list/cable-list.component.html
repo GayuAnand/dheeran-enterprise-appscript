@@ -34,9 +34,9 @@
   <p class="advanced-filter-label"><span (click)="toggleAdvancedFilters()" class="de-cursorpointer">{{showAdvancedFilters ? TKey.COMMON.HIDE_ADVANCED_FILTERS : TKey.COMMON.SHOW_ADVANCED_FILTERS}}</span></p>
 
   <ng-container *ngIf="showAdvancedFilters">
-    <div class="pending-settlement-filter">
+    <div class="pending-settlement-filter" *ngIf="!showCollectedCustomers">
       <label>Pending Settlement Filter</label>
-      <mat-slide-toggle [(ngModel)]="showPendingSettlement" (ngModelChange)="onFilterChange()" [ngClass]="authService.hasPermission(METADATA.APPS.CABLE, METADATA.ROLES.ADMIN) ? '' : 'de-nm--force'">{{TKey.CUSTOMERS.SHOW_PENDING_SETTLEMENT}} {{showPendingSettlement ? '(Rs.' + pendingSettlementAmount + '/-)' : ''}}</mat-slide-toggle>
+      <mat-slide-toggle [(ngModel)]="showPendingSettlement" (ngModelChange)="onPendingSettlementFilterChange()" [ngClass]="authService.hasPermission(METADATA.APPS.CABLE, METADATA.ROLES.ADMIN) ? '' : 'de-nm--force'">{{TKey.CUSTOMERS.SHOW_PENDING_SETTLEMENT}} {{showPendingSettlement ? '(Rs.' + pendingSettlementAmount + '/-)' : ''}}</mat-slide-toggle>
 
       <mat-form-field *ngIf="authService.hasPermission(METADATA.APPS.CABLE, METADATA.ROLES.ADMIN)">
         <mat-label>{{TKey.COMMON.AGENTS}}</mat-label>
@@ -51,9 +51,9 @@
       </mat-form-field>
     </div>
 
-    <div class="collection-filter">
+    <div class="collection-filter" *ngIf="!showPendingSettlement">
       <label>Collection Filter</label>
-      <mat-slide-toggle [(ngModel)]="showCollectedCustomers" (ngModelChange)="onFilterChange()">{{showCollectedCustomers ? TKey.CUSTOMERS.SHOW_COLLECTED : TKey.CUSTOMERS.SHOW_PENDING_COLLECTION}}</mat-slide-toggle>
+      <mat-slide-toggle [(ngModel)]="showCollectedCustomers" (ngModelChange)="onShowCollectedCustomersFilterChange()">{{showCollectedCustomers ? TKey.CUSTOMERS.SHOW_COLLECTED : TKey.CUSTOMERS.SHOW_PENDING_COLLECTION}}</mat-slide-toggle>
 
       <mat-form-field>
         <mat-label>{{TKey.COMMON.MONTHS}}</mat-label>
@@ -74,7 +74,7 @@
 
 <mat-table [dataSource]="data" class="mat-elevation-z8" multiTemplateDataRows>
   <ng-container matColumnDef="{{column}}" *ngFor="let column of displayedColumns">
-    <mat-header-cell *matHeaderCellDef [ngClass]="'de-f-justifycenter'">{{column}}</mat-header-cell>
+    <mat-header-cell *matHeaderCellDef [ngClass]="'de-f-justifycenter'">{{column === 'ACTIONS' ? '' : column}}</mat-header-cell>
 
     <mat-cell *matCellDef="let element" [ngClass]="getCellClassNames(element, column)">
       <ng-container [ngSwitch]="column">
@@ -88,7 +88,13 @@
         </ng-container>
 
         <ng-container *ngSwitchCase="customerColumns?.NAME?.label">
-          {{element[column]}} {{showPendingSettlement ? '(' + element.getPendingSettlement(true) + ')' : ''}}
+          {{element[column]}} {{showPendingSettlement ? '(' + element.getPendingSettlement(true, agentsFilter.control.value) + ')' : ''}}
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'ACTIONS'">
+          <ng-container *ngIf="element?.ID">
+            <mat-icon color="primary" class="de-cursorpointer de-m-rbase" (click)="showEditDetailsDialog(element, $event)">edit</mat-icon>
+          </ng-container>
         </ng-container>
 
         <ng-container *ngSwitchCase="customerColumns?.MOBILE?.label">
@@ -110,13 +116,137 @@
 
   <ng-container matColumnDef="expandedDetail">
     <mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length" class="expanded-detail-cell" [ngClass]="element !== expandedElement ? 'de-noborder--force' : ''">
-      <de-customer-card *ngIf="element === expandedElement" [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'" [customer]="element"></de-customer-card>
+      <de-customer-card
+        *ngIf="element === expandedElement"
+        [customer]="element"
+        [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'"
+        (onCustomerUpdate)="refreshData(true)"
+      >
+      </de-customer-card>
     </mat-cell>
   </ng-container>
 
   <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
-  <mat-row *matRowDef="let row; columns: displayedColumns;" mat-ripple (click)="expandedElement = expandedElement === row ? null : row"></mat-row>
+  <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="expandedElement = expandedElement === row ? null : row"></mat-row>
   <mat-row mat-row *matRowDef="let row; columns: ['expandedDetail']" class="expanded-detail-row"></mat-row>
 </mat-table>
 
 <mat-paginator [pageSizeOptions]="[25, 50, 100, 20]" pageSize="50" showFirstLastButtons></mat-paginator>
+
+
+<de-dialog *ngIf="editCustomerOrig" (closeDialog)="hideEditDetailsDialog()" classNames="customer-card-dialog">
+  <ng-container de-dialog-header>{{TKey.COMMON.EDIT}} - {{editCustomerOrig.Name}}</ng-container>
+  <ng-container de-dialog-body>
+    <table class="customer-card full-width">
+      <tr>
+        <th>Month</th>
+        <th>Collected</th>
+        <th>Amount</th>
+        <th>Settled</th>
+        <th>Notes</th>
+      </tr>
+      <tr *ngFor="let month of editCustomer.getMonthsInOrder()">
+        <td>{{month}}</td>
+        <td>{{editCustomer.getCollectionDateStrFormat(month)}}</td>
+        <td>
+          <ng-container [ngSwitch]="canEditMonth(month)">
+            <ng-container *ngSwitchCase="true">
+              <input type="number" [(ngModel)]="editCustomer[month]">
+            </ng-container>
+            <ng-container *ngSwitchCase="false">{{editCustomerOrig.get(month)}}</ng-container>
+          </ng-container>
+        </td>
+        <td>{{editCustomerOrig.getSettlementDateStrFormat(month)}}</td>
+        <td>
+          <ng-container [ngSwitch]="canEditMonth(month)">
+            <ng-container *ngSwitchCase="true">
+              <ng-container *ngTemplateOutlet="editMonthNotes; context: { editCustomer: editCustomer, notesKey: editCustomer.getNotesKey(month) }"></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="false">{{editCustomerOrig.getNotes(month)}}</ng-container>
+          </ng-container>
+        </td>
+      </tr>
+    </table>
+
+    <p class="mat-headline-5 de-m-bmedium">{{TKey.COMMON.DETAILS}}</p>
+
+    <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
+      <mat-label>{{TKey.COMMON.ID}}</mat-label>
+      <input matInput type="text" [(ngModel)]="editCustomer.ID">
+      <button *ngIf="editCustomer.ID && isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer.ID=''"><mat-icon>close</mat-icon></button>
+    </mat-form-field>
+
+    <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
+      <mat-label>{{TKey.COMMON.STB}}</mat-label>
+      <input matInput type="text" [(ngModel)]="editCustomer.STB">
+      <button *ngIf="editCustomer.STB && isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer.STB=''"><mat-icon>close</mat-icon></button>
+    </mat-form-field>
+
+    <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
+      <mat-label>{{TKey.COMMON.STB_STATUS}}</mat-label>
+      <mat-select [(ngModel)]="editCustomer['STB Status']">
+        <mat-option *ngFor="let status of ['Active', 'Deactive', 'INACTIVE', 'SUSPENDED']" [value]="status">{{status}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
+      <mat-label>{{TKey.COMMON.MOBILE}}</mat-label>
+      <textarea matInput type="text" [(ngModel)]="editCustomer.Mobile"></textarea>
+      <button *ngIf="editCustomer.Mobile && isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer.Mobile=''"><mat-icon>close</mat-icon></button>
+    </mat-form-field>
+    
+    <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
+      <mat-label>{{TKey.COMMON.CONNECTION_ON}}</mat-label>
+      <input matInput [matDatepicker]="picker" [(ngModel)]="editCustomer['Connection On']">
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
+      <mat-label>{{TKey.COMMON.NOTES}}</mat-label>
+      <textarea matInput type="text" [(ngModel)]="editCustomer['Own Notes']"></textarea>
+      <button *ngIf="editCustomer['Own Notes'] && isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer['Own Notes']=''"><mat-icon>close</mat-icon></button>
+    </mat-form-field>
+
+    <div class="location-container">
+      <label>{{TKey.COMMON.LOCATION}}</label>
+      <button mat-raised-button color="primary" *ngIf="isCableAdmin()" (click)="getLatLng(editCustomer)" class="de-m-bmedium">
+        <div class="de-f-aligncenter de-sm-rsmall-nolast">
+          <de-spinner *ngIf="processingLatLng" [size]="16" color="white"></de-spinner>
+          <span>Update Current Location</span>
+        </div>
+      </button>
+
+      <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
+        <mat-label>{{TKey.COMMON.LATITUDE}}</mat-label>
+        <input matInput type="text" [(ngModel)]="editCustomer.Latitude">
+        <button *ngIf="editCustomer.Latitude && isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer.Latitude=''"><mat-icon>close</mat-icon></button>
+      </mat-form-field>
+
+      <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
+        <mat-label>{{TKey.COMMON.LONGITUDE}}</mat-label>
+        <input matInput type="text" [(ngModel)]="editCustomer.Longitude">
+        <button *ngIf="editCustomer.Longitude && isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer.Longitude=''"><mat-icon>close</mat-icon></button>
+      </mat-form-field>
+    </div>
+  </ng-container>
+
+  <ng-container de-dialog-footer>
+    <button mat-raised-button color="warn" (click)="hideEditDetailsDialog()">
+      <div class="de-f-aligncenter de-sm-rsmall-nolast">
+        <mat-icon>close</mat-icon>
+        <span>{{TKey.COMMON.CANCEL}}</span>
+      </div>
+    </button>
+    <button mat-raised-button color="primary" (click)="checkUpdateCollections()">
+      <div class="de-f-aligncenter de-sm-rsmall-nolast">
+        <mat-icon>check</mat-icon>
+        <span>{{TKey.COMMON.OK}}</span>
+      </div>
+    </button>
+  </ng-container>
+</de-dialog>
+
+<ng-template #editMonthNotes let-editCustomer="editCustomer" let-notesKey="notesKey">
+  <input type="string" class="notes" [(ngModel)]="editCustomer[notesKey]">
+</ng-template>

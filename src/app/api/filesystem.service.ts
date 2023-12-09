@@ -6,6 +6,11 @@ export interface IInfoJson {
   [key: string]: { lastUpdatedAt: number } | null
 }
 
+export interface IFileInfo extends FileInfo {
+  path?: string;
+  children?: IFileInfo[]
+}
+
 @Injectable()
 export class ApiFileSystemService {
   dataDir = Directory.Data;
@@ -108,7 +113,7 @@ export class ApiFileSystemService {
     }
   }
 
-  async listDir(path = '', recursive = false) {
+  async listDir(path = '', recursive = false): Promise<IFileInfo[]> {
     const files = (await Filesystem.readdir({ path, directory: this.dataDir })).files;
     files.forEach((f) => (f as any).path = `${path ? path + '/' : ''}${f.name}`);
 

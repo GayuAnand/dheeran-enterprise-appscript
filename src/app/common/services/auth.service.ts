@@ -6,6 +6,10 @@ import { IApps, IRoleValue, IUser } from '../interfaces';
 export class AuthService {
   user?: IUser;
 
+  get Username() {
+    return this.user?.Username || '';
+  }
+
   isAdmin() {
     return !!this.user?.Role?.[IApps.ADMIN];
   }

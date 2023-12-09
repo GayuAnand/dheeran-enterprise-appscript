@@ -27,6 +27,7 @@ export interface ISheetsInfo {
   CUSTOMERS: {
     label: 'Customers',
     cols: {
+      ID: { label: 'ID' },
       NAME: { label: 'Name' },
       MOBILE: { label: 'Mobile' },
       STB: { label: 'STB' },
@@ -35,6 +36,7 @@ export interface ISheetsInfo {
       LATITUDE: { label: 'Latitude' },
       LONGITUDE: { label:	'Longitude' },
       NOTES: { label: 'Notes' },
+      OWN_NOTES: { label: 'Own Notes' },
       CONNECTION_ON: { label: 'Connection On' },
       STB_STATUS: {
         label: 'STB Status',

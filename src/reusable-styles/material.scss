@@ -1,6 +1,10 @@
 mat-form-field {
   min-width: 200px;
   width: 100%;
+
+  &.readonly * {
+    pointer-events: none !important;
+  }
 }
 
 mat-table {

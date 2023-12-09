@@ -33,6 +33,11 @@ export class SettingsService implements OnDestroy {
   isOnline = true;
 
   /**
+   * Show app level loading screen with given message. This will prevent user from interacting with the application while processing.
+   */
+  processingText = '';
+
+  /**
    * Metadata from Google sheet
    */
   metadata: IMetadata = {};
@@ -93,7 +98,7 @@ export class SettingsService implements OnDestroy {
   }
 
   checkAndPopulateNavigationData() {
-    const navigationData = [
+    const navigationData: NavMenuItem[] = [
       {
         name: EN_MAPPING.COMMON.DASHBOARD,
         routerLink: ['/app/dashboard']
@@ -124,9 +129,10 @@ export class SettingsService implements OnDestroy {
     if (this.authService.hasAnyPermission(IApps.ADMIN)) {
       navigationData.push({
         name: EN_MAPPING.COMMON.MAINTENANCE,
-        routerLink: ['/app/maintenance']
+        routerLink: ['/app/maintenance'],
       });
     }
+
     this.navigationData = navigationData;
   }
 

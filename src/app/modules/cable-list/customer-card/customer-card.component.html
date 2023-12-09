@@ -1,4 +1,14 @@
 <table class="customer-details">
+  <ng-container *ngIf="isCableAdmin()">
+    <tr>
+      <td>ID:</td>
+      <td><de-copyable-text [text]="customer.ID"></de-copyable-text></td>
+    </tr>
+    <tr>
+      <td>STB Status:</td>
+      <td>{{customer['STB Status']}}</td>
+    </tr>
+  </ng-container>
   <tr>
     <td>STB:</td>
     <td><de-copyable-text [text]="customer.STB"></de-copyable-text></td>
@@ -26,7 +36,7 @@
 </table>
 
 <div class="customer-card-wrapper">
-  <table>
+  <table class="customer-card">
     <tr>
       <th>Month</th>
       <th>Collected</th>

@@ -3,6 +3,7 @@
   flex-grow: 1;
   flex-wrap: wrap;
   justify-content: space-between;
+  overflow: auto;
 }
 
 .detail-section {
@@ -34,26 +35,42 @@
   flex-grow: 1;
   justify-content: center;
   width: 100%;
+}
 
-  table {
+table.customer-card {
+  border-collapse: collapse;
+  border-color: rgb(222, 226, 230);
+  display: table;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  max-width: 400px;
+  text-align: center;
+  width: 100%;
+
+  th {
+    background-color: #d2d8ff;
+    font-weight: 500;
+  }
+
+  th, td {
+    border: 1px solid rgb(222, 226, 230);
     border-collapse: collapse;
-    border-color: rgb(222, 226, 230);
-    display: table;
-    margin-top: 12px;
-    margin-bottom: 12px;
-    max-width: 400px;
-    text-align: center;
-    width: 100%;
+    padding: 6px;
+  }
+}
 
-    th {
-      background-color: #d2d8ff;
-      font-weight: 500;
+table.customer-card, table.customer-details {
+  input {
+    border: 0px;
+    outline: none;
+    width: 50px;
+
+    &:focus {
+      outline: none;
     }
 
-    th, td {
-      border: 1px solid rgb(222, 226, 230);
-      border-collapse: collapse;
-      padding: 6px;
+    &.notes {
+      width: 200px;
     }
   }
 }

@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
 import { ApiGSheetDataService } from '../../api';
 import { SettingsService } from './settings.service';
+import { environment } from 'src/environments/environment';
 
 export const AuthGuard = () => {
   const router = inject(Router);
@@ -12,7 +13,7 @@ export const AuthGuard = () => {
   const apiGSheetService = inject(ApiGSheetDataService);
   const settingsService = inject(SettingsService);
 
-  return apiGSheetService.discoveryInfo(true).pipe(
+  return apiGSheetService.discoveryInfo(environment.production).pipe(
     map((res: any) => {
       authService.user = res.activeUser;
       settingsService.metadata = res;

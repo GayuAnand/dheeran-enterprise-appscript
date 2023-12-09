@@ -5,9 +5,9 @@ import { MatTableDataSource } from '@angular/material/table';
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 
-import { IInfoJson } from 'src/app/api';
 import { BaseComponent } from 'src/app/common';
 import { CustomerModel } from 'src/app/models';
+import { IApps, IRoleValue } from 'src/app/common/interfaces';
 
 @Component({
   selector: 'de-cable-list',
@@ -59,6 +59,12 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
 
   cacheInfo: any = null;
 
+  editCustomerOrig!: CustomerModel | null;
+
+  editCustomer!: CustomerModel;
+
+  processingLatLng = false;
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   ngOnInit(): void {
@@ -71,17 +77,28 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     this._subscriptions.push(this.eventService.isMobile.subscribe(() => this.refreshDisplayedColumns()));
 
     this.settingsService.pageTitle = this.TKey.COMMON.CABLE;
+    this.geolocationService.getCurrentPosition().subscribe(s => console.log(s));
   }
 
   ngAfterViewInit() {
     this.data.paginator = this.paginator;
     this.refreshDisplayedColumns();
-    this.refreshData();
+    this.refreshData(false, true);
   }
 
   override ngOnDestroy(): void {
     super.ngOnDestroy();
     this.cacheInfo?.destroy();
+  }
+
+  getLatLng(customer: CustomerModel) {
+    this.processingLatLng = true;
+    this.geolocationService.getCurrentPosition()
+      .subscribe((position) => {
+        this.processingLatLng = false;
+        customer.Latitude = position.coords.latitude;
+        customer.Longitude = position.coords.longitude;
+      });
   }
 
   refreshDisplayedColumns() {
@@ -90,9 +107,11 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     } else {
       this.displayedColumns = this.allColumns.slice(0, 4);
     }
+    this.displayedColumns.push('ACTIONS');
   }
 
-  refreshData(force = false) {
+  refreshData(force = false, resetFilters = false) {
+    this.settingsService.processingText = `Refreshing data...`;
     this.apiGSheetDataService.getSheetData<CustomerModel>(this.settingsService.metadata.sheetsInfo?.CUSTOMERS.label as string, CustomerModel, force)
       .pipe(
         concatMap((res) => this.getRefreshCacheInfo(`SHEET_${this.settingsService.metadata.sheetsInfo?.CUSTOMERS.label}` as string, this.cacheInfo)
@@ -103,30 +122,51 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
             }))
           )
       )
-      .subscribe((data) => {
-        this.fullData = data;
-        this.initializeFilters();
+      .subscribe({
+        next: (data) => {
+          this.settingsService.processingText = '';
+          this.fullData = data;
+          this.initializeFilters(resetFilters);
+        },
+        error: () => this.settingsService.processingText = ''
       });
   }
 
-  initializeFilters() {
+  initializeFilters(resetFilters = false) {
     const area: any = {};
+    const appliedAreaFilters = this.areaFilter.control.value;
     this.fullData.forEach(d => area[d.Area] = true);
     this.areaFilter.controlOptions = Object.keys(area);
     this.areaFilter.controlOptions.sort();
-    this.areaFilter.control.setValue([]);
     this.areaFilter.selectAll = false;
+    if (!appliedAreaFilters?.length || resetFilters) {
+      this.areaFilter.control.setValue([]);
+    } else {
+      this.areaFilter.control.setValue(appliedAreaFilters);
+    }
 
-    this.monthsFilter.controlOptions = this.fullData[0].getMonthsInOrder();
-
+    const appliedMonthsFilters = this.monthsFilter.control.value;
+    this.monthsFilter.controlOptions = this.fullData[0]?.getMonthsInOrder() || [];
+    if (!appliedMonthsFilters?.length || resetFilters) {
+      this.monthsFilter.control.setValue([]);
+    } else {
+      this.monthsFilter.control.setValue(appliedMonthsFilters);
+    }
+    
     let agents: any = {};
+    const appliedAgentsFilters = this.agentsFilter.control.value;
     this.fullData.forEach((data) => agents = Object.assign(agents, data.getCollectionAgents()));
     this.agentsFilter.controlOptions = Object.keys(agents);
     this.agentsFilter.controlOptions.sort();
     if (this.authService.hasPermission(this.METADATA.APPS.CABLE, this.METADATA.ROLES.ADMIN)) {
+      if (!appliedAgentsFilters?.length || resetFilters) {
+        this.agentsFilter.control.setValue([]);
+      } else {
+        this.agentsFilter.control.setValue(appliedAgentsFilters);
+      }
       this.agentsFilter.control.setValue([]);
     } else {
-      this.agentsFilter.control.setValue([this.authService.user?.Username as string]);
+      this.agentsFilter.control.setValue([this.authService.Username as string]);
     }
     this.onFilterChange();
   }
@@ -136,6 +176,22 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     this.showPendingSettlement = false;
     this.showCollectedCustomers = false;
     this.monthsFilter.control.setValue([]);
+    this.onFilterChange();
+  }
+
+  onPendingSettlementFilterChange() {
+    if (this.showPendingSettlement) {
+      this.showCollectedCustomers = false;
+      this.monthsFilter.control.setValue([]);
+    }
+    this.onFilterChange();
+  }
+  
+  onShowCollectedCustomersFilterChange() {
+    if (this.showCollectedCustomers) {
+      this.showPendingSettlement = false;
+      this.agentsFilter.control.setValue([]);
+    }
     this.onFilterChange();
   }
 
@@ -228,5 +284,93 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     const mobileColumnFlow = (columnName === this.customerColumns?.MOBILE?.label) ? 'de-f-column' : '';
     const showBorder = (data === this.expandedElement) ? 'de-noborder--force' : '';
     return `${isActiveCustomer} ${centerAlign} ${mobileColumnFlow} ${showBorder}`;
+  }
+
+  isCableAdmin() {
+    return this.authService.hasPermission(IApps.CABLE, IRoleValue.ADMIN);
+  }
+
+  canEditMonth(month: keyof CustomerModel): boolean {
+    const editCustomerOrig: CustomerModel = this.editCustomerOrig as CustomerModel;
+    
+    // No collection yet, no collection by and settlement information
+    return this.isCableAdmin() || (!editCustomerOrig[month] && !editCustomerOrig.getCollectionBy(month) && !editCustomerOrig.getSettlementDate(month));
+  }
+  
+  checkUpdateCollections() {
+    try {
+      const editCustomerOrig: CustomerModel = this.editCustomerOrig as CustomerModel;
+      const customerCols = this.settingsService.getCustomerCols();
+      const payload: any = {
+        [customerCols?.ID.label as string]: editCustomerOrig.ID,
+      };
+      const keysToUpdate: (keyof CustomerModel)[] = [
+        customerCols?.STB.label as any,
+        customerCols?.STB_STATUS.label as any,
+        customerCols?.MOBILE.label as any,
+        customerCols?.OWN_NOTES.label as any,
+        customerCols?.CONNECTION_ON.label as any,
+        customerCols?.LATITUDE.label as any,
+        customerCols?.LONGITUDE.label as any,
+      ];
+      keysToUpdate
+        .filter(key => editCustomerOrig[key] != this.editCustomer[key])
+        .forEach(key => {
+          if (this.editCustomer[key] && (key === customerCols?.CONNECTION_ON.label)) {
+            payload[key] = this.editCustomer.formatDate(this.editCustomer[key]);
+          } else {
+            payload[key] = this.editCustomer[key];
+          }
+        });
+
+      this.editCustomer.getMonthsInOrder().forEach(month => {
+        if (this.canEditMonth(month) && (this.editCustomer[month] || this.editCustomer.getNotes(month))) {
+          if (this.editCustomer[month]) {
+            payload[month] = this.editCustomer[month];
+            payload[this.editCustomer.getCollectionByKey(month)] = this.authService.Username;
+            payload[this.editCustomer.getCollectionDateKey(month)] = this.editCustomer.formatDate(Date.now());
+          }
+          payload[this.editCustomer.getNotesKey(month)] = this.editCustomer.getNotes(month) || '';
+        }
+      });
+
+      if (Object.keys(payload).length === 0) {
+        return this.hideEditDetailsDialog();
+      }
+
+      const customerSheetName = this.settingsService.metadata.sheetsInfo?.CUSTOMERS.label as string;
+      this.settingsService.processingText = `Updating '${editCustomerOrig?.Name}'...`;
+      this.apiGSheetDataService.saveOrUpdateRecord(
+        customerSheetName,
+        [this.settingsService.getCustomerCols()?.ID.label as string],
+        payload
+      )
+        .subscribe({
+          next: () => {
+            this.settingsService.processingText = '';
+            this.utilService.openSnackBar(`Successfully updated '${editCustomerOrig?.Name}'`, 'Close');
+            this.hideEditDetailsDialog();
+            this.refreshData(true, false);
+          },
+          error: (err) => {
+            this.settingsService.processingText = '';
+            this.utilService.openSnackBar(err, 'Close');
+          }
+        });
+      } catch(e) {
+        this.settingsService.processingText = '';
+        this.utilService.openSnackBar(e?.toString() || 'Script error in submitting changes.', 'Close');
+    }
+  }
+
+  showEditDetailsDialog(customer: CustomerModel, event?: MouseEvent) {
+    event?.stopPropagation();
+    event?.preventDefault();
+    this.editCustomerOrig = customer;
+    this.editCustomer = this.editCustomerOrig.clone();
+  }
+
+  hideEditDetailsDialog() {
+    this.editCustomerOrig = null;
   }
 }

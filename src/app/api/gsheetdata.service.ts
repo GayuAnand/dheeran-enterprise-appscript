@@ -2,7 +2,7 @@ import { Network } from '@capacitor/network';
 import { Injectable } from '@angular/core';
 import { Observable, concatMap, delay, map, of } from 'rxjs';
 
-import { BaseModel } from '../models';
+import { BaseModel, CustomerModel } from '../models';
 import { ApiAuthService } from './auth.service';
 import { ApiStorageService } from './storage.service';
 import { ApiAppScriptService } from './appscript.service';
@@ -36,20 +36,22 @@ export class ApiGSheetDataService {
   discoveryInfo(force = false): Observable<IMetadata & { activeUser: IUser } | null> {
     return this.storageService.getData<string>(this.apiAuthService.authTokenName)
       .pipe(
-        map((token) => {
-          this.apiAuthService.authToken = token;
-        }),
+        map((token) => this.apiAuthService.authToken = token),
         concatMap(() => this.storageService.getData<string>('prodDeployId')
           .pipe(
             map((prodDeployId) => this.appScriptService.prodDeployId = prodDeployId || this.appScriptService.prodDeployId),
           )),
-        concatMap(() => {
-          return this.checkCacheAndGet<IMetadata & { activeUser: IUser }>('discoveryInfo', 'discoveryInfo', [this.apiAuthService.authToken], force);
-        }),
+        concatMap(() => this.checkCacheAndGet<IMetadata & { activeUser: IUser }>('discoveryInfo', 'discoveryInfo', [this.apiAuthService.authToken], force)),
         concatMap((res) => {
-          this.appScriptService.prodDeployId = res?.deployIds?.[0] || this.appScriptService.prodDeployId;
+          let refreshDiscovery = of(res);
+          const prodDeployId = res?.deployIds?.[0] || this.appScriptService.prodDeployId;
+          if (prodDeployId !== this.appScriptService.prodDeployId) {
+            this.appScriptService.prodDeployId = prodDeployId;
+            refreshDiscovery = this.checkCacheAndGet<IMetadata & { activeUser: IUser }>('discoveryInfo', 'discoveryInfo', [this.apiAuthService.authToken], force);
+          }
+
           return this.storageService.setData('prodDeployId', this.appScriptService.prodDeployId)
-            .pipe(map(() => res));
+            .pipe(concatMap(() => refreshDiscovery));
         })
       );
   }

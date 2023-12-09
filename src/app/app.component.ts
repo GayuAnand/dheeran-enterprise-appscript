@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
+import { BaseModel } from './models';
 import { ApiFileSystemService } from './api';
 import { BaseComponent, UiBundleUpdaterService } from './common';
 
@@ -18,6 +19,7 @@ export class AppComponent extends BaseComponent {
     private uiBundleUpdaterService: UiBundleUpdaterService,
   ) {
     super();
+    BaseModel.AuthService = this.authService;
     this.uiBundleUpdaterService.initialize();
     this.fileSystemService.cleanupUnknownFiles();
     this.matIconRegistry.addSvgIcon('whatsapp', this.setPath(`assets/images/whatsapp.svg`));

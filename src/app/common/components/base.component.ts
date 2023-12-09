@@ -5,7 +5,7 @@ import { Component, NgZone, OnDestroy, inject } from '@angular/core';
 
 import { EN_MAPPING } from './../../../assets/i18n/en.mapping';
 import { IApps, IRoleValue } from '../interfaces';
-import { AuthService, EventService, SettingsService, UtilService } from '../services';
+import { AuthService, EventService, GeoLocationService, SettingsService, UtilService } from '../services';
 import { ApiAppScriptService, ApiGSheetDataService, ApiAuthService, ApiFileSystemService, ApiStorageService } from './../../../../src/app/api';
 
 @Component({
@@ -35,6 +35,8 @@ export class BaseComponent implements OnDestroy {
   settingsService: SettingsService = inject(SettingsService);
 
   utilService: UtilService = inject(UtilService);
+
+  geolocationService: GeoLocationService = inject(GeoLocationService);
 
   apiGSheetDataService: ApiGSheetDataService = inject(ApiGSheetDataService);
 

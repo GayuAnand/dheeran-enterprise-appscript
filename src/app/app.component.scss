@@ -14,3 +14,22 @@
   width: 100%;
   z-index: 100000;
 }
+
+.loading-screen {
+  align-items: center;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  display: flex;
+  font-size: 18px;
+  height: 100vh;
+  justify-content: center;
+  left: 0px;
+  position: fixed;
+  top: 0px;
+  width: 100vw;
+  z-index: 10000;
+
+  de-spinner {
+    margin-right: 6px;
+  }
+}

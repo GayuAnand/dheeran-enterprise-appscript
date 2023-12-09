@@ -24,8 +24,12 @@ export class PageLayoutComponent extends BaseComponent implements OnInit {
     });
   }
 
-  toggleSidenav() {
-    this.sidenav.opened ? this.sidenav.close() : this.sidenav.open();
+  hybridClearData() {
+    if (this.storageService.isNative) {
+      this.fs.deleteFileOrFolder('data', true);
+    } else {
+      this.storageService.clearData();
+    }
   }
 
   signOut() {

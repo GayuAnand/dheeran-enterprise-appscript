@@ -91,8 +91,7 @@
     <button mat-raised-button color="warn" (click)="recordToEdit = null"><mat-icon>close</mat-icon>{{TKey.COMMON.CANCEL}}</button>
     <button mat-raised-button color="primary" (click)="updateRecord()">
       <div class="de-f-aligncenter de-sm-rsmall-nolast">
-        <mat-icon *ngIf="!processingData">save</mat-icon>
-        <de-spinner *ngIf="processingData" [size]="16" color="white"></de-spinner>
+        <mat-icon>save</mat-icon>
         <span>{{TKey.COMMON.SAVE}}</span>
       </div>
     </button>
@@ -102,6 +101,5 @@
 <de-confirmation-dialog *ngIf="recordToDelete"
   [title]="'Delete Patrol?'"
   [content]="'Are you sure you want to delete patrol \'' + recordToDelete.Route + '\'?'"
-  [processing]="processingData"
   (onSuccess)="deleteRecord()" (onCancel)="recordToDelete = null">
 </de-confirmation-dialog>

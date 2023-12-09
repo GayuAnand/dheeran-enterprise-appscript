@@ -11,7 +11,7 @@ export class ApiAppScriptService {
 
   devDeployId = 'AKfycbwXGymXyx7sQjCVwqZVvkP6nMiRfAA_cVZ_YCiuiJs';
 
-  prodDeployId = 'AKfycbxaHURFyPc0eLPB0Uq1GmXZLzC8aAgds2qZk6o7IwQvrpSQS278POH-sk6CQzY6k8hQ';
+  prodDeployId = 'AKfycbxWZJNA0ToPZBIx7Qofz8s7nr_mng_hxkPF64pDimZNVfkpl7p1eBhpBBQqY0BExiXI';
 
   execPromises: Record<string, { subject: Subject<any>, observable?: Observable<any> }> = {};
 

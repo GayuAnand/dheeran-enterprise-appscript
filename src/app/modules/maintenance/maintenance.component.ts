@@ -4,6 +4,7 @@ import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 
 import { BaseComponent } from 'src/app/common';
+import { IFileInfo } from 'src/app/api';
 
 interface FileNode extends FileInfo {
   name: string;
@@ -58,8 +59,8 @@ export class MaintenanceComponent extends BaseComponent implements OnInit {
     this.storageService.clearData();
   }
 
-  async deleteFileOrFolder(node: any) {
-    await this.fs.deleteFileOrFolder(node.path, node.type);
+  async deleteFileOrFolder(node: IFileInfo) {
+    await this.fs.deleteFileOrFolder(node.path as string, node.type === 'directory');
     await this.listDir();
   }
 

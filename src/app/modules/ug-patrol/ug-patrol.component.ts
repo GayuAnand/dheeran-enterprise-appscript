@@ -48,8 +48,6 @@ export class UGPatrolComponent extends BaseComponent implements OnInit, AfterVie
     workType: [],
   };
 
-  processingData = false;
-
   cacheInfo: any = null;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -98,6 +96,7 @@ export class UGPatrolComponent extends BaseComponent implements OnInit, AfterVie
   }
 
   refreshData(force = false) {
+    this.settingsService.processingText = `Refreshing data...`;
     this.apiGSheetDataService.getSheetData<UGPatrolModel>(this.settingsService.metadata.sheetsInfo?.UG_PATROL.label as string, UGPatrolModel, force)
       .pipe(
         concatMap((res) => this.getRefreshCacheInfo(`SHEET_${this.settingsService.metadata.sheetsInfo?.UG_PATROL.label}` as string, this.cacheInfo)
@@ -118,11 +117,13 @@ export class UGPatrolComponent extends BaseComponent implements OnInit, AfterVie
           this.options.route = Object.keys(this.fullData.reduce((acc, data) => { acc[data.Route] = true; return acc; }, {} as Record<string, boolean>));
           this.options.workType = Object.keys(this.fullData.reduce((acc, data) => { acc[data.WorkType] = true; return acc; }, {} as Record<string, boolean>));
           this.initializeFilters();
+        },
+        error: (err) => this.utilService.openSnackBar(`ERROR IN FETCHING DATA: ${err}`, 'Close'),
+        complete: () => {
           this.recordToEdit = null;
           this.recordToDelete = null;
-          this.processingData = false;
-        },
-        error: (err) => this.utilService.openSnackBar(`ERROR IN FETCHING DATA: ${err}`, 'Close')
+          this.settingsService.processingText = '';
+        }
       });
   }
 
@@ -137,7 +138,7 @@ export class UGPatrolComponent extends BaseComponent implements OnInit, AfterVie
   updateRecord() {
     if (!this.recordToEdit) return;
 
-    this.processingData = true;
+    this.settingsService.processingText = `Updating data...`;
     const recordToEdit = this.recordToEdit.clone();
     recordToEdit.ID = recordToEdit.ID || Date.now().toString();
     recordToEdit.Date = BaseModel.formatDate(recordToEdit.Date) as string;
@@ -145,23 +146,29 @@ export class UGPatrolComponent extends BaseComponent implements OnInit, AfterVie
       [this.ugPatrolColumns?.ID?.label as string],
       recordToEdit as UGPatrolModel
     ).subscribe({
-      next: () => this.refreshData(true),
+      next: () => {
+        this.settingsService.processingText = '';
+        this.refreshData(true);
+      },
       error: (err) => {
-        this.processingData = false;
+        this.settingsService.processingText = ''
         this.utilService.openSnackBar(err, 'Close');
       }
     });
   }
 
   deleteRecord() {
-    this.processingData = true;
+    this.settingsService.processingText = `Deleting record...`;
     this.apiGSheetDataService.deleteRecord<UGPatrolModel>(this.settingsService.metadata.sheetsInfo?.UG_PATROL?.label as string,
       [this.ugPatrolColumns?.ID?.label as string],
       this.recordToDelete as UGPatrolModel
     ).subscribe({
-      next: () => this.refreshData(true),
+      next: () => {
+        this.settingsService.processingText = '';
+        this.refreshData(true);
+      },
       error: (err) => {
-        this.processingData = false;
+        this.settingsService.processingText = '';
         this.utilService.openSnackBar(err, 'Close');
       }
     });
