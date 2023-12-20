@@ -52,6 +52,7 @@ export const EN_MAPPING = {
     TASKS: 'Tasks',
     YES: 'Yes',
     UG_PATROL: 'UG Patrol',
+    UTILITY: 'Utility',
     VERSION: 'Version',
   },
   CUSTOMERS: {
