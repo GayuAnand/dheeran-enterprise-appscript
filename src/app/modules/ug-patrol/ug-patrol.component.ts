@@ -34,6 +34,8 @@ export class UGPatrolComponent extends BaseComponent implements OnInit, AfterVie
 
   searchText = '';
 
+  searchTextRegexp = new RegExp('');
+
   workTypeFilter = this.getNewFilterControl([], []);
 
   routeFilter = this.getNewFilterControl([], []);
@@ -51,19 +53,6 @@ export class UGPatrolComponent extends BaseComponent implements OnInit, AfterVie
   cacheInfo: any = null;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-
-  chartOptions = {
-    theme: "light2",
-    animationEnabled: true,
-    zoomEnabled: true,
-    title: { text: this.TKey.COMMON.UG_PATROL },
-    data: [{
-      type: "line",
-      xValueFormatString: "DD MMM'YY",
-      yValueFormatString: "#",
-      dataPoints: []
-    }]
-  }
 
   constructor() {
     super();
@@ -118,7 +107,7 @@ export class UGPatrolComponent extends BaseComponent implements OnInit, AfterVie
           this.options.workType = Object.keys(this.fullData.reduce((acc, data) => { acc[data.WorkType] = true; return acc; }, {} as Record<string, boolean>));
           this.initializeFilters();
         },
-        error: (err) => this.utilService.openSnackBar(`ERROR IN FETCHING DATA: ${err}`, 'Close'),
+        error: (err) => this.utilService.openErrorSnackBar(`ERROR IN FETCHING DATA: ${err}`, 'Close'),
         complete: () => {
           this.recordToEdit = null;
           this.recordToDelete = null;
@@ -152,7 +141,7 @@ export class UGPatrolComponent extends BaseComponent implements OnInit, AfterVie
       },
       error: (err) => {
         this.settingsService.processingText = ''
-        this.utilService.openSnackBar(err, 'Close');
+        this.utilService.openErrorSnackBar(err, 'Close');
       }
     });
   }
@@ -169,7 +158,7 @@ export class UGPatrolComponent extends BaseComponent implements OnInit, AfterVie
       },
       error: (err) => {
         this.settingsService.processingText = '';
-        this.utilService.openSnackBar(err, 'Close');
+        this.utilService.openErrorSnackBar(err, 'Close');
       }
     });
   }
@@ -220,13 +209,15 @@ export class UGPatrolComponent extends BaseComponent implements OnInit, AfterVie
 
     if (!this.searchText) {
       filterSearch = byPassFilter;
+    } else {
+      this.searchTextRegexp = this.utilService.getFlexibleSearchTextRegexp(this.searchText);
     }
 
     this.data.data = this.fullData.filter(filterRoute).filter(filterWorkType).filter(filterSearch);
   }
 
   filterSearch(data: UGPatrolModel) {
-    return data.freeTextSearch(this.searchText);
+    return data.freeTextSearch(this.searchTextRegexp);
   }
 
   filterRoute(data: UGPatrolModel) {

@@ -1,0 +1,320 @@
+<div class="filter-row de-p-vbase">
+  <mat-form-field>
+    <mat-label>{{TKey.COMMON.SEARCH}}</mat-label>
+    <input matInput type="text" [(ngModel)]="searchText" (ngModelChange)="onFilterChange()">
+    <button *ngIf="searchText" matSuffix mat-icon-button (click)="searchText=''; onFilterChange();">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>{{TKey.COMMON.STATUS}}</mat-label>
+    <mat-select [formControl]="statusFilter.control" multiple>
+      <div class="select-all">
+        <mat-checkbox [(ngModel)]="statusFilter.selectAll"
+                      [ngModelOptions]="{ standalone: true }"
+                      (change)="statusFilter.toggleSelectAll()">Select All</mat-checkbox>
+      </div>
+      <mat-option *ngFor="let status of statusFilter.controlOptions" [value]="status" (click)="statusFilter.onSelectionChange()">{{status}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>{{TKey.COMMON.GPAY}}</mat-label>
+    <mat-select [formControl]="gpayFilter.control" multiple>
+      <div class="select-all">
+        <mat-checkbox [(ngModel)]="gpayFilter.selectAll"
+                      [ngModelOptions]="{ standalone: true }"
+                      (change)="gpayFilter.toggleSelectAll()">Select All</mat-checkbox>
+      </div>
+      <mat-option *ngFor="let status of gpayFilter.controlOptions" [value]="status" (click)="gpayFilter.onSelectionChange()">{{status}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>{{TKey.COMMON.AREA}}</mat-label>
+    <mat-select [formControl]="areaFilter.control" multiple>
+      <div class="select-all">
+        <mat-checkbox [(ngModel)]="areaFilter.selectAll"
+                      [ngModelOptions]="{ standalone: true }"
+                      (change)="areaFilter.toggleSelectAll()">Select All</mat-checkbox>
+      </div>
+      <mat-option *ngFor="let area of areaFilter.controlOptions" [value]="area" (click)="areaFilter.onSelectionChange()">{{area}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <p class="advanced-filter-label"><span (click)="toggleAdvancedFilters()" class="de-cursorpointer">{{showAdvancedFilters ? TKey.COMMON.HIDE_ADVANCED_FILTERS : TKey.COMMON.SHOW_ADVANCED_FILTERS}}</span></p>
+
+  <ng-container *ngIf="showAdvancedFilters">
+    <div class="pending-settlement-filter" *ngIf="!showCollectedCustomers">
+      <label>Pending Settlement Filter</label>
+      <mat-slide-toggle [(ngModel)]="showPendingSettlement" (ngModelChange)="onPendingSettlementFilterChange()" [ngClass]="authService.hasPermission(METADATA.APPS.CABLE, METADATA.ROLES.ADMIN) ? '' : 'de-nm--force'">{{TKey.CUSTOMERS.SHOW_PENDING_SETTLEMENT}} {{showPendingSettlement ? '(Rs.' + pendingSettlementAmount + '/-)' : ''}}</mat-slide-toggle>
+
+      <mat-form-field *ngIf="authService.hasPermission(METADATA.APPS.CABLE, METADATA.ROLES.ADMIN)">
+        <mat-label>{{TKey.COMMON.AGENTS}}</mat-label>
+        <mat-select [formControl]="agentsFilter.control" multiple>
+          <div class="select-all">
+            <mat-checkbox [(ngModel)]="agentsFilter.selectAll"
+                          [ngModelOptions]="{ standalone: true }"
+                          (change)="agentsFilter.toggleSelectAll()">Select All</mat-checkbox>
+          </div>
+          <mat-option *ngFor="let area of agentsFilter.controlOptions" [value]="area" (click)="agentsFilter.onSelectionChange()">{{area}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-raised-button *ngIf="showPendingSettlement" color="primary" (click)="showSettlementConfirmationDialog = true" class="de-m-tbase">
+        <div class="de-f-aligncenter de-sm-rsmall-nolast">
+          <mat-icon>done</mat-icon>
+          <span>{{TKey.COMMON.SETTLE_PENDING_COLLECTIONS}}</span>
+        </div>
+      </button>
+    </div>
+
+    <div class="collection-filter" *ngIf="!showPendingSettlement">
+      <label>Collection Filter</label>
+      <mat-slide-toggle [(ngModel)]="showCollectedCustomers" (ngModelChange)="onShowCollectedCustomersFilterChange()">{{showCollectedCustomers ? TKey.CUSTOMERS.SHOWING_COLLECTED : TKey.CUSTOMERS.SHOWING_PENDING_COLLECTION}}</mat-slide-toggle>
+
+      <mat-form-field>
+        <mat-label>{{TKey.COMMON.MONTHS}}</mat-label>
+        <mat-select [formControl]="monthsFilter.control" multiple>
+          <div class="select-all">
+            <mat-checkbox [(ngModel)]="monthsFilter.selectAll"
+                          [ngModelOptions]="{ standalone: true }"
+                          (change)="monthsFilter.toggleSelectAll()">Select All</mat-checkbox>
+          </div>
+          <mat-option *ngFor="let area of monthsFilter.controlOptions" [value]="area" (click)="monthsFilter.onSelectionChange()">{{area}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </ng-container>
+</div>
+
+<de-refresh-data [cacheInfo]="cacheInfo" [refreshTriggerInterval]="1440" (refresh)="refreshData(true)"></de-refresh-data>
+
+<mat-table [dataSource]="data" class="mat-elevation-z8" multiTemplateDataRows>
+  <ng-container matColumnDef="{{column}}" *ngFor="let column of displayedColumns">
+    <mat-header-cell *matHeaderCellDef [ngClass]="'de-f-justifycenter'">{{column === 'ACTIONS' ? '' : column}}</mat-header-cell>
+
+    <mat-cell *matCellDef="let element" [ngClass]="getCellClassNames(element, column)">
+      <ng-container [ngSwitch]="column">
+        <ng-container *ngSwitchCase="customerColumns?.STATUS?.label">
+          <mat-icon>toggle_on</mat-icon>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="customerColumns?.STB?.label">
+          <de-copyable-text [text]="element[column]"></de-copyable-text>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="customerColumns?.NAME?.label">
+          {{element[column]}} {{showPendingSettlement ? '(' + element.getPendingSettlement(true, agentsFilter.control.value) + ')' : ''}}
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'ACTIONS'">
+          <ng-container *ngIf="element?.ID">
+            <mat-icon color="primary" class="de-cursorpointer de-m-rbase" (click)="showEditDetailsDialog(element, $event)">edit</mat-icon>
+          </ng-container>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="customerColumns?.MOBILE?.label">
+          <ng-container *ngFor="let mobile of element.getMobileNumbers()">
+            <div class="mobile-cell de-sm-rsmall-nolast" *ngIf="mobile">
+              <de-copyable-text [text]="mobile"></de-copyable-text>
+              <div class="de-f-aligncenter de-sm-rbase-nolast">
+                <de-mobile-number [mobile]="mobile" displayType="CALL"></de-mobile-number>
+                <de-mobile-number [mobile]="mobile" displayType="WHATSAPP"></de-mobile-number>
+              </div>
+            </div>
+          </ng-container>
+        </ng-container>
+
+        <ng-container *ngSwitchDefault>{{element[column]}}</ng-container>
+      </ng-container>
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="expandedDetail">
+    <mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length" class="expanded-detail-cell" [ngClass]="element !== expandedElement ? 'de-noborder--force' : ''">
+      <de-customer-card
+        *ngIf="element === expandedElement"
+        [customer]="element"
+        [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'"
+        (onCustomerUpdate)="refreshData(true)"
+      >
+      </de-customer-card>
+    </mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+  <mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="expandedElement === row ? 'highlight-row' : ''" (click)="expandedElement = expandedElement === row ? null : row"></mat-row>
+  <mat-row mat-row *matRowDef="let row; columns: ['expandedDetail']" class="expanded-detail-row"></mat-row>
+</mat-table>
+
+<mat-paginator [pageSizeOptions]="[25, 50, 100, 20]" pageSize="50" showFirstLastButtons></mat-paginator>
+
+
+<de-dialog *ngIf="editCustomerOrig" (closeDialog)="hideEditDetailsDialog()" classNames="customer-card-dialog">
+  <ng-container de-dialog-header>{{TKey.COMMON.EDIT}} - {{editCustomerOrig.Name}}</ng-container>
+  <ng-container de-dialog-body>
+    <div>
+      <table class="customer-card full-width">
+        <tr>
+          <th>Month</th>
+          <th>Collected</th>
+          <th>Amount</th>
+          <th>Settled</th>
+          <th>Notes</th>
+        </tr>
+        <tr *ngFor="let month of editCustomer.getMonthsInOrder()">
+          <td>{{month}}</td>
+          <td>{{editCustomer.getCollectionDateStrFormat(month)}}</td>
+          <td>
+            <ng-container [ngSwitch]="isCableAdmin() || canEditMonth(month)">
+              <ng-container *ngSwitchCase="true">
+                <input type="number" [(ngModel)]="editCustomer[month]">
+              </ng-container>
+              <ng-container *ngSwitchCase="false">{{editCustomerOrig.get(month)}}</ng-container>
+            </ng-container>
+          </td>
+          <td>{{editCustomerOrig.getSettlementDateStrFormat(month)}}</td>
+          <td>
+            <ng-container [ngSwitch]="isCableAdmin() || canEditMonth(month)">
+              <ng-container *ngSwitchCase="true">
+                <ng-container *ngTemplateOutlet="editMonthNotes; context: { editCustomer: editCustomer, notesKey: editCustomer.getNotesKey(month) }"></ng-container>
+              </ng-container>
+              <ng-container *ngSwitchCase="false">{{editCustomerOrig.getNotes(month)}}</ng-container>
+            </ng-container>
+          </td>
+        </tr>
+      </table>
+
+      <p class="mat-headline-5 de-m-bmedium">{{TKey.COMMON.DETAILS}}</p>
+
+      <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
+        <mat-label>{{TKey.COMMON.ID}}</mat-label>
+        <input matInput type="text" [(ngModel)]="editCustomer.ID">
+        <button *ngIf="editCustomer.ID && isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer.ID=''"><mat-icon>close</mat-icon></button>
+      </mat-form-field>
+
+      <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
+        <mat-label>{{TKey.COMMON.NAME}}</mat-label>
+        <input matInput type="text" [(ngModel)]="editCustomer.Name">
+        <button *ngIf="editCustomer.Name && isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer.Name=''"><mat-icon>close</mat-icon></button>
+      </mat-form-field>
+
+      <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
+        <mat-label>{{TKey.COMMON.AREA}}</mat-label>
+        <mat-select [(ngModel)]="editCustomer.Area">
+          <mat-option *ngFor="let area of areaFilter.controlOptions" [value]="area">{{area}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
+        <mat-label>{{TKey.COMMON.STATUS}}</mat-label>
+        <mat-select [(ngModel)]="editCustomer.Status">
+          <mat-option *ngFor="let status of statusFilter.controlOptions" [value]="status">{{status}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
+        <mat-label>{{TKey.COMMON.STB}}</mat-label>
+        <input matInput type="text" [(ngModel)]="editCustomer.STB">
+        <button *ngIf="editCustomer.STB && isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer.STB=''"><mat-icon>close</mat-icon></button>
+      </mat-form-field>
+
+      <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
+        <mat-label>{{TKey.COMMON.STB_STATUS}}</mat-label>
+        <mat-select [(ngModel)]="editCustomer['STB Status']">
+          <mat-option *ngFor="let status of ['Active', 'Deactive', 'INACTIVE', 'SUSPENDED']" [value]="status">{{status}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
+        <mat-label>{{TKey.COMMON.MOBILE}}</mat-label>
+        <textarea matInput type="text" [(ngModel)]="editCustomer.Mobile"></textarea>
+        <button *ngIf="editCustomer.Mobile && isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer.Mobile=''"><mat-icon>close</mat-icon></button>
+      </mat-form-field>
+
+      <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
+        <mat-label>{{TKey.COMMON.GPAY}}</mat-label>
+        <mat-select [(ngModel)]="editCustomer.GPay">
+          <mat-option *ngFor="let option of [[TKey.COMMON.YES, '1'], [TKey.COMMON.NO, '0']]" [value]="option[1]">{{option[0]}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      
+      <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
+        <mat-label>{{TKey.COMMON.CONNECTION_ON}}</mat-label>
+        <input matInput [matDatepicker]="picker" [(ngModel)]="editCustomer['Connection On']">
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
+        <mat-label>{{TKey.COMMON.NOTES}}</mat-label>
+        <textarea matInput type="text" [(ngModel)]="editCustomer['Own Notes']"></textarea>
+        <button *ngIf="editCustomer['Own Notes'] && isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer['Own Notes']=''"><mat-icon>close</mat-icon></button>
+      </mat-form-field>
+
+      <div class="location-container">
+        <label>{{TKey.COMMON.LOCATION}}</label>
+        <button mat-raised-button color="primary" *ngIf="isCableAdmin()" (click)="getLatLng(editCustomer)" class="de-m-bmedium de-m-rbase">
+          <div class="de-f-aligncenter de-sm-rsmall-nolast">
+            <mat-icon *ngIf="!processingLatLng">update</mat-icon>
+            <de-spinner *ngIf="processingLatLng" [size]="16" color="white"></de-spinner>
+            <span>Update Current Location</span>
+          </div>
+        </button>
+
+        <a mat-raised-button color="primary" target="_blank" class="de-m-bmedium"
+          [href]="geolocationService.getGoogleLocationUrl(editCustomer.Latitude, editCustomer.Longitude)">
+          <div class="de-f-aligncenter de-sm-rsmall-nolast">
+            <mat-icon>location_on</mat-icon>
+            <span>Open Location</span>
+          </div>
+        </a>
+
+        <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
+          <mat-label>{{TKey.COMMON.LATITUDE}}</mat-label>
+          <input matInput type="text" [(ngModel)]="editCustomer.Latitude">
+          <button *ngIf="editCustomer.Latitude && isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer.Latitude=''"><mat-icon>close</mat-icon></button>
+        </mat-form-field>
+
+        <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
+          <mat-label>{{TKey.COMMON.LONGITUDE}}</mat-label>
+          <input matInput type="text" [(ngModel)]="editCustomer.Longitude">
+          <button *ngIf="editCustomer.Longitude && isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer.Longitude=''"><mat-icon>close</mat-icon></button>
+        </mat-form-field>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container de-dialog-footer>
+    <button mat-raised-button color="warn" (click)="hideEditDetailsDialog()">
+      <div class="de-f-aligncenter de-sm-rsmall-nolast">
+        <mat-icon>close</mat-icon>
+        <span>{{TKey.COMMON.CANCEL}}</span>
+      </div>
+    </button>
+    <button mat-raised-button color="primary" (click)="checkUpdateCollections()">
+      <div class="de-f-aligncenter de-sm-rsmall-nolast">
+        <mat-icon>check</mat-icon>
+        <span>{{TKey.COMMON.OK}}</span>
+      </div>
+    </button>
+    <button mat-raised-button color="accent" (click)="checkUpdateCollections(true)">
+      <div class="de-f-aligncenter de-sm-rsmall-nolast">
+        <mat-icon>cloud_off</mat-icon>
+        <span>{{TKey.COMMON.SAVE}}</span>
+      </div>
+    </button>
+  </ng-container>
+</de-dialog>
+
+<ng-template #editMonthNotes let-editCustomer="editCustomer" let-notesKey="notesKey">
+  <input type="string" class="notes" [(ngModel)]="editCustomer[notesKey]">
+</ng-template>
+
+<de-confirmation-dialog *ngIf="showSettlementConfirmationDialog"
+  [title]="'Settle collections?'"
+  [content]="'Are you sure you want to settle collection amount of Rs.' + pendingSettlementAmount + '/- from Agents (' + (agentsFilter.control.value.length ? agentsFilter.control.value : agentsFilter.controlOptions).join(', ') + ')?'"
+  (onSuccess)="settlePendingCollections()" (onCancel)="showSettlementConfirmationDialog = false">
+</de-confirmation-dialog>

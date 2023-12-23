@@ -1,0 +1,17 @@
+.whatsapp-wrapper {
+  align-items: center;
+  display: flex;
+  margin-bottom: 12px;
+
+  ::ng-deep {
+    .mat-mdc-form-field-subscript-wrapper {
+      display: none;
+    }
+
+    de-mobile-number mat-icon {
+      height: 50px;
+      margin-left: 12px;
+      width: 50px;
+    }
+  }
+}

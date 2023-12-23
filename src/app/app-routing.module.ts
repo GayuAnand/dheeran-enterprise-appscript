@@ -15,8 +15,8 @@ const routes: Routes = [
         loadChildren: () => import('./modules/dashboard').then((m) => m.DashboardModule),
       },
       {
-        path: 'cable-list',
-        loadChildren: () => import('./modules/cable-list').then((m) => m.CableListModule),
+        path: 'cable',
+        loadChildren: () => import('./modules/cable').then((m) => m.CableModule),
         canActivate: [RoleGuard(IApps.CABLE)],
       },
       {
@@ -30,7 +30,7 @@ const routes: Routes = [
         canActivate: [RoleGuard(IApps.UG)],
       },
       {
-        path: 'maintenance',
+        path: 'utility',
         loadChildren: () => import('./modules/maintenance').then((m) => m.MaintenanceModule),
         canActivate: [RoleGuard(IApps.ADMIN)],
       },

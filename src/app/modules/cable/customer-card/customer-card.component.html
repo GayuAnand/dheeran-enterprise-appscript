@@ -1,20 +1,22 @@
 <table class="customer-details">
   <ng-container *ngIf="isCableAdmin()">
     <tr>
-      <td>ID:</td>
+      <td>{{TKey.COMMON.ID}}:</td>
       <td><de-copyable-text [text]="customer.ID"></de-copyable-text></td>
     </tr>
     <tr>
-      <td>STB Status:</td>
+      <td>{{TKey.COMMON.STB_STATUS}}:</td>
       <td>{{customer['STB Status']}}</td>
     </tr>
   </ng-container>
+
   <tr>
-    <td>STB:</td>
+    <td>{{TKey.COMMON.STB}}:</td>
     <td><de-copyable-text [text]="customer.STB"></de-copyable-text></td>
   </tr>
+
   <tr class="mobile-row">
-    <td>Mobile:</td>
+    <td>{{TKey.COMMON.MOBILE}}:</td>
     <td>
       <div class="de-f-aligncenter de-sm-rbase-nolast" *ngFor="let mobile of customer.getMobileNumbers()">
         <de-mobile-number [mobile]="mobile" displayType="TEXT"></de-mobile-number>
@@ -25,13 +27,31 @@
       </div>
     </td>
   </tr>
+
   <tr>
-    <td>Conection On:</td>
+    <td>{{TKey.COMMON.CONNECTION_ON}}:</td>
     <td>{{customer.getConnectionDate()}}</td>
   </tr>
+
   <tr>
-    <td>Notes:</td>
+    <td>{{TKey.COMMON.NOTES}}:</td>
     <td>{{customer['Own Notes'] || customer.Notes}}</td>
+  </tr>
+
+  <tr *ngIf="customer.Latitude && customer.Longitude">
+    <td>{{TKey.COMMON.LOCATION}}:</td>
+    <td>
+      <div class="de-f-aligncenter">
+        <a [href]="geolocationService.getGoogleLocationUrl(customer.Latitude, customer.Longitude)" class="de-if-aligncenter" target="_blank">
+          <mat-icon>location_on</mat-icon>
+        </a>
+
+        <de-copyable-text
+          [text]="geolocationService.getGoogleLocationUrl(customer.Latitude, customer.Longitude)"
+          displayText="{{TKey.COMMON.LAT_ABBR}}: {{customer.Latitude || 0}}, {{TKey.COMMON.LON_ABBR}}: {{customer.Longitude || 0}}">
+        </de-copyable-text>
+      </div>
+    </td>
   </tr>
 </table>
 

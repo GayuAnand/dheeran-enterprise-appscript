@@ -2,17 +2,18 @@ import { concatMap, map } from 'rxjs';
 import { debounce } from 'typescript-debounce-decorator';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import {animate, state, style, transition, trigger} from '@angular/animations';
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { BaseComponent } from 'src/app/common';
 import { CustomerModel } from 'src/app/models';
+import { CableService } from '../cable.service';
 import { IApps, IRoleValue } from 'src/app/common/interfaces';
 
 @Component({
   selector: 'de-cable-list',
   templateUrl: './cable-list.component.html',
-  styleUrls: ['./../../../reusable-styles/page-component.scss', './cable-list.component.scss'],
+  styleUrls: ['./../../../../reusable-styles/page-component.scss', './cable-list.component.scss'],
   animations: [
     trigger('detailExpand', [
       state('collapsed', style({height: '0px', minHeight: '0'})),
@@ -41,7 +42,11 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
 
   searchText = '';
 
+  searchTextRegexp = new RegExp('');
+
   statusFilter = this.getNewFilterControl(['Active'], ['Active', 'Inactive']);
+
+  gpayFilter = this.getNewFilterControl([], ['1', '0']);
 
   areaFilter = this.getNewFilterControl([], []);
 
@@ -57,6 +62,8 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
 
   pendingSettlementAmount = 0;
 
+  showSettlementConfirmationDialog = false;
+
   cacheInfo: any = null;
 
   editCustomerOrig!: CustomerModel | null;
@@ -67,8 +74,15 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
+  constructor(
+    private cableService: CableService,
+  ) {
+    super();
+  }
+
   ngOnInit(): void {
     this.filterArea = this.filterArea.bind(this);
+    this.filterGpay = this.filterGpay.bind(this);
     this.filterStatus = this.filterStatus.bind(this);
     this.filterSearch = this.filterSearch.bind(this);
     this.filterCollection = this.filterCollection.bind(this);
@@ -199,6 +213,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
   override onFilterChange() {
     const byPassFilter = (data: CustomerModel) => true;
     let filterArea = this.filterArea;
+    let filterGpay = this.filterGpay;
     let filterStatus = this.filterStatus;
     let filterSearch = this.filterSearch;
     let filterCollection = this.filterCollection;
@@ -207,8 +222,17 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     this.areaFilter._selectedObj = {};
     (this.areaFilter.control.value || []).forEach(area => this.areaFilter._selectedObj[area] = true);
 
+    this.gpayFilter._selectedObj = {};
+    (this.gpayFilter.control.value || []).forEach(area => this.gpayFilter._selectedObj[area] = true);
+
     this.statusFilter._selectedObj = {};
     (this.statusFilter.control.value || []).forEach(status => this.statusFilter._selectedObj[status] = true);
+
+    // None or all selected
+    if (!this.gpayFilter.control.value?.length ||
+        (this.gpayFilter.control?.value || []).length === this.gpayFilter.controlOptions?.length) {
+      filterGpay = byPassFilter;
+    }
 
     // None or all selected
     if (!this.areaFilter.control.value?.length ||
@@ -224,6 +248,8 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
 
     if (!this.searchText) {
       filterSearch = byPassFilter;
+    } else {
+      this.searchTextRegexp = this.utilService.getFlexibleSearchTextRegexp(this.searchText);
     }
 
     // None or all selected
@@ -240,7 +266,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
       filterPendingSettlement = byPassFilter;
     }
 
-    this.data.data = this.fullData.filter(filterArea).filter(filterStatus).filter(filterSearch).filter(filterCollection).filter(filterPendingSettlement);
+    this.data.data = this.fullData.filter(filterGpay).filter(filterArea).filter(filterStatus).filter(filterSearch).filter(filterCollection).filter(filterPendingSettlement);
 
     if (this.showPendingSettlement) {
       this.data.data.forEach((d) => this.pendingSettlementAmount += d.getPendingSettlement(false, this.agentsFilter.control.value) as number);
@@ -248,7 +274,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
   }
 
   filterSearch(data: CustomerModel) {
-    return data.freeTextSearch(this.searchText);
+    return data.freeTextSearch(this.searchTextRegexp);
   }
 
   filterArea(data: CustomerModel) {
@@ -257,6 +283,10 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
 
   filterStatus(data: CustomerModel) {
     return (this.statusFilter._selectedObj['Active'] && data.isActive()) || (this.statusFilter._selectedObj['Inactive'] && !data.isActive());
+  }
+
+  filterGpay(data: CustomerModel) {
+    return (this.gpayFilter._selectedObj['1'] && data.hasGpay()) || (this.gpayFilter._selectedObj['0'] && !data.hasGpay());
   }
 
   filterCollection(data: CustomerModel) {
@@ -294,20 +324,25 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     const editCustomerOrig: CustomerModel = this.editCustomerOrig as CustomerModel;
     
     // No collection yet, no collection by and settlement information
-    return this.isCableAdmin() || (!editCustomerOrig[month] && !editCustomerOrig.getCollectionBy(month) && !editCustomerOrig.getSettlementDate(month));
+    return (!editCustomerOrig[month] && !editCustomerOrig.getCollectionBy(month) && !editCustomerOrig.getSettlementDate(month));
   }
   
-  checkUpdateCollections() {
+  checkUpdateCollections(offlineUpdate = false) {
     try {
       const editCustomerOrig: CustomerModel = this.editCustomerOrig as CustomerModel;
       const customerCols = this.settingsService.getCustomerCols();
       const payload: any = {
         [customerCols?.ID.label as string]: editCustomerOrig.ID,
+        [customerCols?.NAME.label as string]: editCustomerOrig.Name,
       };
       const keysToUpdate: (keyof CustomerModel)[] = [
+        customerCols?.NAME.label as any,
+        customerCols?.AREA.label as any,
+        customerCols?.STATUS.label as any,
         customerCols?.STB.label as any,
         customerCols?.STB_STATUS.label as any,
         customerCols?.MOBILE.label as any,
+        customerCols?.GPAY.label as any,
         customerCols?.OWN_NOTES.label as any,
         customerCols?.CONNECTION_ON.label as any,
         customerCols?.LATITUDE.label as any,
@@ -331,6 +366,16 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
             payload[this.editCustomer.getCollectionDateKey(month)] = this.editCustomer.formatDate(Date.now());
           }
           payload[this.editCustomer.getNotesKey(month)] = this.editCustomer.getNotes(month) || '';
+        } else if (this.isCableAdmin() &&
+          (this.editCustomer[month] != editCustomerOrig[month]) || (this.editCustomer.getNotes(month) != editCustomerOrig.getNotes(month))) {
+          payload[month] = this.editCustomer[month];
+          payload[this.editCustomer.getNotesKey(month)] = this.editCustomer.getNotes(month) || '';
+          if (!this.editCustomer[month]) {
+            payload[this.editCustomer.getCollectionByKey(month)] = '';
+            payload[this.editCustomer.getCollectionDateKey(month)] = '';
+            payload[this.editCustomer.getSettlementToKey(month)] = '';
+            payload[this.editCustomer.getSettlementDateKey(month)] = '';
+          }
         }
       });
 
@@ -338,28 +383,45 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
         return this.hideEditDetailsDialog();
       }
 
-      const customerSheetName = this.settingsService.metadata.sheetsInfo?.CUSTOMERS.label as string;
-      this.settingsService.processingText = `Updating '${editCustomerOrig?.Name}'...`;
-      this.apiGSheetDataService.saveOrUpdateRecord(
-        customerSheetName,
-        [this.settingsService.getCustomerCols()?.ID.label as string],
-        payload
-      )
-        .subscribe({
-          next: () => {
-            this.settingsService.processingText = '';
+      if (offlineUpdate) {
+        this.cableService.saveOfflineUpdate(payload);
+        this.hideEditDetailsDialog();
+      } else {
+        this.settingsService.processingText = `Updating '${editCustomerOrig?.Name}'...`;
+        
+        this.cableService.saveCollectionUpdates(payload, (err: any) => {
+          this.settingsService.processingText = '';
+          if (err) {
+            this.utilService.openErrorSnackBar(err, 'Close');
+          } else {
             this.utilService.openSnackBar(`Successfully updated '${editCustomerOrig?.Name}'`, 'Close');
             this.hideEditDetailsDialog();
             this.refreshData(true, false);
-          },
-          error: (err) => {
-            this.settingsService.processingText = '';
-            this.utilService.openSnackBar(err, 'Close');
           }
         });
-      } catch(e) {
-        this.settingsService.processingText = '';
-        this.utilService.openSnackBar(e?.toString() || 'Script error in submitting changes.', 'Close');
+        
+        // const customerSheetName = this.settingsService.metadata.sheetsInfo?.CUSTOMERS.label as string;
+        // this.apiGSheetDataService.saveOrUpdateRecord(
+        //   customerSheetName,
+        //   [this.settingsService.getCustomerCols()?.ID.label as string],
+        //   payload
+        // )
+        //   .subscribe({
+        //     next: () => {
+        //       this.settingsService.processingText = '';
+        //       this.utilService.openSnackBar(`Successfully updated '${editCustomerOrig?.Name}'`, 'Close');
+        //       this.hideEditDetailsDialog();
+        //       this.refreshData(true, false);
+        //     },
+        //     error: (err) => {
+        //       this.settingsService.processingText = '';
+        //       this.utilService.openErrorSnackBar(err, 'Close');
+        //     }
+        //   });
+      }
+    } catch(e) {
+      this.settingsService.processingText = '';
+      this.utilService.openErrorSnackBar(e?.toString() || 'Script error in submitting changes.', 'Close');
     }
   }
 
@@ -372,5 +434,13 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
 
   hideEditDetailsDialog() {
     this.editCustomerOrig = null;
+  }
+
+  settlePendingCollections() {
+    console.log(this.agentsFilter.control.value);
+    this.fullData.forEach((data) => {
+      // TODO
+      // data.getPayload
+    });
   }
 }

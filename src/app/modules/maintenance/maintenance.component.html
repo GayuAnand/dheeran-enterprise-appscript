@@ -1,3 +1,15 @@
+<div class="whatsapp-wrapper">
+  <mat-form-field>
+    <mat-label>{{TKey.COMMON.MOBILE}}</mat-label>
+    <input matInput type="text" [(ngModel)]="mobile" (ngModelChange)="onFilterChange()">
+    <button *ngIf="mobile" matSuffix mat-icon-button (click)="mobile=''; onFilterChange();">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <de-mobile-number [mobile]="mobile" displayType="WHATSAPP"></de-mobile-number>
+</div>
+
 <ng-container *ngIf="!storageService.isNative">
   <button mat-raised-button color="primary" class="de-m-bbase" (click)="clearData()">Clear Data</button>
 </ng-container>

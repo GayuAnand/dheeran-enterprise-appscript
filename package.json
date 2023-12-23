@@ -42,6 +42,7 @@
     "@capacitor/network": "^5.0.6",
     "@capacitor/splash-screen": "^5.0.6",
     "@capgo/capacitor-updater": "^5.3.34",
+    "capacitor-plugin-incoming-call": "^0.0.9",
     "install": "^0.13.0",
     "moment": "^2.29.4",
     "normalize.css": "^8.0.1",

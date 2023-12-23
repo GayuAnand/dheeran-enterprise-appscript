@@ -23,7 +23,7 @@ export class UGPatrolModel extends BaseModel implements Record<string, any> {
     return this.formatDate(this.Date);
   }
 
-  freeTextSearch(searchText = '') {
-    return (`${this.Location || ''} ${this.Route || ''} ${this.WorkType || ''}`).toLowerCase().indexOf(searchText.toLowerCase()) >= 0;
+  freeTextSearch(searchTextRegexp = new RegExp('')) {
+    return [this.Location || '', this.Route || '', this.WorkType || ''].some(value => searchTextRegexp.test(value));
   }
 }

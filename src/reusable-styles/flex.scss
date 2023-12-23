@@ -21,59 +21,72 @@
 }
 
 // Flex horizontal alignment
-@mixin flex-justify($position, $self: false) {
-  display: flex;
+@mixin flex-justify($position, $self: false, $inline: false) {
   justify-content: $position;
 
   @if $self {
     justify-self: $position;
   }
+
+  @if $inline {
+    display: inline-flex;
+  } @else {
+    display: flex;
+  }
 }
 
-@each $elem, $value in ('': false, 's': true) {
-  .de-f#{$elem}-justifyleft {
-    @include flex-justify(flex-start, $value);
-  }
+@each $finline, $finlinevalue in ('': false, 'i': true) {
+  @each $elem, $value in ('': false, 's': true) {
+    .de-#{$finline}f#{$elem}-justifyleft {
+      @include flex-justify(flex-start, $value, $finlinevalue);
+    }
 
-  .de-f#{$elem}-justifycenter {
-    @include flex-justify(center, $value);
-  }
+    .de-#{$finline}f#{$elem}-justifycenter {
+      @include flex-justify(center, $value, $finlinevalue);
+    }
 
-  .de-f#{$elem}-justifyright {
-    @include flex-justify(flex-end, $value);
-  }
+    .de-#{$finline}f#{$elem}-justifyright {
+      @include flex-justify(flex-end, $value, $finlinevalue);
+    }
 
-  .de-f#{$elem}-justifyspacebetween {
-    @include flex-justify(space-between, $value);
-  }
+    .de-#{$finline}f#{$elem}-justifyspacebetween {
+      @include flex-justify(space-between, $value, $finlinevalue);
+    }
 
-  .de-f#{$elem}-justifyspacearound {
-    @include flex-justify(space-around, $value);
+    .de-#{$finline}f#{$elem}-justifyspacearound {
+      @include flex-justify(space-around, $value, $finlinevalue);
+    }
   }
 }
 
 // Flex vertical alignment
-@mixin flex-align($position, $self: false) {
+@mixin flex-align($position, $self: false, $inline: false) {
   align-items: $position;
 
   @if $self {
     align-self: $position;
   }
 
-  display: flex;
+  @if $inline {
+    display: inline-flex;
+  } @else {
+    display: flex;
+  }
 }
 
-@each $elem, $value in ('': false, 's': true) {
-  .de-f#{$elem}-aligntop {
-    @include flex-align(flex-start, $value);
-  }
+@each $finline, $finlinevalue in ('': false, 'i': true) {
+  @each $elem, $value in ('': false, 's': true) {
+    .de-#{$finline}f#{$elem}-aligntop {
+      @include flex-align(flex-start, $value, $finlinevalue);
+    }
 
-  .de-f#{$elem}-aligncenter {
-    @include flex-align(center, $value);
-  }
+    .de-#{$finline}f#{$elem}-aligncenter {
+      @include flex-align(center, $value, $finlinevalue);
+    }
 
-  .de-f#{$elem}-alignbottom {
-    @include flex-align(flex-end, $value);
+    .de-#{$finline}f#{$elem}-alignbottom {
+      @include flex-align(flex-end, $value, $finlinevalue);
+    }
   }
 }
 

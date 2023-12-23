@@ -30,6 +30,7 @@ export interface ISheetsInfo {
       ID: { label: 'ID' },
       NAME: { label: 'Name' },
       MOBILE: { label: 'Mobile' },
+      GPAY: { label: 'GPay' },
       STB: { label: 'STB' },
       STB_TYPE: { label: 'STB Type', data: { GTPL: 'GTPL', TACTV: 'TACTV' } },
       AREA: { label: 'Area' },

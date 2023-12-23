@@ -1,8 +1,6 @@
 import moment from 'moment';
-import { inject } from '@angular/core';
 
 import { BaseModel } from './base.model';
-import { AuthService } from '../common';
 
 export class CustomerModel extends BaseModel implements Record<string, any> {
   ID!: string;
@@ -12,6 +10,8 @@ export class CustomerModel extends BaseModel implements Record<string, any> {
   Area!: string;
 
   Mobile!: string;
+
+  GPay!: '1' | '0';
 
   STB!: string;
 
@@ -39,12 +39,16 @@ export class CustomerModel extends BaseModel implements Record<string, any> {
     return this.Status !== 'Inactive';
   }
 
+  hasGpay() {
+    return this.GPay == '1';
+  }
+
   getMobileNumbers(): string[] {
     return (this.Mobile || '').split(/\s+/);
   }
 
-  freeTextSearch(searchText = '') {
-    return (`${this.ID || ''} ${this.Name || ''} ${this.Mobile || ''} ${this.STB || ''} ${this['Own Notes'] || ''} ${this.Notes || ''}`).toLowerCase().indexOf(searchText.toLowerCase()) >= 0;
+  freeTextSearch(searchTextRegexp = new RegExp('')) {
+    return [this.ID || '', this.Name || '', this.Mobile || '', this.STB || '', this['Own Notes'] || '', this.Notes || ''].some(value => searchTextRegexp.test(value));
   }
   
   getMonthsInOrder(): (keyof CustomerModel)[] {
@@ -57,7 +61,7 @@ export class CustomerModel extends BaseModel implements Record<string, any> {
     return this._monthsOrder;
   }
 
-  getCollectionAgents() {
+  getCollectionAgents(): Record<string, boolean> {
     return this.getMonthsInOrder()
       .map((month) => this.getCollectionBy(month))
       .filter((agent) => agent)
@@ -67,14 +71,44 @@ export class CustomerModel extends BaseModel implements Record<string, any> {
       }, {});
   }
 
-  getPendingSettlement(withCurrency = false, agents: string[] = []): number | string {
-    const pendingSettlement = this.getMonthsInOrder()
-      .filter((month) => this[month as keyof CustomerModel] &&
+  getCollectionInfoByAgent(infoType: 'month' | 'collectionDate' = 'month'): Record<string, Record<string, number>> {
+    const retval: any = {};
+
+    this.getMonthsInOrder()
+      .forEach((month) => {
+        let infoTypeMonth: string = month;
+        const collection = this[month];
+        const agent = this.getCollectionBy(month);
+        
+        if (collection && agent) {
+          if (infoType === 'collectionDate') {
+            infoTypeMonth = this.formatDate(this.getCollectionDate(month), 'MMMYYYY') as string;
+          }
+
+          retval[agent] = retval[agent] || {};
+          retval[agent][infoTypeMonth] = retval[agent][infoTypeMonth] || 0;
+          retval[agent][infoTypeMonth] += parseInt(collection.toString());
+        }
+      });
+    return retval;
+  }
+
+  getPendingSettlementMonths(agents: string[] = []): Record<keyof CustomerModel, boolean> {
+    return this.getMonthsInOrder()
+      .filter((month) => this[month] &&
         this.getCollectionDate(month) &&
         !this.getSettlementDate(month) &&
         (!agents.length || agents.some((agent => this.getCollectionBy(month) === agent))))
       .reduce((acc, month) => {
-        acc += parseInt(this[month as keyof CustomerModel] as string || '0') || 0;
+        acc[month] = true;
+        return acc;
+      }, {} as Record<keyof CustomerModel, boolean>);
+  }
+
+  getPendingSettlement(withCurrency = false, agents: string[] = []): number | string {
+    const pendingSettlement = Object.keys(this.getPendingSettlementMonths(agents))
+      .reduce((acc, month) => {
+        acc += parseInt((this as any)[month] as string || '0') || 0;
         return acc;
       }, 0);
 

@@ -1,0 +1,8 @@
+<button *ngIf="offlineUpdateData?.length" mat-raised-button color="primary" (click)="syncOfflineUpdates()">
+  <div class="de-f-aligncenter de-sm-rsmall-nolast">
+    <mat-icon>sync</mat-icon>
+    <span>{{TKey.COMMON.SYNC}}</span>
+  </div>
+</button>
+
+<pre>{{offlineUpdateData | json}}</pre>

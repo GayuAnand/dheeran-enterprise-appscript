@@ -7,8 +7,8 @@ export class BaseModel {
     Object.keys(data || {}).forEach((k: string) => (this as any)[k] = data[k]);
   }
 
-  formatDate(dateStr: string | number) {
-    return dateStr ? BaseModel.formatDate(dateStr) : '';
+  formatDate(dateStr: string | number, format?: string) {
+    return dateStr ? BaseModel.formatDate(dateStr, format) : '';
   }
 
   getMomentDate(dateStr: string) {
@@ -27,9 +27,9 @@ export class BaseModel {
     return JSON.parse(JSON.stringify(this));
   }
 
-  static formatDate(dateStr: string | number) {
+  static formatDate(dateStr: string | number, format = 'DD MMM YY') {
     const d = moment(dateStr);
-    return d.isValid() ? d.format("DD MMM YY") : dateStr;
+    return d.isValid() ? d.format(format || 'DD MMM YY') : dateStr;
   }
 
   static AuthService: AuthService;

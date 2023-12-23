@@ -24,6 +24,12 @@ export class PageLayoutComponent extends BaseComponent implements OnInit {
     });
   }
 
+  checkAndCloseMainNavForMobile() {
+    if (this.settingsService.isMobile) {
+      setTimeout(() => this.sidenav.close());
+    }
+  }
+
   hybridClearData() {
     if (this.storageService.isNative) {
       this.fs.deleteFileOrFolder('data', true);

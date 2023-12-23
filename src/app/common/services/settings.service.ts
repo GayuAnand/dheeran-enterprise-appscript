@@ -35,7 +35,7 @@ export class SettingsService implements OnDestroy {
   /**
    * Show app level loading screen with given message. This will prevent user from interacting with the application while processing.
    */
-  processingText = '';
+  _processingText = '';
 
   /**
    * Metadata from Google sheet
@@ -56,6 +56,14 @@ export class SettingsService implements OnDestroy {
 
   set pageTitle(value) {
     setTimeout(() => this._pageTitle = value);
+  }
+
+  get processingText() {
+    return this._processingText;
+  }
+
+  set processingText(value) {
+    setTimeout(() => this._processingText = value);
   }
 
   get navigationData() {
@@ -108,7 +116,20 @@ export class SettingsService implements OnDestroy {
     if (this.authService.hasAnyPermission(IApps.CABLE)) {
       navigationData.push({
         name: EN_MAPPING.COMMON.CABLE,
-        routerLink: ['/app/cable-list']
+        children: [
+          {
+            name: EN_MAPPING.COMMON.LIST,
+            routerLink: ['/app/cable/list'],
+          },
+          {
+            name: EN_MAPPING.COMMON.STATISTICS,
+            routerLink: ['/app/cable/statistics'],
+          },
+          {
+            name: EN_MAPPING.COMMON.OFFLINE_UPDATES,
+            routerLink: ['/app/cable/offline-updates'],
+          },
+        ]
       });
     }
 
@@ -128,8 +149,8 @@ export class SettingsService implements OnDestroy {
 
     if (this.authService.hasAnyPermission(IApps.ADMIN)) {
       navigationData.push({
-        name: EN_MAPPING.COMMON.MAINTENANCE,
-        routerLink: ['/app/maintenance'],
+        name: EN_MAPPING.COMMON.UTILITY,
+        routerLink: ['/app/utility'],
       });
     }
 

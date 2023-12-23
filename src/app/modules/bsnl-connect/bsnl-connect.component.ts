@@ -60,7 +60,7 @@ export class BSNLConnectComponent extends BaseComponent implements OnInit {
         this.informationType = '';
         this.informationFor = '';
         this.information = null;
-        this.utilService.openSnackBar(`${infoFor}: ${err}`, 'Close');
+        this.utilService.openErrorSnackBar(`${infoFor}: ${err}`, 'Close');
       }
     });
   }

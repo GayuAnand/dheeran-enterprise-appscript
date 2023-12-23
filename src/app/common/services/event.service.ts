@@ -20,6 +20,11 @@ export class EventService {
     this.init();
   }
 
+  /**
+   * @param startTime Starting time from which the lapsed time duration is calculated
+   * @param duration in ms to update the timer
+   * @returns 
+   */
   getTimeDifferenceObservable(startTime: Date | number, duration = 15000): ITimeDiffObservable {
     const until = new Subject();
     const destroy = () => {

@@ -23,6 +23,8 @@ interface FlatFileNode extends FileNode {
   styleUrls: ['./../../../reusable-styles/page-component.scss', './maintenance.component.scss'],
 })
 export class MaintenanceComponent extends BaseComponent implements OnInit {
+  mobile = '';
+
   filesInfo: (FileInfo & { children?: FileInfo[] })[] = [];
 
   private _transformer = (node: FileNode, level: number) => {
@@ -48,7 +50,7 @@ export class MaintenanceComponent extends BaseComponent implements OnInit {
   dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
 
   ngOnInit(): void {
-    this.settingsService.pageTitle = this.TKey.COMMON.MAINTENANCE;
+    this.settingsService.pageTitle = this.TKey.COMMON.UTILITY;
   }
 
   hasChild(_: number, node: FlatFileNode) {

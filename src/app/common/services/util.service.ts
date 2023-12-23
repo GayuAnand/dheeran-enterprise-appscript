@@ -14,6 +14,7 @@ export class UtilService {
     const defaultOptions = Object.assign({
       horizontalPosition: 'center',
       verticalPosition: 'top',
+      duration: 3000
     }, options);
 
     if (this.snackBarRef) {
@@ -24,9 +25,14 @@ export class UtilService {
     this.snackBarRef.onAction().subscribe(() => this.snackBarRef.dismiss());
   }
 
-  formatDate(dateStr: string) {
+  openErrorSnackBar(message: string, action?: string, options: MatSnackBarConfig = {}) {
+    const defaultOptions = Object.assign({ duration: 0 }, options);
+    this.openSnackBar(message, action, defaultOptions);
+  }
+
+  formatDate(dateStr: string, format?: string) {
     const d = this.moment(dateStr);
-    return d.isValid() ? d.format("DD MMM'YY") : dateStr;
+    return d.isValid() ? d.format(format || "DD MMM'YY") : dateStr;
   }
 
   getObjectKeys(obj: Record<string, any>) {
@@ -107,10 +113,20 @@ export class UtilService {
     return retval;
   }
 
+  getFlexibleSearchTextRegexp(searchText = '') {
+    if (/[0-9]/.test(searchText)) {
+      // Has some numeric characters. Strict regex.
+      return new RegExp(searchText, 'i');
+    } else {
+      // Has only non-numeric characters. Flexible regex.
+      return new RegExp(searchText.split('').join('.*'), 'i');
+    }
+  }
+
   async copyToClipboard(text: string) {
     try {
       await navigator.clipboard.writeText(text);
-      this.openSnackBar(`Copied '${text}' to clipboard.`, undefined, { duration: 3000 });
+      this.openSnackBar(`Copied '${text}' to clipboard.`, undefined);
     } catch (err) {
       console.error('Failed to copy: ', err);
     }
