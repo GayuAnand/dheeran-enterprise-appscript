@@ -38,6 +38,7 @@ export const EN_MAPPING = {
     OFFLINE_UPDATES: 'Offline Updates',
     OK: 'Ok',
     PHONE_NUMBER: 'Phone Number',
+    REMARKS: 'Remarks',
     ROUTE: 'Route',
     SAVE: 'Save',
     SEARCH: 'Search',
