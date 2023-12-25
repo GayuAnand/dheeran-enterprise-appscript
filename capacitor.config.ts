@@ -8,7 +8,7 @@ const config: CapacitorConfig = {
     androidScheme: 'https'
   },
   // server: {
-  //   url: 'http://192.168.1.7:4200',
+  //   url: 'http://192.168.1.7:4200', // ifconfig => en0 -> inet
   //   cleartext: true
   // },
   plugins: {

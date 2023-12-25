@@ -25,3 +25,6 @@ project(':capacitor-splash-screen').projectDir = new File('../node_modules/@capa
 
 include ':capgo-capacitor-updater'
 project(':capgo-capacitor-updater').projectDir = new File('../node_modules/@capgo/capacitor-updater/android')
+
+include ':capacitor-plugin-incoming-call'
+project(':capacitor-plugin-incoming-call').projectDir = new File('../node_modules/capacitor-plugin-incoming-call/android')
