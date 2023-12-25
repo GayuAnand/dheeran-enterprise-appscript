@@ -31,6 +31,13 @@ export class MobileNumberComponent extends BaseComponent {
 
   @Input() displayType = MobileNumberDisplayType.TEXT;
 
+  get mobileWithCode() {
+    if (/^[0-9]*$/.test(this.mobile)) {
+      return '+91' + this.mobile;
+    }
+    return this.mobile;
+  }
+
   displayTypes = MobileNumberDisplayType;
 
   copyText(event: MouseEvent) {

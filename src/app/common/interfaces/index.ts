@@ -125,6 +125,7 @@ export interface ISheetsInfo {
     label: 'UG Patrol',
     cols: {
       ID: { label: 'ID' },
+      BY: { label: 'By' },
       DATE: { label: 'Date' },
       LOCATION: { label: 'Location' },
       ROUTE: { label: 'Route' },
@@ -253,4 +254,5 @@ export interface IMetadata {
   sheetsInfo?: ISheetsInfo,
   taskPriority?: ('High' | 'Medium' | 'Low')[],
   taskStatus?: ('Done' | 'Open' | 'Closed')[],
+  ugWorkType?: string[],
 }

@@ -3,6 +3,8 @@ import { BaseModel } from './base.model';
 export class UGPatrolModel extends BaseModel implements Record<string, any> {
   ID!: string;
 
+  By!: string;
+
   Date!: string;
 
   Location!: string;

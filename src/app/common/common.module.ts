@@ -34,6 +34,7 @@ import { CanvasJSAngularChartsModule } from '@canvasjs/angular-charts';
 import { AutocompleteComponent, CopyableTextComponent, DialogComponent, EmptyLayoutComponent, ConfirmationDialogComponent,
          IframeComponent, MobileNumberComponent, PageLayoutComponent, SpinnerComponent, RefreshDataComponent } from './components';
 import { AuthService, EventService, GeoLocationService, SettingsService, UiBundleUpdaterService, UtilService } from './services';
+import { MatSortModule } from '@angular/material/sort';
 
 @NgModule({
   imports: [
@@ -60,6 +61,7 @@ import { AuthService, EventService, GeoLocationService, SettingsService, UiBundl
     MatMenuModule,
     MatRippleModule,
     MatSnackBarModule,
+    MatSortModule,
     MatSidenavModule,
     MatSlideToggleModule,
     MatProgressSpinnerModule,
@@ -106,6 +108,7 @@ import { AuthService, EventService, GeoLocationService, SettingsService, UiBundl
     MatNativeDateModule,
     MatRippleModule,
     MatSnackBarModule,
+    MatSortModule,
     MatSidenavModule,
     MatSlideToggleModule,
     MatProgressSpinnerModule,

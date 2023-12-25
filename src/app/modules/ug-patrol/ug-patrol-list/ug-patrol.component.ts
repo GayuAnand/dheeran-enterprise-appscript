@@ -1,4 +1,5 @@
 import { concatMap, map } from 'rxjs';
+import { MatSort } from '@angular/material/sort';
 import { debounce } from 'typescript-debounce-decorator';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
@@ -6,11 +7,12 @@ import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 
 import { BaseComponent } from 'src/app/common';
 import { BaseModel, UGPatrolModel } from 'src/app/models';
+import { IApps, IRoleValue } from 'src/app/common/interfaces';
 
 @Component({
   selector: 'de-ug-patrol',
   templateUrl: './ug-patrol.component.html',
-  styleUrls: ['./../../../reusable-styles/page-component.scss', './ug-patrol.component.scss'],
+  styleUrls: ['./../../../../reusable-styles/page-component.scss', './ug-patrol.component.scss'],
 })
 export class UGPatrolComponent extends BaseComponent implements OnInit, AfterViewInit {
   data = new MatTableDataSource<UGPatrolModel>([]);
@@ -21,6 +23,7 @@ export class UGPatrolComponent extends BaseComponent implements OnInit, AfterVie
 
   allColumns = [
     this.ugPatrolColumns?.DATE?.label || '',
+    this.ugPatrolColumns?.BY?.label || '',
     this.ugPatrolColumns?.LOCATION?.label || '',
     this.ugPatrolColumns?.ROUTE?.label || '',
     this.ugPatrolColumns?.WORK_TYPE?.label || '',
@@ -52,6 +55,8 @@ export class UGPatrolComponent extends BaseComponent implements OnInit, AfterVie
 
   cacheInfo: any = null;
 
+  @ViewChild(MatSort) sort!: MatSort;
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor() {
@@ -71,15 +76,16 @@ export class UGPatrolComponent extends BaseComponent implements OnInit, AfterVie
   }
 
   ngAfterViewInit() {
+    this.data.sort = this.sort;
     this.data.paginator = this.paginator;
     this.refreshData();
   }
 
   refreshDisplayedColumns() {
     if (this.settingsService.isMobile) {
-      this.displayedColumns = this.allColumns.slice(0, 3);
+      this.displayedColumns = this.allColumns.slice(0, 4);
     } else {
-      this.displayedColumns = this.allColumns.slice(0, 6);
+      this.displayedColumns = this.allColumns.slice(0, 7);
     }
     this.displayedColumnsWithAction = [...this.displayedColumns, 'ACTIONS'];
   }
@@ -99,12 +105,12 @@ export class UGPatrolComponent extends BaseComponent implements OnInit, AfterVie
       .subscribe({
         next: (data) => {
           this.fullData = data;
-          // https://canvasjs.com/angular-charts/line-chart-with-date-time-axis/
-          // const dates = this.fullData.map((d) => ({ x: this.utilService.moment(d.Date).valueOf(), y: 1 }));
-          // this.chartOptions.data[0].dataPoints = dates.sort(this.utilService.sortObjectsByProperty('x'));
           this.options.location = Object.keys(this.fullData.reduce((acc, data) => { acc[data.Location] = true; return acc; }, {} as Record<string, boolean>));
           this.options.route = Object.keys(this.fullData.reduce((acc, data) => { acc[data.Route] = true; return acc; }, {} as Record<string, boolean>));
-          this.options.workType = Object.keys(this.fullData.reduce((acc, data) => { acc[data.WorkType] = true; return acc; }, {} as Record<string, boolean>));
+          this.options.workType = this.settingsService.metadata.ugWorkType as string[];
+          this.options.location.sort();
+          this.options.route.sort();
+          this.options.workType.sort();
           this.initializeFilters();
         },
         error: (err) => this.utilService.openErrorSnackBar(`ERROR IN FETCHING DATA: ${err}`, 'Close'),
@@ -129,8 +135,11 @@ export class UGPatrolComponent extends BaseComponent implements OnInit, AfterVie
 
     this.settingsService.processingText = `Updating data...`;
     const recordToEdit = this.recordToEdit.clone();
+    const newRecord = !recordToEdit.ID;
     recordToEdit.ID = recordToEdit.ID || Date.now().toString();
     recordToEdit.Date = BaseModel.formatDate(recordToEdit.Date) as string;
+
+    if (newRecord) recordToEdit.By = this.authService.Username;
     this.apiGSheetDataService.saveOrUpdateRecord<UGPatrolModel>(this.settingsService.metadata.sheetsInfo?.UG_PATROL?.label as string,
       [this.ugPatrolColumns?.ID?.label as string],
       recordToEdit as UGPatrolModel
@@ -233,5 +242,13 @@ export class UGPatrolComponent extends BaseComponent implements OnInit, AfterVie
                          (columnName === this.ugPatrolColumns?.PATROL_COUNT?.label) ||
                          (columnName === 'ACTIONS')) ? 'align-center' : '';
     return `${centerAlign}`;
+  }
+
+  isUgPatrolAdmin() {
+    return this.authService.hasPermission(IApps.UG, IRoleValue.ADMIN);
+  }
+
+  isRecordByLoggedInUser(record: UGPatrolModel) {
+    return record.By === this.authService.Username;
   }
 }

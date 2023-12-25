@@ -36,16 +36,16 @@
 
 <de-refresh-data [cacheInfo]="cacheInfo" (refresh)="refreshData(true)"></de-refresh-data>
 
-<mat-table [dataSource]="data" class="mat-elevation-z8">
+<mat-table matSort [dataSource]="data" matSortActive="Date" matSortDirection="desc"  class="mat-elevation-z8">
   <ng-container matColumnDef="{{column}}" *ngFor="let column of displayedColumnsWithAction">
-    <mat-header-cell *matHeaderCellDef [ngClass]="'de-f-justifycenter'">{{column === 'ACTIONS' ? '' : column}}</mat-header-cell>
+    <mat-header-cell mat-sort-header *matHeaderCellDef [ngClass]="'de-f-justifycenter'">{{column === 'ACTIONS' ? '' : column}}</mat-header-cell>
 
     <mat-cell *matCellDef="let element" [ngClass]="getCellClassNames(element, column)">
       <ng-container [ngSwitch]="column">
         <ng-container *ngSwitchCase="ugPatrolColumns?.DATE?.label">{{element.getPatrolDateStr()}}</ng-container>
 
         <ng-container *ngSwitchCase="'ACTIONS'">
-          <ng-container *ngIf="element?.ID">
+          <ng-container *ngIf="element?.ID && (isUgPatrolAdmin() || isRecordByLoggedInUser(element))">
             <mat-icon color="primary" class="de-cursorpointer de-m-rbase" (click)="editRecord(element)">edit</mat-icon>
             <mat-icon color="warn" class="de-cursorpointer" (click)="recordToDelete = element">delete</mat-icon>
           </ng-container>
@@ -62,7 +62,7 @@
 
 <mat-paginator [pageSizeOptions]="[25, 50, 100, 20]" pageSize="50" showFirstLastButtons></mat-paginator>
 
-<de-dialog *ngIf="recordToEdit" classNames="min-w360" (closeDialog)="recordToEdit = null">
+<de-dialog *ngIf="recordToEdit" classNames="min-w300" (closeDialog)="recordToEdit = null">
   <ng-container de-dialog-header>{{recordToEdit.ID ? TKey.UG_PATROL.EDIT_PATROL : TKey.UG_PATROL.ADD_PATROL}}</ng-container>
   <ng-container de-dialog-body>
     <div class="de-p-vbase"></div>
@@ -78,13 +78,24 @@
 
     <de-autocomplete [label]="TKey.COMMON.ROUTE" [(ngModel)]="recordToEdit.Route" [options]="options.route"></de-autocomplete>
 
-    <de-autocomplete [label]="TKey.UG_PATROL.WORK_TYPE" [(ngModel)]="recordToEdit.WorkType" [options]="options.workType"></de-autocomplete>
+    <mat-form-field>
+      <mat-label>{{TKey.UG_PATROL.WORK_TYPE}}</mat-label>
+      <mat-select [(ngModel)]="recordToEdit.WorkType">
+        <mat-option *ngFor="let status of settingsService.metadata.ugWorkType" [value]="status">{{status}}</mat-option>
+      </mat-select>
+    </mat-form-field>
 
     <mat-form-field>
       <mat-label>{{TKey.UG_PATROL.PATROL_COUNT}}</mat-label>
       <input matInput type="number" [(ngModel)]="recordToEdit.PatrolCount">
     </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>{{TKey.COMMON.REMARKS}}</mat-label>
+      <textarea matInput [(ngModel)]="recordToEdit.Remarks"></textarea>
+    </mat-form-field>
   </ng-container>
+
   <ng-container de-dialog-footer>
     <button mat-raised-button color="warn" (click)="recordToEdit = null"><mat-icon>close</mat-icon>{{TKey.COMMON.CANCEL}}</button>
     <button mat-raised-button color="primary" (click)="updateRecord()">

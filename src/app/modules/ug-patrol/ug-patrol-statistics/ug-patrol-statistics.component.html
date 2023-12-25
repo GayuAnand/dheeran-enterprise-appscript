@@ -1,0 +1,19 @@
+<section class="de-f-column de-h-full">
+  <div class="filter-row de-m-bbase">
+    <mat-form-field>
+      <mat-label>{{TKey.COMMON.CHART_TYPE}}</mat-label>
+      <mat-select [(ngModel)]="chartType" (ngModelChange)="initializeChartData()">
+        <mat-option value="line">LINE</mat-option>
+        <mat-option value="spline">SPLINE</mat-option>
+        <mat-option value="bar">BAR</mat-option>
+        <mat-option value="column">COLUMN</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <de-refresh-data [cacheInfo]="cacheInfo" [refreshTriggerInterval]="1440" (refresh)="refreshData(true)"></de-refresh-data>
+
+  <div class="de-h-full de-w-full de-p-tbase">
+    <canvasjs-chart #chart [styles]="{ width: '100%', height:'100%' }" [options]="chartOptions" (chartInstance)="setChartInstance($event)"></canvasjs-chart>
+  </div>
+</section>
