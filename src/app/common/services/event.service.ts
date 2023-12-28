@@ -15,7 +15,6 @@ export class EventService {
 
   constructor(
     private observer: BreakpointObserver,
-    private utilService: UtilService,
   ) {
     this.init();
   }
@@ -34,10 +33,43 @@ export class EventService {
     const observable = timer(0, duration)
       .pipe(
         takeUntil(until),
-        map(() => this.utilService.getReadableTimeDifference(startTime))
+        map(() => this.getReadableTimeDifference(startTime))
       );
 
     return { destroy, observable };
+  }
+
+  getReadableTimeDifference(pastDate: Date | number) {
+    pastDate = (typeof pastDate === 'number') ? (new Date(pastDate)) : pastDate;
+    const currentDate = new Date();
+    const timeDifference = currentDate.getTime() - pastDate.getTime();
+    
+    const seconds = Math.floor(timeDifference / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    const retval = { duration: minutes, text: '' };
+  
+    if (seconds < 5) {
+      retval.text = 'Just now';
+    } else if (seconds < 60) {
+      retval.text = `${seconds} seconds ago`;
+    } else if (minutes === 1) {
+      retval.text = `1 minute ago`;
+    } else if (minutes < 60) {
+      retval.text = `${minutes} minutes ago`;
+    } else if (hours === 1) {
+      retval.text = `1 hour ago`;
+    } else if (hours < 24) {
+      retval.text = `${hours} hours ago`;
+    } else if (days === 1) {
+      retval.text = `1 day ago`;
+    } else {
+      retval.text = `${days} days ago`;
+    }
+
+    return retval;
   }
 
   private init() {

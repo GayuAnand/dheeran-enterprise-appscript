@@ -21,4 +21,28 @@ export class AuthService {
   hasAnyPermission(app: IApps) {
     return this.isAdmin() || !!this.user?.Role?.[app];
   }
+  
+  isCableAdmin() {
+    return this.hasPermission(IApps.CABLE, IRoleValue.ADMIN);
+  }
+  
+  isBSNLAdmin() {
+    return this.hasPermission(IApps.BSNL, IRoleValue.ADMIN);
+  }
+  
+  isUGAdmin() {
+    return this.hasPermission(IApps.UG, IRoleValue.ADMIN);
+  }
+
+  hasAnyCablePermission() {
+    return this.hasAnyPermission(IApps.CABLE);
+  }
+
+  hasAnyBSNLPermission() {
+    return this.hasAnyPermission(IApps.BSNL);
+  }
+
+  hasAnyUGPermission() {
+    return this.hasAnyPermission(IApps.UG);
+  }
 }

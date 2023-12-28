@@ -1,9 +1,7 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 import { BaseComponent } from 'src/app/common';
 import { CustomerModel } from 'src/app/models';
-import { IApps, IRoleValue } from 'src/app/common/interfaces';
-import { concatMap } from 'rxjs';
 
 @Component({
   selector: 'de-customer-card',
@@ -13,7 +11,5 @@ import { concatMap } from 'rxjs';
 export class CustomerCardComponent extends BaseComponent {
   @Input() customer!: CustomerModel;
 
-  isCableAdmin() {
-    return this.authService.hasPermission(IApps.CABLE, IRoleValue.ADMIN);
-  }
+  showPaymentQrCode = false;
 }

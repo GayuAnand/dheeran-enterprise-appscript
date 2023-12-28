@@ -20,8 +20,8 @@ const routes: Routes = [
         canActivate: [RoleGuard(IApps.CABLE)],
       },
       {
-        path: 'bsnl-connect',
-        loadChildren: () => import('./modules/bsnl-connect').then((m) => m.BSNLConnectModule),
+        path: 'bsnl',
+        loadChildren: () => import('./modules/bsnl').then((m) => m.BSNLConnectModule),
         canActivate: [RoleGuard(IApps.BSNL)],
       },
       {

@@ -1,0 +1,51 @@
+.filter-row {
+  .advanced-filter-label {
+    color: var(--primary);
+    justify-content: end;
+    margin-top: 6px;
+    margin-bottom: 6px;
+    text-decoration: underline;
+    width: 100%;
+  }
+}
+
+.fms-customer-info-table {
+  td {
+    padding: 6px;
+  }
+}
+
+.bsnl-connect-input-container {
+  align-items: center;
+  display: flex;
+  flex-grow: 1;
+  flex-wrap: wrap;
+
+  > mat-form-field {
+    display: flex;
+    flex-grow: 1;
+    min-width: 200px;
+
+    ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+      display: none;
+    }
+  }
+}
+
+.highlight-row {
+  background-color: #f0f0f0;
+}
+
+.expanded-detail-row, .expanded-detail-cell {
+  min-height: 0px;
+}
+
+.mobile-cell {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.select-all {
+  padding: 6px;
+}

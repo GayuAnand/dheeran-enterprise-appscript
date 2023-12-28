@@ -46,6 +46,11 @@ export class SettingsService implements OnDestroy {
 
   flags = {
     showAboutDialog: false,
+    showConfigDialog: false,
+  };
+
+  configurations = {
+    showCableCSVExport: false,
   };
 
   private _navigationData: MatTreeNestedDataSource<NavMenuItem> = new MatTreeNestedDataSource();
@@ -113,7 +118,7 @@ export class SettingsService implements OnDestroy {
       },
     ];
     
-    if (this.authService.hasAnyPermission(IApps.CABLE)) {
+    if (this.authService.hasAnyCablePermission()) {
       navigationData.push({
         name: EN_MAPPING.COMMON.CABLE,
         children: [
@@ -133,14 +138,14 @@ export class SettingsService implements OnDestroy {
       });
     }
 
-    if (this.authService.hasAnyPermission(IApps.BSNL)) {
+    if (this.authService.hasAnyBSNLPermission()) {
       navigationData.push({
-        name: EN_MAPPING.COMMON.BSNL_CONNECT,
-        routerLink: ['/app/bsnl-connect']
+        name: EN_MAPPING.COMMON.BSNL,
+        routerLink: ['/app/bsnl']
       });
     }
 
-    if (this.authService.hasAnyPermission(IApps.UG)) {
+    if (this.authService.hasAnyUGPermission()) {
       navigationData.push({
         name: EN_MAPPING.COMMON.UG_PATROL,
         children: [

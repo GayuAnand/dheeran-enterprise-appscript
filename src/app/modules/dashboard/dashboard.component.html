@@ -1,1 +1,9 @@
-<div style="font-size: 20px;">Welcome <span class="mat-headline-6" style="color: var(--primary);">{{authService.Username}}!</span></div>
+<div style="font-size: 20px;" class="de-p-bbase">Welcome <span class="mat-headline-6" style="color: var(--primary);">{{authService.Username}}!</span></div>
+
+<section class="de-f-aligncenter de-f-wrap de-sm-base">
+  <a *ngFor="let card of getCardsInfo()" [routerLink]="card.routerLink" class="card">
+    <mat-icon *ngIf="!card.isSvgIcon">{{card.icon}}</mat-icon>
+    <mat-icon *ngIf="card.isSvgIcon" [svgIcon]="card.icon"></mat-icon>
+    <span class="card-title">{{card.text}}</span>
+  </a>
+</section>

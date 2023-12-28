@@ -2,13 +2,19 @@ import moment from 'moment';
 import { Injectable } from '@angular/core';
 import { MatSnackBar, MatSnackBarConfig, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
 
+import { CustomerModel } from 'src/app/models';
+import { SettingsService } from './settings.service';
+
 @Injectable()
 export class UtilService {
   moment = moment;
 
   snackBarRef!: MatSnackBarRef<TextOnlySnackBar>;
 
-  constructor(private snackBar: MatSnackBar) {}
+  constructor(
+    private snackBar: MatSnackBar,
+    private settingsService: SettingsService,
+  ) {}
 
   openSnackBar(message: string, action?: string, options: MatSnackBarConfig = {}) {
     const defaultOptions = Object.assign({
@@ -80,46 +86,13 @@ export class UtilService {
     };
   }
 
-  getReadableTimeDifference(pastDate: Date | number) {
-    pastDate = (typeof pastDate === 'number') ? (new Date(pastDate)) : pastDate;
-    const currentDate = new Date();
-    const timeDifference = currentDate.getTime() - pastDate.getTime();
-    
-    const seconds = Math.floor(timeDifference / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-
-    const retval = { duration: minutes, text: '' };
-  
-    if (seconds < 5) {
-      retval.text = 'Just now';
-    } else if (seconds < 60) {
-      retval.text = `${seconds} seconds ago`;
-    } else if (minutes === 1) {
-      retval.text = `1 minute ago`;
-    } else if (minutes < 60) {
-      retval.text = `${minutes} minutes ago`;
-    } else if (hours === 1) {
-      retval.text = `1 hour ago`;
-    } else if (hours < 24) {
-      retval.text = `${hours} hours ago`;
-    } else if (days === 1) {
-      retval.text = `1 day ago`;
-    } else {
-      retval.text = `${days} days ago`;
-    }
-
-    return retval;
-  }
-
   getFlexibleSearchTextRegexp(searchText = '') {
     if (/[0-9]/.test(searchText)) {
       // Has some numeric characters. Strict regex.
-      return new RegExp(searchText, 'i');
+      return new RegExp(searchText, 'si');
     } else {
       // Has only non-numeric characters. Flexible regex.
-      return new RegExp(searchText.split('').join('.*'), 'i');
+      return new RegExp(searchText.split('').join('.*'), 'si');
     }
   }
 
@@ -130,5 +103,65 @@ export class UtilService {
     } catch (err) {
       console.error('Failed to copy: ', err);
     }
+  }
+
+  async gtplActivation(customer: CustomerModel, activate: boolean) {
+    const franchiseId = customer.STB?.toString().startsWith('31') ? 'SPCHE3954' : 'SPCHE5734';
+    await this.copyToClipboard(`${franchiseId}: Please ${activate ? 'activate' : 'deactivate'} ${customer.STB}.`);
+
+    if (this.settingsService.metadata.gtplWAGroupID) {
+      window.open(this.settingsService.metadata.gtplWAGroupID, '_blank');
+    } else {
+      this.openSnackBar(`No WhatsApp group information to launch WhatsApp.`);
+    }
+  }
+
+  async tactvActivation(customer: CustomerModel, activate: boolean) {
+    await this.copyToClipboard(`${customer.STB}`);
+    window.open('https://sms.tactv.in/index.php','_blank');
+  }
+
+  exportObjectsToCSV(objects: Record<string, any>[], filename: string) {
+    const keys: string[] = Object.keys(objects[0]);
+    const values: string[][] = [keys];
+    objects.forEach(obj => values.push(keys.map((k) => this.escapeCSVCell(obj[k]))));
+    this.exportToCSV(values, filename);
+  }
+
+  escapeCSVCell(cellData: string) {
+    // Escape double quotes by doubling them
+    let escapedData = cellData.replace(/"/g, '""');
+  
+    // If the data contains a comma or newline, enclose it in double quotes
+    if (escapedData.includes(',') || escapedData.includes('\n')) {
+      escapedData = `"${escapedData}"`;
+    }
+  
+    return escapedData;
+  }
+
+  exportToCSV(csvValues: string[][], filename: string) {
+    const a = window.document.createElement('a');
+    a.href = window.URL.createObjectURL(new Blob([csvValues.map(row => row.join(',')).join('\n')], { type: 'text/csv' }));
+    a.download = filename.replace(/[^a-zA-Z0-1]/g, ' ').replace(/\s+/g, ' ') + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  qrCodeUrl(customer: CustomerModel) {
+    return 'https://chart.googleapis.com/chart?chs=200x200&&cht=qr&chl=' + encodeURIComponent(this.upiUrl(customer));
+  }
+
+  upiUrl(customer: CustomerModel) {
+    return `upi://pay?pa=7204413241@paytm&pn=Dheeran Enterprise&cu=INR&tn=${this.processedPaymentNote(customer)}`;
+  }
+
+  processedPaymentNote(customer: CustomerModel) {
+    return this.rawPaymentNote(customer).replace(/[^a-z0-9 ]/ig, '').replace(/\s+/g, ' ').slice(0, 49);
+  }
+
+  rawPaymentNote(customer: CustomerModel) {
+    return `${customer?.ID} - ${customer?.Name} - ${customer?.Area}`;
   }
 }

@@ -8,7 +8,6 @@ import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular
 import { BaseComponent } from 'src/app/common';
 import { CustomerModel } from 'src/app/models';
 import { CableService } from '../cable.service';
-import { IApps, IRoleValue } from 'src/app/common/interfaces';
 
 @Component({
   selector: 'de-cable-list',
@@ -34,6 +33,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
   allColumns = [
     this.customerColumns?.NAME?.label || '',
     this.customerColumns?.AREA?.label || '',
+    this.customerColumns?.ID?.label || '',
     this.customerColumns?.MOBILE?.label || '',
     this.customerColumns?.STB?.label || '',
   ];
@@ -43,6 +43,10 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
   searchText = '';
 
   searchTextRegexp = new RegExp('');
+
+  searchPhoneNumber = '';
+
+  searchPhoneNumberRegexp = new RegExp('');
 
   statusFilter = this.getNewFilterControl(['Active'], ['Active', 'Inactive']);
 
@@ -85,6 +89,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     this.filterGpay = this.filterGpay.bind(this);
     this.filterStatus = this.filterStatus.bind(this);
     this.filterSearch = this.filterSearch.bind(this);
+    this.filterSearchPhoneNumber = this.filterSearchPhoneNumber.bind(this);
     this.filterCollection = this.filterCollection.bind(this);
     this.filterPendingSettlement = this.filterPendingSettlement.bind(this);
 
@@ -117,9 +122,9 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
 
   refreshDisplayedColumns() {
     if (this.settingsService.isMobile) {
-      this.displayedColumns = this.allColumns.slice(0, 2);
+      this.displayedColumns = this.allColumns.slice(0, 3);
     } else {
-      this.displayedColumns = this.allColumns.slice(0, 4);
+      this.displayedColumns = this.allColumns.slice(0, 5);
     }
     this.displayedColumns.push('ACTIONS');
   }
@@ -216,6 +221,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     let filterGpay = this.filterGpay;
     let filterStatus = this.filterStatus;
     let filterSearch = this.filterSearch;
+    let filterSearchPhoneNumber = this.filterSearchPhoneNumber;
     let filterCollection = this.filterCollection;
     let filterPendingSettlement = this.filterPendingSettlement;
 
@@ -252,6 +258,12 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
       this.searchTextRegexp = this.utilService.getFlexibleSearchTextRegexp(this.searchText);
     }
 
+    if (!this.searchPhoneNumber) {
+      filterSearchPhoneNumber = byPassFilter;
+    } else {
+      this.searchPhoneNumberRegexp = this.utilService.getFlexibleSearchTextRegexp(this.searchPhoneNumber);
+    }
+
     // None or all selected
     if (!this.monthsFilter.control.value?.length ||
         (this.monthsFilter.control.value || []).length === this.monthsFilter.controlOptions?.length) {
@@ -266,7 +278,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
       filterPendingSettlement = byPassFilter;
     }
 
-    this.data.data = this.fullData.filter(filterGpay).filter(filterArea).filter(filterStatus).filter(filterSearch).filter(filterCollection).filter(filterPendingSettlement);
+    this.data.data = this.fullData.filter(filterGpay).filter(filterArea).filter(filterStatus).filter(filterSearch).filter(filterSearchPhoneNumber).filter(filterCollection).filter(filterPendingSettlement);
 
     if (this.showPendingSettlement) {
       this.data.data.forEach((d) => this.pendingSettlementAmount += d.getPendingSettlement(false, this.agentsFilter.control.value) as number);
@@ -275,6 +287,10 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
 
   filterSearch(data: CustomerModel) {
     return data.freeTextSearch(this.searchTextRegexp);
+  }
+
+  filterSearchPhoneNumber(data: CustomerModel) {
+    return data.freeTextSearch(this.searchPhoneNumberRegexp);
   }
 
   filterArea(data: CustomerModel) {
@@ -314,10 +330,6 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     const mobileColumnFlow = (columnName === this.customerColumns?.MOBILE?.label) ? 'de-f-column' : '';
     const showBorder = (data === this.expandedElement) ? 'de-noborder--force' : '';
     return `${isActiveCustomer} ${centerAlign} ${mobileColumnFlow} ${showBorder}`;
-  }
-
-  isCableAdmin() {
-    return this.authService.hasPermission(IApps.CABLE, IRoleValue.ADMIN);
   }
 
   canEditMonth(month: keyof CustomerModel): boolean {
@@ -366,7 +378,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
             payload[this.editCustomer.getCollectionDateKey(month)] = this.editCustomer.formatDate(Date.now());
           }
           payload[this.editCustomer.getNotesKey(month)] = this.editCustomer.getNotes(month) || '';
-        } else if (this.isCableAdmin() &&
+        } else if (this.authService.isCableAdmin() &&
           (this.editCustomer[month] != editCustomerOrig[month]) || (this.editCustomer.getNotes(month) != editCustomerOrig.getNotes(month))) {
           payload[month] = this.editCustomer[month];
           payload[this.editCustomer.getNotesKey(month)] = this.editCustomer.getNotes(month) || '';
@@ -399,25 +411,6 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
             this.refreshData(true, false);
           }
         });
-        
-        // const customerSheetName = this.settingsService.metadata.sheetsInfo?.CUSTOMERS.label as string;
-        // this.apiGSheetDataService.saveOrUpdateRecord(
-        //   customerSheetName,
-        //   [this.settingsService.getCustomerCols()?.ID.label as string],
-        //   payload
-        // )
-        //   .subscribe({
-        //     next: () => {
-        //       this.settingsService.processingText = '';
-        //       this.utilService.openSnackBar(`Successfully updated '${editCustomerOrig?.Name}'`, 'Close');
-        //       this.hideEditDetailsDialog();
-        //       this.refreshData(true, false);
-        //     },
-        //     error: (err) => {
-        //       this.settingsService.processingText = '';
-        //       this.utilService.openErrorSnackBar(err, 'Close');
-        //     }
-        //   });
       }
     } catch(e) {
       this.settingsService.processingText = '';
@@ -442,5 +435,25 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
       // TODO
       // data.getPayload
     });
+  }
+
+  // TODO: Cleanup
+  exportQrCSV() {
+    const csvData = this.fullData
+      .map(d => {
+        return [
+          this.utilService.escapeCSVCell(d.ID),
+          this.utilService.escapeCSVCell(d.Name),
+          this.utilService.escapeCSVCell(d.Area),
+          this.utilService.escapeCSVCell(d.Mobile),
+          this.utilService.escapeCSVCell(this.utilService.rawPaymentNote(d)),
+          this.utilService.escapeCSVCell(this.utilService.processedPaymentNote(d)),
+          this.utilService.escapeCSVCell(this.utilService.upiUrl(d)),
+          this.utilService.escapeCSVCell(encodeURIComponent(this.utilService.upiUrl(d))),
+          this.utilService.escapeCSVCell(this.utilService.qrCodeUrl(d)),
+        ];
+      });
+    csvData.unshift(['ID', 'Name', 'Area', 'Mobile', 'Raw Payment Note', 'Processed Payment Note', 'UPI Url', 'Encoded UPI Url', 'QR Code URL']);
+    this.utilService.exportToCSV(csvData, 'customers');
   }
 }

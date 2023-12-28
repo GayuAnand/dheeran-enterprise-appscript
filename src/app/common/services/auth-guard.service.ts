@@ -13,11 +13,20 @@ export const AuthGuard = () => {
   const apiGSheetService = inject(ApiGSheetDataService);
   const settingsService = inject(SettingsService);
 
-  return apiGSheetService.discoveryInfo(environment.production).pipe(
+  return apiGSheetService.discoveryInfo().pipe(
     map((res: any) => {
       authService.user = res.activeUser;
       settingsService.metadata = res;
       settingsService.checkAndPopulateNavigationData();
+
+      apiGSheetService.discoveryInfo(true).subscribe({
+        next: (forceCheckRes: any) => {
+          authService.user = forceCheckRes.activeUser;
+          settingsService.metadata = forceCheckRes;
+          settingsService.checkAndPopulateNavigationData();
+        },
+        error: () => router.navigate(['/auth'])
+      })
       return true;
     }),
     catchError(() => {

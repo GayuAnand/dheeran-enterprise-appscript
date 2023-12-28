@@ -1,5 +1,5 @@
 <table class="customer-details">
-  <ng-container *ngIf="isCableAdmin()">
+  <ng-container *ngIf="authService.isCableAdmin()">
     <tr>
       <td>{{TKey.COMMON.ID}}:</td>
       <td><de-copyable-text [text]="customer.ID"></de-copyable-text></td>
@@ -12,7 +12,17 @@
 
   <tr>
     <td>{{TKey.COMMON.STB}}:</td>
-    <td><de-copyable-text [text]="customer.STB"></de-copyable-text></td>
+    <td class="de-f-aligncenter de-sm-rbase-nolast">
+      <de-copyable-text [text]="customer.STB"></de-copyable-text>
+      <ng-container *ngIf="customer['STB Type'] === 'TACTV'">
+        <mat-icon class="primary-text de-cursorpointer" (click)="utilService.tactvActivation(customer, true)">open_in_new</mat-icon>
+      </ng-container>
+
+      <ng-container *ngIf="customer['STB Type'] === 'GTPL'">
+        <mat-icon class="success-text bold-text de-cursorpointer" (click)="utilService.gtplActivation(customer, true)">desktop_windows</mat-icon>
+        <mat-icon class="danger-text bold-text de-cursorpointer" (click)="utilService.gtplActivation(customer, false)">desktop_access_disabled</mat-icon>
+      </ng-container>
+    </td>
   </tr>
 
   <tr class="mobile-row">
@@ -53,7 +63,20 @@
       </div>
     </td>
   </tr>
+
+  <tr *ngIf="showPaymentQrCode">
+    <td>{{TKey.COMMON.PAYMENT_QR_CODE}}:</td>
+    <td>
+      <img [src]="utilService.qrCodeUrl(customer)" class="de-block" />
+      <de-copyable-text [text]="utilService.upiUrl(customer)"></de-copyable-text>
+    </td>
+  </tr>
 </table>
+
+<button mat-stroked-button *ngIf="!showPaymentQrCode" color="primary" (click)="showPaymentQrCode = !showPaymentQrCode" class="de-m-vbase">
+  <mat-icon matPrefix>payments</mat-icon>
+  {{TKey.COMMON.SHOW_PAYMENT_QR_CODE}}
+</button>
 
 <div class="customer-card-wrapper">
   <table class="customer-card">

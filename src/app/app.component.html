@@ -2,11 +2,20 @@
 
 <de-dialog *ngIf="settingsService.flags.showAboutDialog" (closeDialog)="settingsService.flags.showAboutDialog = !settingsService.flags.showAboutDialog">
   <ng-container de-dialog-header>{{TKey.COMMON.ABOUT}}</ng-container>
-  <ng-container de-dialog-body>{{TKey.COMMON.VERSION}}: {{settingsService.currentVersion}}</ng-container>
+  <ng-container de-dialog-body>
+    <p>{{TKey.COMMON.USER}}: {{authService.Username}}</p>
+    <p>{{TKey.COMMON.VERSION}}: {{settingsService.currentVersion}}</p>
+  </ng-container>
+</de-dialog>
+
+<de-dialog *ngIf="settingsService.flags.showConfigDialog" (closeDialog)="settingsService.flags.showConfigDialog = !settingsService.flags.showConfigDialog">
+  <ng-container de-dialog-header>{{TKey.COMMON.CONFIGURATION}}</ng-container>
+  <ng-container de-dialog-body>
+    <mat-checkbox [(ngModel)]="settingsService.configurations.showCableCSVExport">{{TKey.COMMON.ENABLE_CABLE_CSV_EXPORT}}</mat-checkbox>
+  </ng-container>
 </de-dialog>
 
 <div *ngIf="!settingsService.isOnline" class="offline-indicator">No internet.</div>
-
 
 <div class="loading-screen" *ngIf="settingsService.processingText">
   <de-spinner color="white"></de-spinner>

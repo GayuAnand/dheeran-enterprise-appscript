@@ -3,6 +3,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { NavMenuItem } from './../../services';
 import { BaseComponent } from './../base.component';
+import { IApps, IRoleValue } from '../../interfaces';
 
 @Component({
   selector: 'de-page-layout',

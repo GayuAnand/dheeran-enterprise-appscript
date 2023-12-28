@@ -1,0 +1,207 @@
+<section class="bsnl-connect-input-container de-sm-small">
+  <!-- <button (click)="downloadAccounts()">Download</button>
+  <input type="file" multiple accept=".xls" (change)="processAccounts($event)" /> -->
+
+  <div class="filter-row">
+    <mat-form-field>
+      <mat-label>{{TKey.COMMON.SEARCH}}</mat-label>
+      <input matInput type="text" [(ngModel)]="searchText" (ngModelChange)="onFilterChange()">
+      <button *ngIf="searchText" matSuffix mat-icon-button (click)="searchText=''; onFilterChange();">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>{{TKey.COMMON.SEARCH_PHONE_NUMBER}}</mat-label>
+      <input matInput type="number" [(ngModel)]="searchPhoneNumber" (ngModelChange)="onFilterChange()">
+      <button *ngIf="searchPhoneNumber" matSuffix mat-icon-button (click)="searchPhoneNumber=''; onFilterChange();">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <p class="advanced-filter-label"><span (click)="showAdvancedFilters = !showAdvancedFilters" class="de-cursorpointer">{{showAdvancedFilters ? TKey.COMMON.HIDE_ADVANCED_FILTERS : TKey.COMMON.SHOW_ADVANCED_FILTERS}}</span></p>
+
+    <ng-container *ngIf="showAdvancedFilters">
+      <mat-form-field>
+        <mat-label>{{TKey.COMMON.FRANCHISE}}</mat-label>
+        <mat-select [formControl]="franchiseFilter.control" multiple>
+          <div class="select-all">
+            <mat-checkbox [(ngModel)]="franchiseFilter.selectAll"
+                          [ngModelOptions]="{ standalone: true }"
+                          (change)="franchiseFilter.toggleSelectAll()">Select All</mat-checkbox>
+          </div>
+          <mat-option *ngFor="let status of franchiseFilter.controlOptions" [value]="status" (click)="franchiseFilter.onSelectionChange()">{{status}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>{{TKey.COMMON.STATUS}}</mat-label>
+        <mat-select [formControl]="statusFilter.control" multiple>
+          <div class="select-all">
+            <mat-checkbox [(ngModel)]="statusFilter.selectAll"
+                          [ngModelOptions]="{ standalone: true }"
+                          (change)="statusFilter.toggleSelectAll()">Select All</mat-checkbox>
+          </div>
+          <mat-option *ngFor="let status of statusFilter.controlOptions" [value]="status" (click)="statusFilter.onSelectionChange()">{{status}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>{{TKey.COMMON.PLAN}}</mat-label>
+        <mat-select [formControl]="bbplanFilter.control" multiple>
+          <div class="select-all">
+            <mat-checkbox [(ngModel)]="bbplanFilter.selectAll"
+                          [ngModelOptions]="{ standalone: true }"
+                          (change)="bbplanFilter.toggleSelectAll()">Select All</mat-checkbox>
+          </div>
+          <mat-option *ngFor="let status of bbplanFilter.controlOptions" [value]="status" (click)="bbplanFilter.onSelectionChange()">{{status}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>{{TKey.COMMON.EXCHANGE}}</mat-label>
+        <mat-select [formControl]="exchangeFilter.control" multiple>
+          <div class="select-all">
+            <mat-checkbox [(ngModel)]="exchangeFilter.selectAll"
+                          [ngModelOptions]="{ standalone: true }"
+                          (change)="exchangeFilter.toggleSelectAll()">Select All</mat-checkbox>
+          </div>
+          <mat-option *ngFor="let status of exchangeFilter.controlOptions" [value]="status" (click)="exchangeFilter.onSelectionChange()">{{status}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </ng-container>
+  </div>
+</section>
+
+<de-refresh-data [cacheInfo]="cacheInfo" [refreshTriggerInterval]="4320" (refresh)="refreshData(true)"></de-refresh-data>
+
+<mat-table matSort [dataSource]="data" matSortActive="CUSTOMER_NAME" matSortDirection="asc" class="mat-elevation-z8" multiTemplateDataRows>
+  <ng-container matColumnDef="{{column}}" *ngFor="let column of displayedColumns">
+    <mat-header-cell mat-sort-header *matHeaderCellDef [ngClass]="'de-f-justifycenter'">{{column === 'ACTIONS' ? '' : column}}</mat-header-cell>
+
+    <mat-cell *matCellDef="let element" [ngClass]="getCellClassNames(element, column)">
+      <ng-container [ngSwitch]="column">
+        <ng-container *ngSwitchCase="fmsColumns?.MOBILE_NO?.label">
+          <div class="mobile-cell de-sm-rsmall-nolast" *ngIf="element[column]">
+            <de-copyable-text [text]="element[column]"></de-copyable-text>
+            <div class="de-f-aligncenter de-sm-rbase-nolast">
+              <de-mobile-number [mobile]="element[column]" displayType="CALL"></de-mobile-number>
+              <de-mobile-number [mobile]="element[column]" displayType="WHATSAPP"></de-mobile-number>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngSwitchDefault>{{element[column]}}</ng-container>
+      </ng-container>
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="expandedDetail">
+    <mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length" class="expanded-detail-cell" [ngClass]="element !== expandedElement ? 'de-noborder--force' : ''">
+      <div *ngIf="element === expandedElement" class="de-p-vmedium">
+        <table class="fms-customer-info-table">
+          <tr>
+            <td>Name: </td>
+            <td><de-copyable-text [text]="element.CUSTOMER_NAME"></de-copyable-text></td>
+          </tr>
+          <tr>
+            <td>Phone No.: </td>
+            <td><de-copyable-text [text]="element.PHONE_NO"></de-copyable-text></td>
+          </tr>
+          <tr>
+            <td>Mobile: </td>
+            <td>
+              <div class="mobile-cell de-sm-rsmall-nolast" *ngIf="element.MOBILE_NO">
+                <de-copyable-text [text]="element.MOBILE_NO"></de-copyable-text>
+                <div class="de-f-aligncenter de-sm-rbase-nolast">
+                  <de-mobile-number [mobile]="element.MOBILE_NO" displayType="CALL"></de-mobile-number>
+                  <de-mobile-number [mobile]="element.MOBILE_NO" displayType="WHATSAPP"></de-mobile-number>
+                </div>
+              </div>  
+            </td>
+          </tr>
+          <tr>
+            <td>EmailID: </td>
+            <td><de-copyable-text [text]="element.EMAIL_ID"></de-copyable-text></td>
+          </tr>
+          <tr>
+            <td>BB User ID: </td>
+            <td><de-copyable-text [text]="element.BB_USER_ID"></de-copyable-text></td>
+          </tr>
+          <tr>
+            <td>Franchise: </td>
+            <td class="bold-text"><de-copyable-text [text]="element.MTCE_FRANCHISE_CODE"></de-copyable-text></td>
+          </tr>
+          <tr>
+            <td>Exchange: </td>
+            <td><de-copyable-text [text]="element.FTTH_EXCHANGE"></de-copyable-text></td>
+          </tr>
+          <tr>
+            <td>BB Plan: </td>
+            <td><de-copyable-text [text]="element.BB_PLAN"></de-copyable-text></td>
+          </tr>
+          <tr>
+            <td>Installation Date: </td>
+            <td><de-copyable-text [text]="element.LL_INSTALL_DATE"></de-copyable-text></td>
+          </tr>
+          <tr>
+            <td>Status: </td>
+            <td>{{element.WKG_STATUS}}</td>
+          </tr>
+          <tr>
+            <td>OLT IP: </td>
+            <td><de-copyable-text [text]="element.OLT_IP"></de-copyable-text></td>
+          </tr>
+        </table>
+
+        <div class="de-f-grow de-f-wrap de-sm-hxsmall de-m-tbase" *ngIf="authService.isBSNLAdmin()">
+          <button mat-raised-button color="primary" (click)="getBillView()" class="de-f-grow">
+            <mat-icon matPrefix>payments</mat-icon>
+            {{TKey.BSNL.BILL_VIEW}}
+          </button>
+      
+          <button mat-raised-button color="accent" (click)="getVLANInfo()" class="de-f-grow">
+            <mat-icon>lan</mat-icon>
+            {{TKey.BSNL.VLAN_INFO}}
+          </button>
+        </div>
+
+        <ng-container *ngIf="information">
+          <p class="bold-text de-m-hsmall--force de-m-vbase--force mat-headline-6">{{informationType}} - {{informationFor}}</p>
+          <table class="fms-customer-info-table">
+            <tr *ngFor="let infoKey of utilService.getObjectKeys(information)">
+              <td>{{infoKey}}: </td>
+              <td>{{information[infoKey]}}</td>
+            </tr>
+          </table>
+        </ng-container>
+
+        <div class="de-m-vlarge de-m-hsmall de-f-aligncenter de-sm-rbase-nolast de-f-justifycenter" *ngIf="informationType && !information">
+          <de-spinner></de-spinner>
+          <span>Fetching {{informationType}}</span>
+        </div>
+      </div>
+    </mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+  <mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="expandedElement === row ? 'highlight-row' : ''" (click)="toggleExpandedRow(row)"></mat-row>
+  <mat-row mat-row *matRowDef="let row; columns: ['expandedDetail']" class="expanded-detail-row"></mat-row>
+</mat-table>
+
+<mat-paginator [pageSizeOptions]="[25, 50, 100, 20]" pageSize="50" showFirstLastButtons></mat-paginator>
+<!-- 
+<ng-container *ngIf="information">
+  <p class="bold-text de-m-hsmall--force de-m-vbase--force mat-headline-6">{{informationType}} - {{informationFor}}</p>
+  <table class="de-m-hsmall">
+    <tr *ngFor="let infoKey of utilService.getObjectKeys(information)">
+      <td class="italic-text">{{infoKey}}: </td>
+      <td>{{information[infoKey]}}</td>
+    </tr>
+  </table>
+</ng-container>
+
+<div class="de-m-vlarge de-m-hsmall de-f-aligncenter de-sm-rbase-nolast de-f-justifycenter" *ngIf="informationType && !information">
+  <de-spinner></de-spinner>
+  <span>Fetching {{informationType}}</span>
+</div> -->

@@ -17,6 +17,8 @@ export class CustomerModel extends BaseModel implements Record<string, any> {
 
   'STB Status'!: string;
 
+  'STB Type'!: string | 'TACTV' | 'GTPL';
+
   Status!: string;
 
   'Connection On'!: string;

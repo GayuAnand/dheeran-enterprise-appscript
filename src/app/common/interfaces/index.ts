@@ -145,6 +145,7 @@ export interface ISheetsInfo {
       TASKPRIORITY: { label: 'TaskPriority' },
       TASKSTATUS: { label: 'TaskStatus' },
       DEPLOYID: { label: 'DeployID' },
+      GTPLWAGROUPID: { label: 'GTPLNamakkalWAGroupID' },
       UGWorkType: { label: 'UGWorkType' },
     }
   },
@@ -230,8 +231,22 @@ export interface ISheetsInfo {
   FMS_EXPORT: {
     label: 'FMS Export',
     cols: {
-      VLAN: { label: 'VLAN' },
       PHONE_NO: { label: 'PHONE_NO' },
+      OLT_IP: { label: 'OLT_IP' },
+      MTCE_FRANCHISE_CODE: { label: 'MTCE_FRANCHISE_CODE' },
+      CATEGORY: { label: 'CATEGORY' },
+      CUSTOMER_NAME: { label: 'CUSTOMER_NAME' },
+      MOBILE_NO: { label: 'MOBILE_NO' },
+      EMAIL_ID: { label: 'EMAIL_ID' },
+      BB_USER_ID: { label: 'BB_USER_ID' },
+      FTTH_EXCHANGE: { label: 'FTTH_EXCHANGE' },
+      PLAN_ID: { label: 'PLAN_ID' },
+      BB_PLAN: { label: 'BB_PLAN' },
+      LL_INSTALL_DATE: { label: 'LL_INSTALL_DATE' },
+      WKG_STATUS: { label: 'WKG_STATUS' },
+      ASSIGNED_TO: { label: 'ASSIGNED_TO' },
+      RURAL_URBAN: { label: 'RURAL_URBAN' },
+      ACQUISITION_TYPE: { label: 'ACQUISITION_TYPE' },
     }
   },
   ANALYSIS: {
@@ -250,6 +265,7 @@ export interface ISheetsInfo {
 export interface IMetadata {
   area?: string[],
   deployIds?: string[],
+  gtplWAGroupID?: string,
   position?: Record<string, { Latitude: string, Longitude: string, area: string }>,
   sheetsInfo?: ISheetsInfo,
   taskPriority?: ('High' | 'Medium' | 'Low')[],

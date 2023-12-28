@@ -16,6 +16,10 @@
     <mat-icon matSuffix>info</mat-icon>
     <span>{{TKey.COMMON.ABOUT}}</span>
   </button>
+  <button *ngIf="authService.isCableAdmin()" mat-menu-item (click)="settingsService.flags.showConfigDialog = true">
+    <mat-icon matSuffix>settings</mat-icon>
+    <span>{{TKey.COMMON.CONFIGURATION}}</span>
+  </button>
   <button mat-menu-item (click)="hybridClearData()">
     <mat-icon matSuffix>delete</mat-icon>
     <span>{{TKey.COMMON.CLEAR_DATA}}</span>
