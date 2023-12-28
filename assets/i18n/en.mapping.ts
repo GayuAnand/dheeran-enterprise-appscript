@@ -12,6 +12,7 @@ export const EN_MAPPING = {
     COLLECTION_TYPE: 'Collection Type',
     CONFIGURATION: 'Configuration',
     CONNECTION_ON: 'Connection On',
+    COPY: 'Copy',
     DASHBOARD: 'Dashboard',
     DATE: 'Date',
     DETAILS: 'Details',
