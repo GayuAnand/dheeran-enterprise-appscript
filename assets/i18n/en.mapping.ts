@@ -4,7 +4,7 @@ export const EN_MAPPING = {
     ADD: 'Add',
     AGENTS: 'Agents',
     AREA: 'Area',
-    BSNL_CONNECT: 'BSNL Connect',
+    BSNL: 'BSNL',
     CABLE: 'Cable',
     CANCEL: 'Cancel',
     CHART_TYPE: 'Chart Type',
@@ -72,7 +72,7 @@ export const EN_MAPPING = {
     SHOWING_PENDING_COLLECTION: 'Showing pending collection',
     SHOW_PENDING_SETTLEMENT: 'Show pending settlement',
   },
-  BSNL_CONNECT: {
+  BSNL: {
     BILL_VIEW: 'Bill View',
     VLAN_INFO: 'VLAN Info',
   },
