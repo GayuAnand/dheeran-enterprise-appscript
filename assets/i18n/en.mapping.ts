@@ -19,6 +19,8 @@ export const EN_MAPPING = {
     EDIT: 'Edit',
     ENABLE_CABLE_CSV_EXPORT: 'Enable CABLE CSV Export',
     EXCHANGE: 'Exchange',
+    EXPORT: 'Export',
+    EXPORT_TO_CSV: 'Export To CSV',
     FAULTS: 'Faults',
     FRANCHISE: 'Franchise',
     GPAY: 'GPay',
