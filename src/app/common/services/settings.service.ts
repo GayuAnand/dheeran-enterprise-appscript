@@ -139,10 +139,28 @@ export class SettingsService implements OnDestroy {
     }
 
     if (this.authService.hasAnyBSNLPermission()) {
-      navigationData.push({
+      const bsnlNavigationData = {
         name: EN_MAPPING.COMMON.BSNL,
-        routerLink: ['/app/bsnl']
-      });
+        children: [
+          {
+            name: EN_MAPPING.COMMON.LIST,
+            routerLink: ['/app/bsnl/list']
+          },
+        ]
+      };
+
+      if (this.authService.isBSNLAdmin()) {
+        bsnlNavigationData.children.push({
+          name: EN_MAPPING.COMMON.UTILITY,
+          routerLink: ['/app/bsnl/utility']
+        });
+        bsnlNavigationData.children.push({
+          name: EN_MAPPING.COMMON.SYNC,
+          routerLink: ['/app/bsnl/sync']
+        });
+      }
+
+      navigationData.push(bsnlNavigationData);
     }
 
     if (this.authService.hasAnyUGPermission()) {
@@ -161,7 +179,7 @@ export class SettingsService implements OnDestroy {
       });
     }
 
-    if (this.authService.hasAnyPermission(IApps.ADMIN)) {
+    if (this.authService.isAdmin()) {
       navigationData.push({
         name: EN_MAPPING.COMMON.UTILITY,
         routerLink: ['/app/utility'],

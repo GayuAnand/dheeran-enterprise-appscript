@@ -116,13 +116,13 @@ export class UtilService {
     }
   }
 
-  async tactvActivation(customer: CustomerModel, activate: boolean) {
+  async tactvActivation(customer: CustomerModel) {
     await this.copyToClipboard(`${customer.STB}`);
-    window.open('https://sms.tactv.in/index.php','_blank');
+    window.open('https://sms.tactv.in','_blank');
   }
 
-  exportObjectsToCSV(objects: Record<string, any>[], filename: string) {
-    const keys: string[] = Object.keys(objects[0]);
+  exportObjectsToCSV(objects: Record<string, any>[], filename: string, keysToExport: string[] = []) {
+    const keys: string[] = (keysToExport.length === 0) ? Object.keys(objects[0]) : keysToExport;
     const values: string[][] = [keys];
     objects.forEach(obj => values.push(keys.map((k) => this.escapeCSVCell(obj[k]))));
     this.exportToCSV(values, filename);
@@ -130,7 +130,7 @@ export class UtilService {
 
   escapeCSVCell(cellData: string) {
     // Escape double quotes by doubling them
-    let escapedData = cellData.replace(/"/g, '""');
+    let escapedData = (cellData || '').toString().replace(/"/g, '""');
   
     // If the data contains a comma or newline, enclose it in double quotes
     if (escapedData.includes(',') || escapedData.includes('\n')) {

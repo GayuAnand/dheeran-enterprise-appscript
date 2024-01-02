@@ -92,6 +92,7 @@ export class CableStatisticsComponent extends BaseComponent implements OnInit, A
     let agents: Record<string, boolean> = {};
     this.rawCustomersData.forEach((data) => agents = Object.assign(agents, data.getCollectionAgents()));
     const agentsArr: string[] = Object.keys(agents);
+    agentsArr.push('Total');
     agentsArr.sort();
     
     let chartData: Record<string, Record<string, number>> = {};
@@ -106,7 +107,9 @@ export class CableStatisticsComponent extends BaseComponent implements OnInit, A
       Object.keys(agentWiseCollection).forEach(agent => {
         Object.keys(agentWiseCollection[agent]).forEach(month => {
           chartData[agent][month] = chartData[agent][month] || 0;
+          chartData['Total'][month] = chartData['Total'][month] || 0;
           chartData[agent][month] += agentWiseCollection[agent][month];
+          chartData['Total'][month] += agentWiseCollection[agent][month];
         });
       });
     });

@@ -10,11 +10,11 @@ import { BaseComponent } from 'src/app/common';
 import { FMSCustomerModel } from 'src/app/models';
 
 @Component({
-  selector: 'de-bsnl-connect',
-  templateUrl: './bsnl-connect.component.html',
-  styleUrls: ['./../../../reusable-styles/page-component.scss', './bsnl-connect.component.scss'],
+  selector: 'de-bsnl-list',
+  templateUrl: './bsnl-list.component.html',
+  styleUrls: ['./../../../../reusable-styles/page-component.scss', './bsnl-list.component.scss'],
 })
-export class BSNLConnectComponent extends BaseComponent implements OnInit, AfterViewInit {
+export class BSNLListComponent extends BaseComponent implements OnInit, AfterViewInit {
   data = new MatTableDataSource<FMSCustomerModel>([]);
 
   fullData: FMSCustomerModel[] = [];
@@ -58,10 +58,6 @@ export class BSNLConnectComponent extends BaseComponent implements OnInit, After
   cacheInfo: any = null;
 
   showAdvancedFilters = false;
-
-  rawAccountsText: string[] = [];
-
-  processedAccountsObj: any[] = [];
 
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -296,39 +292,5 @@ export class BSNLConnectComponent extends BaseComponent implements OnInit, After
     this.informationType = '';
     this.informationFor = '';
     this.information = null;
-  }
-
-  downloadAccounts() {
-    window.open('https://fms.bsnl.in/downloadAccountsList?userName=pradeep_tnslm&serviceType=Bharat%20Fiber%20BB', '_blank');
-    window.open('https://fms.bsnl.in/downloadAccountsList?userName=yogapradeep_tnslm&serviceType=Bharat%20Fiber%20BB', '_blank');
-    window.open('https://fms.bsnl.in/downloadAccountsList?userName=krbdheeran_tnslm&serviceType=Bharat%20Fiber%20BB', '_blank');
-    window.open('https://fms.bsnl.in/downloadAccountsList?userName=krbsuresh_tnslm&serviceType=Bharat%20Fiber%20BB', '_blank');
-  }
-
-  processAccounts(event: any) {
-    this.rawAccountsText = [];
-    this.processedAccountsObj = [];
-    const files = event.target.files as FileList;
-    Array.from(files).forEach(f => {
-      console.log(f);
-      const reader = new FileReader()
-      reader.onload = (e: any) => {
-        this.rawAccountsText.push(e.target.result as string);
-        if (files.length === this.rawAccountsText.length) {
-          this.rawAccountsText.forEach(rat => {
-            const dom = (new DOMParser()).parseFromString(rat, 'text/html');
-            const arrayValues: string[][] = Array.from(dom.querySelectorAll('table')[0].querySelectorAll('tr')).map(tr => Array.from(tr.querySelectorAll('th,td')).map((td) => (td as HTMLElement).innerText));
-            const headers: string[] = arrayValues.shift() as string[];
-            arrayValues.forEach(row => {
-              const accountObj: any = {};
-              row.forEach((d, i) => accountObj[headers[i]] = d);
-              this.processedAccountsObj.push(accountObj);
-            });
-          });
-          this.utilService.exportObjectsToCSV(this.processedAccountsObj, 'Master BSNL Accounts');
-        }
-      };
-      reader.readAsText(f);
-    });
   }
 }

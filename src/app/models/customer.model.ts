@@ -19,6 +19,8 @@ export class CustomerModel extends BaseModel implements Record<string, any> {
 
   'STB Type'!: string | 'TACTV' | 'GTPL';
 
+  'Bulk Payment'!: '1' | '0';
+
   Status!: string;
 
   'Connection On'!: string;
@@ -33,8 +35,23 @@ export class CustomerModel extends BaseModel implements Record<string, any> {
 
   private _monthsOrder!: (keyof CustomerModel)[];
 
+  idNum() {
+    return (this.ID || '').replace(/^cde0*/i, '');
+  }
+
   get(prop: string) {
     return (this as any)[prop];
+  }
+
+  getInfoAsText(includeLocation = false) {
+    return [
+      this.Name,
+      this.Mobile.replace(/\n/g, ', ').trim(),
+      this.Area,
+      (includeLocation && this.Latitude && this.Longitude) ? `https://www.google.com/maps/place/${this.Latitude},${this.Longitude}` : ''
+    ]
+      .filter(x => x)
+      .join(' - ');
   }
 
   isActive() {

@@ -1,0 +1,27 @@
+<button mat-raised-button color="primary" (click)="downloadAccounts()">Download</button>
+<!-- <input type="file" multiple accept=".xls" mat-input (change)="processAccounts($event)" /> -->
+
+<button type="button" mat-raised-button (click)="analyzeFiles.click()">Analyze</button>
+<input hidden (change)="processAccounts($event, false)" #analyzeFiles type="file" multiple accept=".xls">
+
+<button type="button" mat-raised-button (click)="mergeFiles.click()">Merge</button>
+<input hidden (change)="processAccounts($event, true)" #mergeFiles type="file" multiple accept=".xls">
+
+<de-refresh-data [cacheInfo]="cacheInfo" [refreshTriggerInterval]="4320" (refresh)="refreshData(true)"></de-refresh-data>
+
+<div *ngFor="let record of diffRecordsArr">
+  <table>
+    <tr>
+      <td>Database</td>
+      <td>FMS</td>
+    </tr>
+    <tr>
+      <td>{{record.database.PHONE_NO}}</td>
+      <td>{{record.fms.PHONE_NO}}</td>
+    </tr>
+    <tr *ngFor="let key of record.diffKeys">
+      <td>{{record.database[key]}}</td>
+      <td>{{record.fms[key]}}</td>
+    </tr>
+  </table>
+</div>

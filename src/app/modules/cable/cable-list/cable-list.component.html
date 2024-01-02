@@ -16,30 +16,6 @@
   </mat-form-field>
 
   <mat-form-field>
-    <mat-label>{{TKey.COMMON.STATUS}}</mat-label>
-    <mat-select [formControl]="statusFilter.control" multiple>
-      <div class="select-all">
-        <mat-checkbox [(ngModel)]="statusFilter.selectAll"
-                      [ngModelOptions]="{ standalone: true }"
-                      (change)="statusFilter.toggleSelectAll()">Select All</mat-checkbox>
-      </div>
-      <mat-option *ngFor="let status of statusFilter.controlOptions" [value]="status" (click)="statusFilter.onSelectionChange()">{{status}}</mat-option>
-    </mat-select>
-  </mat-form-field>
-
-  <mat-form-field>
-    <mat-label>{{TKey.COMMON.GPAY}}</mat-label>
-    <mat-select [formControl]="gpayFilter.control" multiple>
-      <div class="select-all">
-        <mat-checkbox [(ngModel)]="gpayFilter.selectAll"
-                      [ngModelOptions]="{ standalone: true }"
-                      (change)="gpayFilter.toggleSelectAll()">Select All</mat-checkbox>
-      </div>
-      <mat-option *ngFor="let status of gpayFilter.controlOptions" [value]="status" (click)="gpayFilter.onSelectionChange()">{{status}}</mat-option>
-    </mat-select>
-  </mat-form-field>
-
-  <mat-form-field>
     <mat-label>{{TKey.COMMON.AREA}}</mat-label>
     <mat-select [formControl]="areaFilter.control" multiple>
       <div class="select-all">
@@ -51,6 +27,18 @@
     </mat-select>
   </mat-form-field>
 
+  <mat-form-field>
+    <mat-label>{{TKey.COMMON.STATUS}}</mat-label>
+    <mat-select [formControl]="statusFilter.control" multiple>
+      <div class="select-all">
+        <mat-checkbox [(ngModel)]="statusFilter.selectAll"
+                      [ngModelOptions]="{ standalone: true }"
+                      (change)="statusFilter.toggleSelectAll()">Select All</mat-checkbox>
+      </div>
+      <mat-option *ngFor="let status of statusFilter.controlOptions" [value]="status" (click)="statusFilter.onSelectionChange()">{{status}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
   <button *ngIf="authService.isCableAdmin() && settingsService.configurations.showCableCSVExport" mat-raised-button color="primary" (click)="exportQrCSV()" class="de-f-grow">
     <mat-icon matPrefix>payments</mat-icon>
     Export QR CSV
@@ -59,6 +47,18 @@
   <p class="advanced-filter-label"><span (click)="toggleAdvancedFilters()" class="de-cursorpointer">{{showAdvancedFilters ? TKey.COMMON.HIDE_ADVANCED_FILTERS : TKey.COMMON.SHOW_ADVANCED_FILTERS}}</span></p>
 
   <ng-container *ngIf="showAdvancedFilters">
+    <mat-form-field>
+      <mat-label>{{TKey.COMMON.GPAY}}</mat-label>
+      <mat-select [formControl]="gpayFilter.control" multiple>
+        <div class="select-all">
+          <mat-checkbox [(ngModel)]="gpayFilter.selectAll"
+                        [ngModelOptions]="{ standalone: true }"
+                        (change)="gpayFilter.toggleSelectAll()">Select All</mat-checkbox>
+        </div>
+        <mat-option *ngFor="let status of gpayFilter.controlOptions" [value]="status" (click)="gpayFilter.onSelectionChange()">{{status}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
     <div class="pending-settlement-filter" *ngIf="!showCollectedCustomers">
       <label>Pending Settlement Filter</label>
       <mat-slide-toggle [(ngModel)]="showPendingSettlement" (ngModelChange)="onPendingSettlementFilterChange()" [ngClass]="authService.hasPermission(METADATA.APPS.CABLE, METADATA.ROLES.ADMIN) ? '' : 'de-nm--force'">{{TKey.CUSTOMERS.SHOW_PENDING_SETTLEMENT}} {{showPendingSettlement ? '(Rs.' + pendingSettlementAmount + '/-)' : ''}}</mat-slide-toggle>
@@ -102,7 +102,10 @@
   </ng-container>
 </div>
 
-<de-refresh-data [cacheInfo]="cacheInfo" [refreshTriggerInterval]="1440" (refresh)="refreshData(true)"></de-refresh-data>
+<div class="de-f-aligncenter de-f-justifyright de-m-bbase">
+  <a class="de-m-rbase de-link" (click)="exportFilteredDataToCSV()">{{TKey.COMMON.EXPORT_TO_CSV}}</a>
+  <de-refresh-data [cacheInfo]="cacheInfo" [refreshTriggerInterval]="1440" (refresh)="refreshData(true)"></de-refresh-data>
+</div>
 
 <mat-table [dataSource]="data" class="mat-elevation-z8" multiTemplateDataRows>
   <ng-container matColumnDef="{{column}}" *ngFor="let column of displayedColumns">
@@ -116,6 +119,10 @@
 
         <ng-container *ngSwitchCase="customerColumns?.STB?.label">
           <de-copyable-text [text]="element[column]"></de-copyable-text>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="customerColumns?.ID?.label">
+          {{element.idNum()}}
         </ng-container>
 
         <ng-container *ngSwitchCase="customerColumns?.NAME?.label">
@@ -147,13 +154,27 @@
 
   <ng-container matColumnDef="expandedDetail">
     <mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length" class="expanded-detail-cell" [ngClass]="element !== expandedElement ? 'de-noborder--force' : ''">
-      <de-customer-card
-        *ngIf="element === expandedElement"
-        [customer]="element"
-        [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'"
-        (onCustomerUpdate)="refreshData(true)"
-      >
-      </de-customer-card>
+      <section *ngIf="element === expandedElement" class="de-f-column de-p-vbase">
+        <div class="de-fs-alignbottom de-sm-rbase-nolast de-m-bxsmall">
+          <button *ngIf="settingsService.isMobile" mat-mini-fab color="primary" (click)="showEditDetailsDialog(element, $event)">
+            <mat-icon matPrefix>edit</mat-icon>
+          </button>
+
+          <button mat-mini-fab color="accent" (click)="utilService.copyToClipboard(element.getInfoAsText(true))">
+            <mat-icon matPrefix>perm_media</mat-icon>
+          </button>
+
+          <button mat-mini-fab color="accent" (click)="utilService.copyToClipboard(element.getInfoAsText())">
+            <mat-icon matPrefix>content_copy</mat-icon>
+          </button>
+        </div>
+        <de-customer-card
+          [customer]="element"
+          [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'"
+          (onCustomerUpdate)="refreshData(true)"
+        >
+        </de-customer-card>
+      </section>
     </mat-cell>
   </ng-container>
 

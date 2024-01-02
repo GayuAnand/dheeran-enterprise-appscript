@@ -31,6 +31,7 @@ export interface ISheetsInfo {
       NAME: { label: 'Name' },
       MOBILE: { label: 'Mobile' },
       GPAY: { label: 'GPay' },
+      BULK_PAYMENT: { label: 'Bulk Payment' },
       STB: { label: 'STB' },
       STB_TYPE: { label: 'STB Type', data: { GTPL: 'GTPL', TACTV: 'TACTV' } },
       AREA: { label: 'Area' },

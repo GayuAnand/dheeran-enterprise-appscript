@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { CustomerModel } from 'src/app/models';
 import { SettingsService, UtilService } from 'src/app/common';
 import { ApiGSheetDataService, ApiStorageService } from 'src/app/api';
-import { Subject, concatMap, from, map, mergeMap } from 'rxjs';
+import { Subject, concatMap, finalize, from, map, mergeMap } from 'rxjs';
 
 @Injectable()
 export class CableService {
@@ -78,13 +78,16 @@ export class CableService {
               }, 1)
             )
         }),
-        concatMap((data) => {
+        concatMap((savedData) => {
           return this.storageService.updateCableOfflineData(offlineData, this.customerIdLabel, true)
             .pipe(map(() => {
               this.offlineDataUpdated$.next(true);
-              return data;
+              return savedData;
             }));
-        })
+        }),
+        finalize(() => this.apiGSheetDataService.getSheetData<CustomerModel>(this.settingsService.metadata.sheetsInfo?.CUSTOMERS.label as string, CustomerModel, true)
+          .subscribe()
+        )
       )
       .subscribe({
         next: (data) => {

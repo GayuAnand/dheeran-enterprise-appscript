@@ -1,7 +1,4 @@
 <section class="bsnl-connect-input-container de-sm-small">
-  <!-- <button (click)="downloadAccounts()">Download</button>
-  <input type="file" multiple accept=".xls" (change)="processAccounts($event)" /> -->
-
   <div class="filter-row">
     <mat-form-field>
       <mat-label>{{TKey.COMMON.SEARCH}}</mat-label>
@@ -154,7 +151,7 @@
           </tr>
         </table>
 
-        <div class="de-f-grow de-f-wrap de-sm-hxsmall de-m-tbase" *ngIf="authService.isBSNLAdmin()">
+        <div class="de-f-grow de-f-wrap de-sm-hxsmall de-m-tbase">
           <button mat-raised-button color="primary" (click)="getBillView()" class="de-f-grow">
             <mat-icon matPrefix>payments</mat-icon>
             {{TKey.BSNL.BILL_VIEW}}

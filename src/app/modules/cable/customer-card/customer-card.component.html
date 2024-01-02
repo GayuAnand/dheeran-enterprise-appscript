@@ -15,7 +15,7 @@
     <td class="de-f-aligncenter de-sm-rbase-nolast">
       <de-copyable-text [text]="customer.STB"></de-copyable-text>
       <ng-container *ngIf="customer['STB Type'] === 'TACTV'">
-        <mat-icon class="primary-text de-cursorpointer" (click)="utilService.tactvActivation(customer, true)">open_in_new</mat-icon>
+        <mat-icon class="primary-text de-cursorpointer" (click)="utilService.tactvActivation(customer)">open_in_new</mat-icon>
       </ng-container>
 
       <ng-container *ngIf="customer['STB Type'] === 'GTPL'">
@@ -68,7 +68,7 @@
     <td>{{TKey.COMMON.PAYMENT_QR_CODE}}:</td>
     <td>
       <img [src]="utilService.qrCodeUrl(customer)" class="de-block" />
-      <de-copyable-text [text]="utilService.upiUrl(customer)"></de-copyable-text>
+      <a mat-raised-button [href]="utilService.upiUrl(customer)" target="_blank">{{TKey.COMMON.PAY_BILL}}</a>
     </td>
   </tr>
 </table>

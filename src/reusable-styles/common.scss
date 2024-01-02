@@ -42,6 +42,12 @@
   word-break: break-word;
 }
 
+.de-link {
+  color: var(--primary);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
 .de-noborder {
   border: 0px;
 }

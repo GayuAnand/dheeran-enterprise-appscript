@@ -125,8 +125,8 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
       this.displayedColumns = this.allColumns.slice(0, 3);
     } else {
       this.displayedColumns = this.allColumns.slice(0, 5);
+      this.displayedColumns.push('ACTIONS');
     }
-    this.displayedColumns.push('ACTIONS');
   }
 
   refreshData(force = false, resetFilters = false) {
@@ -435,6 +435,14 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
       // TODO
       // data.getPayload
     });
+  }
+
+  exportFilteredDataToCSV() {
+    this.utilService.exportObjectsToCSV(
+      this.data.data,
+      'Cable Customers',
+      ['ID', 'Name', 'Mobile', 'Area', 'Status', 'GPay', 'Bulk Payment', 'STB', 'STB Status', 'STB Type', 'Own Notes']
+    );
   }
 
   // TODO: Cleanup
