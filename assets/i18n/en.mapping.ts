@@ -23,7 +23,7 @@ export const EN_MAPPING = {
     EXPORT_TO_CSV: 'Export To CSV',
     FAULTS: 'Faults',
     FRANCHISE: 'Franchise',
-    GPAY: 'GPay',
+    NOCREDIT: 'No Credit',
     HIDE_ADVANCED_FILTERS: 'Hide Advanced Filters',
     HOME: 'Home',
     ID: 'ID',
