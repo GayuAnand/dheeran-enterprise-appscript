@@ -36,9 +36,9 @@ export class DashboardComponent extends BaseComponent implements OnInit {
 
     if (this.authService.hasAnyUGPermission()) {
       this.cards.push({
-        routerLink: '../ug-patrol',
+        routerLink: '../ug',
         icon: 'groups',
-        text: this.TKey.COMMON.UG_PATROL,
+        text: this.TKey.COMMON.UG,
       })
     }
 

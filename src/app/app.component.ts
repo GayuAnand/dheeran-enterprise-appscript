@@ -24,6 +24,7 @@ export class AppComponent extends BaseComponent {
     this.uiBundleUpdaterService.initialize();
     this.fileSystemService.cleanupUnknownFiles();
     this.matIconRegistry.addSvgIcon('whatsapp', this.setPath(`assets/images/whatsapp.svg`));
+    this.matIconRegistry.addSvgIcon('whatsappreminder', this.setPath(`assets/images/whatsappreminder.svg`));
     this.matIconRegistry.addSvgIcon('bsnl', this.setPath(`assets/images/bsnl.svg`));
 
     // console.log('### Test CallDetector plugin ###');

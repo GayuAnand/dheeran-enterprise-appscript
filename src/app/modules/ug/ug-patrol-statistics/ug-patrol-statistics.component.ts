@@ -58,7 +58,7 @@ export class UGPatrolStatisticsComponent extends BaseComponent implements OnInit
 
   constructor() {
     super();
-    this.settingsService.pageTitle = this.TKey.COMMON.UG_PATROL;
+    this.settingsService.pageTitle = this.TKey.COMMON.UG;
   }
 
   ngOnInit(): void {

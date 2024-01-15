@@ -44,18 +44,21 @@
     Export QR CSV
   </button>
 
-  <p class="advanced-filter-label"><span (click)="toggleAdvancedFilters()" class="de-cursorpointer">{{showAdvancedFilters ? TKey.COMMON.HIDE_ADVANCED_FILTERS : TKey.COMMON.SHOW_ADVANCED_FILTERS}}</span></p>
+  <p class="advanced-filter-label de-sm-rbase-nolast">
+    <span (click)="clearFilters()" class="de-cursorpointer">{{TKey.COMMON.CLEAR_FILTERS}}</span>
+    <span (click)="toggleAdvancedFilters()" class="de-cursorpointer">{{showAdvancedFilters ? TKey.COMMON.HIDE_ADVANCED_FILTERS : TKey.COMMON.SHOW_ADVANCED_FILTERS}}</span>
+  </p>
 
   <ng-container *ngIf="showAdvancedFilters">
     <mat-form-field>
-      <mat-label>{{TKey.COMMON.GPAY}}</mat-label>
-      <mat-select [formControl]="gpayFilter.control" multiple>
+      <mat-label>{{TKey.COMMON.ALLOW_CREDIT}}</mat-label>
+      <mat-select [formControl]="allowCreditFilter.control" multiple>
         <div class="select-all">
-          <mat-checkbox [(ngModel)]="gpayFilter.selectAll"
+          <mat-checkbox [(ngModel)]="allowCreditFilter.selectAll"
                         [ngModelOptions]="{ standalone: true }"
-                        (change)="gpayFilter.toggleSelectAll()">Select All</mat-checkbox>
+                        (change)="allowCreditFilter.toggleSelectAll()">Select All</mat-checkbox>
         </div>
-        <mat-option *ngFor="let status of gpayFilter.controlOptions" [value]="status" (click)="gpayFilter.onSelectionChange()">{{status}}</mat-option>
+        <mat-option *ngFor="let status of allowCreditFilter.controlOptions" [value]="status" (click)="allowCreditFilter.onSelectionChange()">{{(status == '1' ? TKey.COMMON.YES : TKey.COMMON.NO)}}</mat-option>
       </mat-select>
     </mat-form-field>
 
@@ -102,89 +105,113 @@
   </ng-container>
 </div>
 
-<div class="de-f-aligncenter de-f-justifyright de-m-bbase">
-  <a class="de-m-rbase de-link" (click)="exportFilteredDataToCSV()">{{TKey.COMMON.EXPORT_TO_CSV}}</a>
+<div class="de-f-aligncenter de-f-justifyright de-sm-rbase-nolast de-f-wrap de-sm-bbase">
+  <a class="de-link" (click)="exportFilteredDataToCSV()">{{TKey.COMMON.EXPORT_TO_CSV}}</a>
+
   <de-refresh-data [cacheInfo]="cacheInfo" [refreshTriggerInterval]="1440" (refresh)="refreshData(true)"></de-refresh-data>
+
+  <mat-button-toggle-group appearance="legacy" [(ngModel)]="viewType">
+    <mat-button-toggle value="table_view">
+      <mat-icon>toc</mat-icon>
+    </mat-button-toggle>
+    <mat-button-toggle value="map_view">
+      <mat-icon>public</mat-icon>
+    </mat-button-toggle>
+  </mat-button-toggle-group>
 </div>
 
-<mat-table [dataSource]="data" class="mat-elevation-z8" multiTemplateDataRows>
-  <ng-container matColumnDef="{{column}}" *ngFor="let column of displayedColumns">
-    <mat-header-cell *matHeaderCellDef [ngClass]="'de-f-justifycenter'">{{column === 'ACTIONS' ? '' : column}}</mat-header-cell>
+<ng-container *ngIf="viewType === 'table_view'">
+  <mat-table [dataSource]="data" class="mat-elevation-z8" multiTemplateDataRows>
+    <ng-container matColumnDef="{{column}}" *ngFor="let column of displayedColumns">
+      <mat-header-cell *matHeaderCellDef [ngClass]="'de-f-justifycenter'">{{column === 'ACTIONS' ? '' : column}}</mat-header-cell>
 
-    <mat-cell *matCellDef="let element" [ngClass]="getCellClassNames(element, column)">
-      <ng-container [ngSwitch]="column">
-        <ng-container *ngSwitchCase="customerColumns?.STATUS?.label">
-          <mat-icon>toggle_on</mat-icon>
-        </ng-container>
-
-        <ng-container *ngSwitchCase="customerColumns?.STB?.label">
-          <de-copyable-text [text]="element[column]"></de-copyable-text>
-        </ng-container>
-
-        <ng-container *ngSwitchCase="customerColumns?.ID?.label">
-          {{element.idNum()}}
-        </ng-container>
-
-        <ng-container *ngSwitchCase="customerColumns?.NAME?.label">
-          {{element[column]}} {{showPendingSettlement ? '(' + element.getPendingSettlement(true, agentsFilter.control.value) + ')' : ''}}
-        </ng-container>
-
-        <ng-container *ngSwitchCase="'ACTIONS'">
-          <ng-container *ngIf="element?.ID">
-            <mat-icon color="primary" class="de-cursorpointer de-m-rbase" (click)="showEditDetailsDialog(element, $event)">edit</mat-icon>
+      <mat-cell *matCellDef="let element" [ngClass]="getCellClassNames(element, column)">
+        <ng-container [ngSwitch]="column">
+          <ng-container *ngSwitchCase="customerColumns?.STATUS?.label">
+            <mat-icon>toggle_on</mat-icon>
           </ng-container>
-        </ng-container>
 
-        <ng-container *ngSwitchCase="customerColumns?.MOBILE?.label">
-          <ng-container *ngFor="let mobile of element.getMobileNumbers()">
-            <div class="mobile-cell de-sm-rsmall-nolast" *ngIf="mobile">
-              <de-copyable-text [text]="mobile"></de-copyable-text>
-              <div class="de-f-aligncenter de-sm-rbase-nolast">
-                <de-mobile-number [mobile]="mobile" displayType="CALL"></de-mobile-number>
-                <de-mobile-number [mobile]="mobile" displayType="WHATSAPP"></de-mobile-number>
+          <ng-container *ngSwitchCase="customerColumns?.STB?.label">
+            <de-copyable-text [text]="element[column]"></de-copyable-text>
+          </ng-container>
+
+          <ng-container *ngSwitchCase="customerColumns?.ID?.label">
+            {{element.idNum()}}
+          </ng-container>
+
+          <ng-container *ngSwitchCase="customerColumns?.NAME?.label">
+            {{element[column]}} {{showPendingSettlement ? '(' + element.getPendingSettlement(true, agentsFilter.control.value) + ')' : ''}}
+          </ng-container>
+
+          <ng-container *ngSwitchCase="'ACTIONS'">
+            <ng-container *ngIf="element?.ID">
+              <mat-icon color="primary" class="de-cursorpointer de-m-rbase" (click)="showEditDetailsDialog(element, $event)">edit</mat-icon>
+            </ng-container>
+          </ng-container>
+
+          <ng-container *ngSwitchCase="customerColumns?.MOBILE?.label">
+            <ng-container *ngFor="let mobile of element.getMobileNumbers()">
+              <div class="mobile-cell de-sm-rsmall-nolast" *ngIf="mobile">
+                <de-copyable-text [text]="mobile"></de-copyable-text>
+                <div class="de-f-aligncenter de-sm-rbase-nolast">
+                  <de-mobile-number [mobile]="mobile" displayType="CALL"></de-mobile-number>
+                  <de-mobile-number [mobile]="mobile" displayType="WHATSAPP"></de-mobile-number>
+                </div>
               </div>
-            </div>
+            </ng-container>
           </ng-container>
+
+          <ng-container *ngSwitchDefault>{{element[column]}}</ng-container>
         </ng-container>
+      </mat-cell>
+    </ng-container>
 
-        <ng-container *ngSwitchDefault>{{element[column]}}</ng-container>
-      </ng-container>
-    </mat-cell>
-  </ng-container>
+    <ng-container matColumnDef="expandedDetail">
+      <mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length" class="expanded-detail-cell" [ngClass]="element !== expandedElement ? 'de-noborder--force' : ''">
+        <section *ngIf="element === expandedElement" class="de-f-column de-p-vbase">
+          <div class="de-fs-alignbottom de-sm-rbase-nolast de-m-bxsmall">
+            <button *ngIf="settingsService.isMobile" mat-mini-fab color="primary" (click)="showEditDetailsDialog(element, $event)">
+              <mat-icon matPrefix>edit</mat-icon>
+            </button>
 
-  <ng-container matColumnDef="expandedDetail">
-    <mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length" class="expanded-detail-cell" [ngClass]="element !== expandedElement ? 'de-noborder--force' : ''">
-      <section *ngIf="element === expandedElement" class="de-f-column de-p-vbase">
-        <div class="de-fs-alignbottom de-sm-rbase-nolast de-m-bxsmall">
-          <button *ngIf="settingsService.isMobile" mat-mini-fab color="primary" (click)="showEditDetailsDialog(element, $event)">
-            <mat-icon matPrefix>edit</mat-icon>
-          </button>
+            <a mat-mini-fab color="accent" href="https://api.whatsapp.com/send?text={{encodeURIComponent(element.getInfoAsText(true))}}" target="_blank">
+              <mat-icon svgIcon="whatsapp"></mat-icon>
+            </a>
 
-          <button mat-mini-fab color="accent" (click)="utilService.copyToClipboard(element.getInfoAsText(true))">
-            <mat-icon matPrefix>perm_media</mat-icon>
-          </button>
+            <button mat-mini-fab color="accent" (click)="utilService.copyToClipboard(element.getInfoAsText(true))">
+              <mat-icon matPrefix>perm_media</mat-icon>
+            </button>
 
-          <button mat-mini-fab color="accent" (click)="utilService.copyToClipboard(element.getInfoAsText())">
-            <mat-icon matPrefix>content_copy</mat-icon>
-          </button>
-        </div>
-        <de-customer-card
-          [customer]="element"
-          [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'"
-          (onCustomerUpdate)="refreshData(true)"
-        >
-        </de-customer-card>
-      </section>
-    </mat-cell>
-  </ng-container>
+            <button mat-mini-fab color="accent" (click)="utilService.copyToClipboard(element.getInfoAsText())">
+              <mat-icon matPrefix>content_copy</mat-icon>
+            </button>
+          </div>
+          <de-customer-card
+            [customer]="element"
+            [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'"
+            (onCustomerUpdate)="refreshData(true)"
+          >
+          </de-customer-card>
+        </section>
+      </mat-cell>
+    </ng-container>
 
-  <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
-  <mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="expandedElement === row ? 'highlight-row' : ''" (click)="expandedElement = expandedElement === row ? null : row"></mat-row>
-  <mat-row mat-row *matRowDef="let row; columns: ['expandedDetail']" class="expanded-detail-row"></mat-row>
-</mat-table>
+    <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+    <mat-row
+      *matRowDef="let row; columns: displayedColumns;"
+      [ngClass]="expandedElement === row ? 'highlight-row' : ''"
+      (click)="expandedElement = expandedElement === row ? null : row"
+    >
+    </mat-row>
+    <mat-row mat-row *matRowDef="let row; columns: ['expandedDetail']" class="expanded-detail-row"></mat-row>
+  </mat-table>
 
-<mat-paginator [pageSizeOptions]="[25, 50, 100, 20]" pageSize="50" showFirstLastButtons></mat-paginator>
+  <mat-paginator [pageSizeOptions]="[25, 50, 100, 20]" pageSize="50" showFirstLastButtons></mat-paginator>
+</ng-container>
 
+<ng-container *ngIf="viewType === 'map_view'">
+  <de-map [styles]="{ height: 'calc(100% - 50px)', width: '100%' }" [options]="mapOptions" [markerClusterData]="markers"></de-map>
+</ng-container>
 
 <de-dialog *ngIf="editCustomerOrig" (closeDialog)="hideEditDetailsDialog()" classNames="customer-card-dialog">
   <ng-container de-dialog-header>{{TKey.COMMON.EDIT}} - {{editCustomerOrig.Name}}</ng-container>
@@ -269,8 +296,8 @@
       </mat-form-field>
 
       <mat-form-field [ngClass]="{ 'readonly': !authService.isCableAdmin() }">
-        <mat-label>{{TKey.COMMON.GPAY}}</mat-label>
-        <mat-select [(ngModel)]="editCustomer.GPay">
+        <mat-label>{{TKey.COMMON.ALLOW_CREDIT}}</mat-label>
+        <mat-select [(ngModel)]="editCustomer.AllowCredit">
           <mat-option *ngFor="let option of [[TKey.COMMON.YES, '1'], [TKey.COMMON.NO, '0']]" [value]="option[1]">{{option[0]}}</mat-option>
         </mat-select>
       </mat-form-field>

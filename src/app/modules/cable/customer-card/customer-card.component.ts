@@ -12,4 +12,6 @@ export class CustomerCardComponent extends BaseComponent {
   @Input() customer!: CustomerModel;
 
   showPaymentQrCode = false;
+
+  showMiniMap = false;
 }

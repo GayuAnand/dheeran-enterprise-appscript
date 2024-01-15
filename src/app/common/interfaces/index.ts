@@ -30,7 +30,7 @@ export interface ISheetsInfo {
       ID: { label: 'ID' },
       NAME: { label: 'Name' },
       MOBILE: { label: 'Mobile' },
-      GPAY: { label: 'GPay' },
+      ALLOW_CREDIT: { label: 'AllowCredit' },
       BULK_PAYMENT: { label: 'Bulk Payment' },
       STB: { label: 'STB' },
       STB_TYPE: { label: 'STB Type', data: { GTPL: 'GTPL', TACTV: 'TACTV' } },
@@ -133,6 +133,73 @@ export interface ISheetsInfo {
       WORK_TYPE: { label: 'WorkType' },
       PATROL_COUNT: { label: 'PatrolCount' },
       REMARKS: { label: 'Remarks' },
+    }
+  },
+  UG_WORK: {
+    label: 'UG Work',
+    cols: {
+      'ID': { label: 'ID' },
+      'BY': { label: 'By' },
+      'TYPE': {
+        label: 'Type',
+        data: {
+          PERMANENT: 'Permanent',
+          TEMPORARY: 'Temporary',
+        }
+      },
+      'BREAK_TIME': { label: 'BreakTime' },
+      'RESTORE_TIME': { label: 'RestoreTime' },
+      'EXCHANGE': { label: 'Exchange' },
+      'DISTANCE_FROM_EXCHANGE_KM': { label: 'DistanceFromExchange_km' },
+      'ROUTE_NAME': { label: 'RouteName' },
+      'WORK_LOCATION': { label: 'WorkLocation' },
+      'TRENCHING_M': { label: 'Trenching_m' },
+      'TEST_PIT': { label: 'TestPit' },
+      'PLB_m': { label: 'PLB_m' },
+      'CABLE_PULLING_m': { label: 'CablePulling_m' },
+      'USED_CABLE_CAPACITY': {
+        label: 'UsedCableCapacity',
+        data: {
+          '4F': '4F',
+          '6F': '6F',
+          '12F': '12F',
+          '24F': '24F',
+          '48F': '48F',
+          '96F': '96F',
+          '144F': '144F',
+          '288F': '288F',
+        }
+      },
+      'SPLICING_4F6F': { label: 'Splicing_4F6F' },
+      'SPLICING_12F24F': { label: 'Splicing_12F24F' },
+      'SPLICING_48F96F': { label: 'Splicing_48F96F' },
+      'SPLICING_144F': { label: 'Splicing_144F' },
+      'SPLICING_288F': { label: 'Splicing_288F' },
+      'CHAMBER_INSTALLED': { label: 'ChamberInstalled' },
+      'OPENING_OF_MAN_HOLE_COVERS': { label: 'OpeningOfManHoleCovers' },
+      'DEWATERING_OF_CHAMBERS': { label: 'DewateringOfChambers' },
+      'OPENING_AND_CLOSING_OF_RING_MANHOLES': { label: 'OpeningAndClosingOfRingManHoles' },
+      'NO._OF_POLES_INSTALLED': { label: 'NoOfPolesInstalled' },
+      'OVERHEAD_CABLE_USED': { label: 'OverheadCableUsed_m' },
+      'OVERHEAD_CABLE_CAPACITY': {
+        label: 'OverheadCableCapacity',
+        data: {
+          '4F': '4F',
+          '6F': '6F',
+          '12F': '12F',
+          '24F': '24F',
+          '48F': '48F',
+          '96F': '96F',
+          '144F': '144F',
+          '288F': '288F',
+        }
+      },
+      'OVERHEAD_CABLE_SPLICING_4F6F': { label: 'OverheadCableSplicing_4F6F' },
+      'OVERHEAD_CABLE_SPLICING_12F24F': { label: 'OverheadCableSplicing_12F24F' },
+      'OVERHEAD_CABLE_SPLICING_48F96F': { label: 'OverheadCableSplicing_48F96F' },
+      'OVERHEAD_CABLE_SPLICING_144F': { label: 'OverheadCableSplicing_144F' },
+      'OVERHEAD_CABLE_SPLICING_288F': { label: 'OverheadCableSplicing_288F' },
+      'REMARKS': { label: 'Remarks' },
     }
   },
   REFERENCE_DATA: {

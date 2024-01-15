@@ -17,10 +17,6 @@ export class UGPatrolModel extends BaseModel implements Record<string, any> {
 
   Remarks!: string;
 
-  constructor(data: any) {
-    super(data);
-  }
-
   getPatrolDateStr() {
     return this.formatDate(this.Date);
   }

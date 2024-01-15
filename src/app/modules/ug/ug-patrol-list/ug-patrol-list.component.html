@@ -20,7 +20,7 @@
   </mat-form-field>
 
   <mat-form-field>
-    <mat-label>{{TKey.UG_PATROL.WORK_TYPE}}</mat-label>
+    <mat-label>{{TKey.UG.WORK_TYPE}}</mat-label>
     <mat-select [formControl]="workTypeFilter.control" multiple>
       <div class="select-all">
         <mat-checkbox [(ngModel)]="workTypeFilter.selectAll"
@@ -34,7 +34,7 @@
   <button mat-raised-button color="accent" *ngIf="settingsService.isOnline" (click)="createRecord()"><mat-icon>add</mat-icon>{{TKey.COMMON.ADD}}</button>
 </div>
 
-<de-refresh-data [cacheInfo]="cacheInfo" (refresh)="refreshData(true)"></de-refresh-data>
+<de-refresh-data [cacheInfo]="cacheInfo" (refresh)="refreshData(true)" class="de-m-bbase"></de-refresh-data>
 
 <mat-table matSort [dataSource]="data" matSortActive="Date" matSortDirection="desc"  class="mat-elevation-z8">
   <ng-container matColumnDef="{{column}}" *ngFor="let column of displayedColumnsWithAction">
@@ -45,7 +45,7 @@
         <ng-container *ngSwitchCase="ugPatrolColumns?.DATE?.label">{{element.getPatrolDateStr()}}</ng-container>
 
         <ng-container *ngSwitchCase="'ACTIONS'">
-          <ng-container *ngIf="element?.ID && (isUgPatrolAdmin() || isRecordByLoggedInUser(element))">
+          <ng-container *ngIf="element?.ID && (authService.isUGAdmin() || isRecordByLoggedInUser(element))">
             <mat-icon color="primary" class="de-cursorpointer de-m-rbase" (click)="editRecord(element)">edit</mat-icon>
             <mat-icon color="warn" class="de-cursorpointer" (click)="recordToDelete = element">delete</mat-icon>
           </ng-container>
@@ -63,7 +63,7 @@
 <mat-paginator [pageSizeOptions]="[25, 50, 100, 20]" pageSize="50" showFirstLastButtons></mat-paginator>
 
 <de-dialog *ngIf="recordToEdit" classNames="min-w300" (closeDialog)="recordToEdit = null">
-  <ng-container de-dialog-header>{{recordToEdit.ID ? TKey.UG_PATROL.EDIT_PATROL : TKey.UG_PATROL.ADD_PATROL}}</ng-container>
+  <ng-container de-dialog-header>{{recordToEdit.ID ? TKey.UG.EDIT_PATROL : TKey.UG.ADD_PATROL}}</ng-container>
   <ng-container de-dialog-body>
     <div class="de-p-vbase"></div>
 
@@ -79,14 +79,14 @@
     <de-autocomplete [label]="TKey.COMMON.ROUTE" [(ngModel)]="recordToEdit.Route" [options]="options.route"></de-autocomplete>
 
     <mat-form-field>
-      <mat-label>{{TKey.UG_PATROL.WORK_TYPE}}</mat-label>
+      <mat-label>{{TKey.UG.WORK_TYPE}}</mat-label>
       <mat-select [(ngModel)]="recordToEdit.WorkType">
         <mat-option *ngFor="let status of settingsService.metadata.ugWorkType" [value]="status">{{status}}</mat-option>
       </mat-select>
     </mat-form-field>
 
     <mat-form-field>
-      <mat-label>{{TKey.UG_PATROL.PATROL_COUNT}}</mat-label>
+      <mat-label>{{TKey.UG.PATROL_COUNT}}</mat-label>
       <input matInput type="number" [(ngModel)]="recordToEdit.PatrolCount">
     </mat-form-field>
 

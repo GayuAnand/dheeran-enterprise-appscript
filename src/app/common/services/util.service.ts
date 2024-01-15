@@ -31,7 +31,7 @@ export class UtilService {
     this.snackBarRef.onAction().subscribe(() => this.snackBarRef.dismiss());
   }
 
-  openErrorSnackBar(message: string, action?: string, options: MatSnackBarConfig = {}) {
+  openErrorSnackBar(message: string, action: string = 'Close', options: MatSnackBarConfig = {}) {
     const defaultOptions = Object.assign({ duration: 0 }, options);
     this.openSnackBar(message, action, defaultOptions);
   }

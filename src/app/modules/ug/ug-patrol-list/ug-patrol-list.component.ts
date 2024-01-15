@@ -10,9 +10,9 @@ import { BaseModel, UGPatrolModel } from 'src/app/models';
 import { IApps, IRoleValue } from 'src/app/common/interfaces';
 
 @Component({
-  selector: 'de-ug-patrol',
-  templateUrl: './ug-patrol.component.html',
-  styleUrls: ['./../../../../reusable-styles/page-component.scss', './ug-patrol.component.scss'],
+  selector: 'de-ug-patrol-list',
+  templateUrl: './ug-patrol-list.component.html',
+  styleUrls: ['./../../../../reusable-styles/page-component.scss', './ug-patrol-list.component.scss'],
 })
 export class UGPatrolComponent extends BaseComponent implements OnInit, AfterViewInit {
   data = new MatTableDataSource<UGPatrolModel>([]);
@@ -62,17 +62,16 @@ export class UGPatrolComponent extends BaseComponent implements OnInit, AfterVie
   constructor() {
     super();
     this.filterRoute = this.filterRoute.bind(this);
+    this.filterSearch = this.filterSearch.bind(this);
     this.filterWorkType = this.filterWorkType.bind(this);
 
     this._subscriptions.push(this.eventService.isMobile.subscribe(() => this.refreshDisplayedColumns()));
 
-    this.settingsService.pageTitle = this.TKey.COMMON.UG_PATROL;
+    this.settingsService.pageTitle = this.TKey.UG.PATROL_LIST;
   }
 
   ngOnInit(): void {
     this._subscriptions.push(this.eventService.isMobile.subscribe(() => this.refreshDisplayedColumns()));
-
-    this.settingsService.pageTitle = this.TKey.COMMON.UG_PATROL;
   }
 
   ngAfterViewInit() {
@@ -242,10 +241,6 @@ export class UGPatrolComponent extends BaseComponent implements OnInit, AfterVie
                          (columnName === this.ugPatrolColumns?.PATROL_COUNT?.label) ||
                          (columnName === 'ACTIONS')) ? 'align-center' : '';
     return `${centerAlign}`;
-  }
-
-  isUgPatrolAdmin() {
-    return this.authService.hasPermission(IApps.UG, IRoleValue.ADMIN);
   }
 
   isRecordByLoggedInUser(record: UGPatrolModel) {

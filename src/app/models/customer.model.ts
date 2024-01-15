@@ -11,7 +11,7 @@ export class CustomerModel extends BaseModel implements Record<string, any> {
 
   Mobile!: string;
 
-  GPay!: '1' | '0';
+  AllowCredit!: '1' | '0';
 
   STB!: string;
 
@@ -33,14 +33,40 @@ export class CustomerModel extends BaseModel implements Record<string, any> {
   
   Longitude!: string | number;
 
+  DraftChanges!: any;
+
   private _monthsOrder!: (keyof CustomerModel)[];
 
   idNum() {
     return (this.ID || '').replace(/^cde0*/i, '');
   }
 
+  hasDraftChanges() {
+    return !!this.DraftChanges;
+  }
+
   get(prop: string) {
     return (this as any)[prop];
+  }
+
+  getLatitudeAsNum() {
+    return parseFloat(this.Latitude.toString());
+  }
+
+  getLongitudeAsNum() {
+    return parseFloat(this.Longitude.toString());
+  }
+
+  hasLocationInfo() {
+    return !!(this.Latitude && this.Longitude);
+  }
+
+  hasPendingPayment(month?: keyof CustomerModel) {
+    return !this[month || this.getCurrentMonth() as keyof CustomerModel];
+  }
+
+  getCurrentMonth() {
+    return moment().format('MMMYYYY');
   }
 
   getInfoAsText(includeLocation = false) {
@@ -54,12 +80,43 @@ export class CustomerModel extends BaseModel implements Record<string, any> {
       .join(' - ');
   }
 
+  getReminderText() {
+    let lastKnownPaymentInfo = 200;
+    const pendingMonths = [];
+    const monthsInOrder = this.getMonthsInOrder();
+
+    for (let month of monthsInOrder) {
+      if (this.hasPendingPayment(month)) {
+        pendingMonths.push(month);
+      } else {
+        lastKnownPaymentInfo = parseInt(this[month] || '200');
+        pendingMonths.length = 0;
+      }
+
+      if (month === this.getCurrentMonth()) break;
+    }
+
+    return `Hello _${this.Name}_,
+
+A friendly reminder for your ${pendingMonths.map(m => '`' + m + '`').join(', ')} cable payment. Total *Rs.${pendingMonths.length * lastKnownPaymentInfo}/-*
+
+CustomerID: ${this.ID}
+Area: ${this.Area}
+
+Best Regards,
+*_Dheeran Enterprise_*`
+  }
+
   isActive() {
     return this.Status !== 'Inactive';
   }
 
-  hasGpay() {
-    return this.GPay == '1';
+  allowCredit() {
+    return this.AllowCredit == '1';
+  }
+
+  noCredit() {
+    return this.AllowCredit == '0';
   }
 
   getMobileNumbers(): string[] {

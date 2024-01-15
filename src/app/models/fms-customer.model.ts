@@ -42,4 +42,16 @@ export class FMSCustomerModel extends BaseModel implements Record<string, any> {
   getPhoneNumber() {
     return this.PHONE_NO.replace(/[^0-9]/g, '');
   }
+
+  getInfoAsText() {
+    return [
+      `Name: ${this.CUSTOMER_NAME}`,
+      `Phone: ${this.PHONE_NO}`,
+      `BB UserID: ${this.BB_USER_ID}`,
+      `Mobile: ${this.MOBILE_NO}`,
+      `Email: ${this.EMAIL_ID}`,
+      `Franchise: ${this.MTCE_FRANCHISE_CODE}`,
+    ]
+      .join('\n');
+  }
 }

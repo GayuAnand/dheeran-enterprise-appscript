@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 
-import { BaseComponent } from 'src/app/common';
+import { BaseComponent, UiBundleUpdaterService } from 'src/app/common';
 import { IFileInfo } from 'src/app/api';
 
 interface FileNode extends FileInfo {
@@ -48,6 +48,10 @@ export class MaintenanceComponent extends BaseComponent implements OnInit {
   );
 
   dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
+
+  constructor(public uiUpdaterService: UiBundleUpdaterService) {
+    super();
+  }
 
   ngOnInit(): void {
     this.settingsService.pageTitle = this.TKey.COMMON.UTILITY;

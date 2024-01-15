@@ -33,6 +33,7 @@
         <div class="de-f-aligncenter de-sm-rbase-nolast">
           <de-mobile-number [mobile]="mobile" displayType="CALL"></de-mobile-number>
           <de-mobile-number [mobile]="mobile" displayType="WHATSAPP"></de-mobile-number>
+          <de-mobile-number *ngIf="customer.hasPendingPayment()" [mobile]="mobile" [whatsAppMessage]="customer.getReminderText()" displayType="WHATSAPP_REMINDER"></de-mobile-number>
         </div>
       </div>
     </td>
@@ -64,19 +65,31 @@
     </td>
   </tr>
 
+  <tr *ngIf="showMiniMap">
+    <td colspan="2">
+      <de-cable-location [customer]="customer"></de-cable-location>
+    </td>
+  </tr>
+
   <tr *ngIf="showPaymentQrCode">
-    <td>{{TKey.COMMON.PAYMENT_QR_CODE}}:</td>
-    <td>
+    <td colspan="2">
       <img [src]="utilService.qrCodeUrl(customer)" class="de-block" />
       <a mat-raised-button [href]="utilService.upiUrl(customer)" target="_blank">{{TKey.COMMON.PAY_BILL}}</a>
     </td>
   </tr>
 </table>
 
-<button mat-stroked-button *ngIf="!showPaymentQrCode" color="primary" (click)="showPaymentQrCode = !showPaymentQrCode" class="de-m-vbase">
-  <mat-icon matPrefix>payments</mat-icon>
-  {{TKey.COMMON.SHOW_PAYMENT_QR_CODE}}
-</button>
+<div class="de-f de-sm-rbase-nolast">
+  <button mat-stroked-button color="primary" (click)="showPaymentQrCode = !showPaymentQrCode" class="de-m-vbase">
+    <mat-icon matPrefix>qr_code</mat-icon>
+    {{TKey.COMMON.PAYMENT_QR_CODE}}
+  </button>
+
+  <button mat-stroked-button *ngIf="customer.hasLocationInfo()" color="primary" (click)="showMiniMap = !showMiniMap" class="de-m-vbase">
+    <mat-icon matPrefix>{{showMiniMap ? 'location_off' : 'location_on'}}</mat-icon>
+    {{TKey.COMMON.MAP_VIEW}}
+  </button>
+</div>
 
 <div class="customer-card-wrapper">
   <table class="customer-card">

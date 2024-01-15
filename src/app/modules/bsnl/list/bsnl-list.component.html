@@ -95,7 +95,17 @@
 
   <ng-container matColumnDef="expandedDetail">
     <mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length" class="expanded-detail-cell" [ngClass]="element !== expandedElement ? 'de-noborder--force' : ''">
-      <div *ngIf="element === expandedElement" class="de-p-vmedium">
+      <div *ngIf="element === expandedElement" class="de-p-bmedium de-p-tbase de-w-full">
+        <div class="de-fs-justifyright de-sm-rbase-nolast de-m-bxsmall">
+          <a mat-mini-fab color="accent" href="https://api.whatsapp.com/send?text={{encodeURIComponent(element.getInfoAsText())}}" target="_blank">
+            <mat-icon svgIcon="whatsapp"></mat-icon>
+          </a>
+
+          <button mat-mini-fab color="accent" (click)="utilService.copyToClipboard(element.getInfoAsText())">
+            <mat-icon matPrefix>content_copy</mat-icon>
+          </button>
+        </div>
+
         <table class="fms-customer-info-table">
           <tr>
             <td>Name: </td>
@@ -152,12 +162,12 @@
         </table>
 
         <div class="de-f-grow de-f-wrap de-sm-hxsmall de-m-tbase">
-          <button mat-raised-button color="primary" (click)="getBillView()" class="de-f-grow">
+          <button mat-raised-button color="primary" (click)="getBillView()" class="de-f-grow" style="max-width: 160px;">
             <mat-icon matPrefix>payments</mat-icon>
             {{TKey.BSNL.BILL_VIEW}}
           </button>
       
-          <button mat-raised-button color="accent" (click)="getVLANInfo()" class="de-f-grow">
+          <button mat-raised-button color="accent" (click)="getVLANInfo()" class="de-f-grow" style="max-width: 160px;">
             <mat-icon>lan</mat-icon>
             {{TKey.BSNL.VLAN_INFO}}
           </button>

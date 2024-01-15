@@ -1,3 +1,5 @@
+import * as L from 'leaflet';
+import { marker } from 'leaflet';
 import { concatMap, map } from 'rxjs';
 import { debounce } from 'typescript-debounce-decorator';
 import { MatPaginator } from '@angular/material/paginator';
@@ -5,9 +7,9 @@ import { MatTableDataSource } from '@angular/material/table';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
-import { BaseComponent } from 'src/app/common';
 import { CustomerModel } from 'src/app/models';
 import { CableService } from '../cable.service';
+import { BaseComponent, BaseMapLayers, MapLayers } from 'src/app/common';
 
 @Component({
   selector: 'de-cable-list',
@@ -40,6 +42,8 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
 
   displayedColumns: string[] = [];
 
+  viewType: 'table_view' | 'map_view' = 'table_view';
+
   searchText = '';
 
   searchTextRegexp = new RegExp('');
@@ -50,7 +54,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
 
   statusFilter = this.getNewFilterControl(['Active'], ['Active', 'Inactive']);
 
-  gpayFilter = this.getNewFilterControl([], ['1', '0']);
+  allowCreditFilter = this.getNewFilterControl([], ['1', '0']);
 
   areaFilter = this.getNewFilterControl([], []);
 
@@ -75,6 +79,14 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
   editCustomer!: CustomerModel;
 
   processingLatLng = false;
+
+  mapOptions = {
+    layers: [BaseMapLayers[MapLayers.SATELLITE]],
+    zoomControl: false,
+    zoom: 17,
+  };
+
+  markers: L.Marker[] = []
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -139,16 +151,34 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
               this.cacheInfo = value;
               return res;
             }))
-          )
+          ),
+        concatMap((res) => this.storageService.getCableOfflieData()
+          .pipe(
+            map((offlineDataArr) => {
+              this.fullData = res;
+              (offlineDataArr || []).forEach((offlineData) => this.mergeOfflineData(offlineData));
+              return res;
+            })
+          ))
       )
       .subscribe({
         next: (data) => {
           this.settingsService.processingText = '';
-          this.fullData = data;
           this.initializeFilters(resetFilters);
         },
         error: () => this.settingsService.processingText = ''
       });
+  }
+
+  mergeOfflineData(offlineData: any) {
+    const originalData = this.fullData.find(r => r.ID === offlineData.ID);
+
+    if (originalData) {
+      originalData.DraftChanges = offlineData;
+      Object.keys(offlineData).forEach((offlineDatakey) => originalData[offlineDatakey as keyof CustomerModel] = offlineData[offlineDatakey]);
+    } else {
+      this.utilService.openErrorSnackBar(`Unknown entry in offline data. ${JSON.stringify(offlineData)}`);
+    }
   }
 
   initializeFilters(resetFilters = false) {
@@ -198,6 +228,30 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     this.onFilterChange();
   }
 
+  clearFilters() {
+    this.searchText = '';
+    this.searchPhoneNumber = '';
+
+    this.areaFilter.selectAll = false;
+    this.areaFilter.control.setValue([]);
+
+    this.statusFilter.selectAll = false;
+    this.statusFilter.control.setValue(['Active']);
+
+    this.allowCreditFilter.selectAll = false;
+    this.allowCreditFilter.control.setValue([]);
+
+    this.showPendingSettlement = false;
+    this.agentsFilter.selectAll = false;
+    this.agentsFilter.control.setValue([]);
+    
+    this.showCollectedCustomers = false;
+    this.monthsFilter.selectAll = false;
+    this.monthsFilter.control.setValue([]);
+
+    this.onFilterChange();
+  }
+
   onPendingSettlementFilterChange() {
     if (this.showPendingSettlement) {
       this.showCollectedCustomers = false;
@@ -228,15 +282,15 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     this.areaFilter._selectedObj = {};
     (this.areaFilter.control.value || []).forEach(area => this.areaFilter._selectedObj[area] = true);
 
-    this.gpayFilter._selectedObj = {};
-    (this.gpayFilter.control.value || []).forEach(area => this.gpayFilter._selectedObj[area] = true);
+    this.allowCreditFilter._selectedObj = {};
+    (this.allowCreditFilter.control.value || []).forEach(nocredit => this.allowCreditFilter._selectedObj[nocredit] = true);
 
     this.statusFilter._selectedObj = {};
     (this.statusFilter.control.value || []).forEach(status => this.statusFilter._selectedObj[status] = true);
 
     // None or all selected
-    if (!this.gpayFilter.control.value?.length ||
-        (this.gpayFilter.control?.value || []).length === this.gpayFilter.controlOptions?.length) {
+    if (!this.allowCreditFilter.control.value?.length ||
+        (this.allowCreditFilter.control?.value || []).length === this.allowCreditFilter.controlOptions?.length) {
       filterGpay = byPassFilter;
     }
 
@@ -279,6 +333,9 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     }
 
     this.data.data = this.fullData.filter(filterGpay).filter(filterArea).filter(filterStatus).filter(filterSearch).filter(filterSearchPhoneNumber).filter(filterCollection).filter(filterPendingSettlement);
+    this.markers = this.data.data
+      .filter((d) => d.hasLocationInfo())
+      .map((d) => marker([d.getLatitudeAsNum(), d.getLongitudeAsNum()]).bindPopup(d.getInfoAsText()))
 
     if (this.showPendingSettlement) {
       this.data.data.forEach((d) => this.pendingSettlementAmount += d.getPendingSettlement(false, this.agentsFilter.control.value) as number);
@@ -302,7 +359,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
   }
 
   filterGpay(data: CustomerModel) {
-    return (this.gpayFilter._selectedObj['1'] && data.hasGpay()) || (this.gpayFilter._selectedObj['0'] && !data.hasGpay());
+    return (this.allowCreditFilter._selectedObj['1'] && data.allowCredit()) || (this.allowCreditFilter._selectedObj['0'] && data.noCredit());
   }
 
   filterCollection(data: CustomerModel) {
@@ -354,7 +411,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
         customerCols?.STB.label as any,
         customerCols?.STB_STATUS.label as any,
         customerCols?.MOBILE.label as any,
-        customerCols?.GPAY.label as any,
+        customerCols?.ALLOW_CREDIT.label as any,
         customerCols?.OWN_NOTES.label as any,
         customerCols?.CONNECTION_ON.label as any,
         customerCols?.LATITUDE.label as any,
@@ -397,6 +454,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
 
       if (offlineUpdate) {
         this.cableService.saveOfflineUpdate(payload);
+        this.mergeOfflineData(payload);
         this.hideEditDetailsDialog();
       } else {
         this.settingsService.processingText = `Updating '${editCustomerOrig?.Name}'...`;
@@ -441,7 +499,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     this.utilService.exportObjectsToCSV(
       this.data.data,
       'Cable Customers',
-      ['ID', 'Name', 'Mobile', 'Area', 'Status', 'GPay', 'Bulk Payment', 'STB', 'STB Status', 'STB Type', 'Own Notes']
+      ['ID', 'Name', 'Mobile', 'Area', 'Status', 'NoCredit', 'Bulk Payment', 'STB', 'STB Status', 'STB Type', 'Own Notes']
     );
   }
 

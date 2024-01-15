@@ -1,0 +1,10 @@
+<div
+  *ngIf="options"
+  leaflet
+  [ngStyle]="styles"
+  class="leaflet-map"
+  [leafletOptions]="processedOptions"
+  [leafletLayersControl]="layersControl"
+  (leafletMapReady)="refreshMap()"
+>
+</div>

@@ -1,0 +1,258 @@
+<div class="filter-row de-p-vbase">
+  <mat-form-field>
+    <mat-label>{{TKey.COMMON.SEARCH}}</mat-label>
+    <input matInput type="text" [(ngModel)]="searchText" (ngModelChange)="onFilterChange()">
+    <button *ngIf="searchText" matSuffix mat-icon-button (click)="searchText=''; onFilterChange();">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>{{TKey.COMMON.ROUTE}}</mat-label>
+    <mat-select [formControl]="routeFilter.control" multiple>
+      <div class="select-all">
+        <mat-checkbox [(ngModel)]="routeFilter.selectAll"
+                      [ngModelOptions]="{ standalone: true }"
+                      (change)="routeFilter.toggleSelectAll()">Select All</mat-checkbox>
+      </div>
+      <mat-option *ngFor="let status of routeFilter.controlOptions" [value]="status" (click)="routeFilter.onSelectionChange()">{{status}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>{{TKey.COMMON.TYPE}}</mat-label>
+    <mat-select [formControl]="typeFilter.control" multiple>
+      <div class="select-all">
+        <mat-checkbox [(ngModel)]="typeFilter.selectAll"
+                      [ngModelOptions]="{ standalone: true }"
+                      (change)="typeFilter.toggleSelectAll()">Select All</mat-checkbox>
+      </div>
+      <mat-option *ngFor="let status of typeFilter.controlOptions" [value]="status" (click)="typeFilter.onSelectionChange()">{{status}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <button mat-raised-button color="accent" *ngIf="settingsService.isOnline" (click)="createRecord()"><mat-icon>add</mat-icon>{{TKey.COMMON.ADD}}</button>
+</div>
+
+<de-refresh-data [cacheInfo]="cacheInfo" (refresh)="refreshData(true)" class="de-m-bbase"></de-refresh-data>
+
+<mat-table matSort [dataSource]="data" matSortActive="BreakTime" matSortDirection="desc"  class="mat-elevation-z8">
+  <ng-container matColumnDef="{{column}}" *ngFor="let column of displayedColumnsWithAction">
+    <mat-header-cell mat-sort-header *matHeaderCellDef [ngClass]="'de-f-justifycenter'">{{column === 'ACTIONS' ? '' : column}}</mat-header-cell>
+
+    <mat-cell *matCellDef="let element" [ngClass]="getCellClassNames(element, column)">
+      <ng-container [ngSwitch]="column">
+        <ng-container *ngSwitchCase="ugWorkColumns?.BREAK_TIME?.label">{{element.getBreakTimeStr()}}</ng-container>
+        <ng-container *ngSwitchCase="ugWorkColumns?.RESTORE_TIME?.label">{{element.getRestoreTimeStr()}}</ng-container>
+
+        <ng-container *ngSwitchCase="'ACTIONS'">
+          <ng-container *ngIf="element?.ID && (authService.isUGAdmin() || isRecordByLoggedInUser(element))">
+            <mat-icon color="primary" class="de-cursorpointer de-m-rbase" (click)="editRecord(element)">edit</mat-icon>
+            <mat-icon color="warn" class="de-cursorpointer" (click)="recordToDelete = element">delete</mat-icon>
+          </ng-container>
+        </ng-container>
+
+        <ng-container *ngSwitchDefault>{{element[column]}}</ng-container>
+      </ng-container>
+    </mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="displayedColumnsWithAction; sticky: true"></mat-header-row>
+  <mat-row *matRowDef="let row; columns: displayedColumnsWithAction;"></mat-row>
+</mat-table>
+
+<mat-paginator [pageSizeOptions]="[25, 50, 100, 20]" pageSize="50" showFirstLastButtons></mat-paginator>
+
+<de-dialog *ngIf="recordToEdit" classNames="min-w300" (closeDialog)="recordToEdit = null">
+  <ng-container de-dialog-header>{{recordToEdit.ID ? TKey.UG.EDIT_PATROL : TKey.UG.ADD_PATROL}}</ng-container>
+  <ng-container de-dialog-body>
+    <div class="de-p-vbase"></div>
+
+    <mat-form-field>
+      <mat-label>{{TKey.COMMON.TYPE}}</mat-label>
+      <mat-select [(ngModel)]="recordToEdit.Type">
+        <mat-option *ngFor="let status of options.type" [value]="status">{{status}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>{{TKey.UG.BREAK_TIME}}</mat-label>
+      <input matInput type="datetime-local" 
+        [ngModel]="recordToEdit.BreakTime | date:'yyyy-MM-ddTHH:mm'"
+        (ngModelChange)="recordToEdit.BreakTime = $event" />
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>{{TKey.UG.RESTORE_TIME}}</mat-label>
+      <input matInput type="datetime-local" 
+        [ngModel]="recordToEdit.RestoreTime | date:'yyyy-MM-ddTHH:mm'"
+        (ngModelChange)="recordToEdit.RestoreTime = $event" />
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>{{TKey.COMMON.REMARKS}}</mat-label>
+      <textarea matInput [(ngModel)]="recordToEdit.Remarks"></textarea>
+    </mat-form-field>
+
+    <mat-accordion class="example-headers-align" multi>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>{{TKey.UG.SITE_DETAILS}}</mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <de-autocomplete [label]="TKey.COMMON.EXCHANGE" [(ngModel)]="recordToEdit.Exchange" [options]="options.exchange"></de-autocomplete>
+
+        <de-autocomplete [label]="TKey.COMMON.ROUTE" [(ngModel)]="recordToEdit.RouteName" [options]="options.routeName"></de-autocomplete>
+
+        <de-autocomplete [label]="TKey.UG.WORK_LOCATION" [(ngModel)]="recordToEdit.WorkLocation" [options]="options.workLocation"></de-autocomplete>
+
+        <mat-form-field>
+          <mat-label>{{TKey.UG.DISTANCE_FROM_EXCHANGE}}</mat-label>
+          <input matInput type="number" [(ngModel)]="recordToEdit.DistanceFromExchange_km">
+        </mat-form-field>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>{{TKey.UG.WORK_DETAILS}}</mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <mat-form-field>
+          <mat-label>{{TKey.UG.TRENCHING}}</mat-label>
+          <input matInput type="number" [(ngModel)]="recordToEdit.Trenching_m">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{TKey.UG.TEST_PIT}}</mat-label>
+          <input matInput type="number" [(ngModel)]="recordToEdit.TestPit">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{TKey.UG.PLB}}</mat-label>
+          <input matInput type="number" [(ngModel)]="recordToEdit.PLB_m">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{TKey.UG.CABLE_PULLING}}</mat-label>
+          <input matInput type="number" [(ngModel)]="recordToEdit.CablePulling_m">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{TKey.UG.USED_CABLE_CAPACITY}}</mat-label>
+          <mat-select [(ngModel)]="recordToEdit.UsedCableCapacity">
+            <mat-option *ngFor="let capacity of options.cableCapacity" [value]="capacity">{{capacity}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{TKey.UG.SPLICING_4F6F}}</mat-label>
+          <input matInput type="number" [(ngModel)]="recordToEdit.Splicing_4F6F">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{TKey.UG.SPLICING_12F24F}}</mat-label>
+          <input matInput type="number" [(ngModel)]="recordToEdit.Splicing_12F24F">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{TKey.UG.SPLICING_48F96F}}</mat-label>
+          <input matInput type="number" [(ngModel)]="recordToEdit.Splicing_48F96F">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{TKey.UG.SPLICING_144F}}</mat-label>
+          <input matInput type="number" [(ngModel)]="recordToEdit.Splicing_144F">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{TKey.UG.SPLICING_288F}}</mat-label>
+          <input matInput type="number" [(ngModel)]="recordToEdit.Splicing288F">
+        </mat-form-field>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>{{TKey.UG.ADDITIONAL_WORK_DETAILS}}</mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <mat-form-field>
+          <mat-label>{{TKey.UG.CHAMBERS_INSTALLED}}</mat-label>
+          <input matInput type="number" [(ngModel)]="recordToEdit.ChamberInstalled">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{TKey.UG.OPENING_OF_MANHOLE_COVERS}}</mat-label>
+          <input matInput type="number" [(ngModel)]="recordToEdit.OpeningOfManHoleCovers">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{TKey.UG.DEWATERING_OF_CHAMBERS}}</mat-label>
+          <input matInput type="number" [(ngModel)]="recordToEdit.DewateringOfChambers">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{TKey.UG.OPENING_AND_CLOSING_OF_RING_MANHOLES}}</mat-label>
+          <input matInput type="number" [(ngModel)]="recordToEdit.OpeningAndClosingOfRingManHoles">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{TKey.UG.NO_OF_POLES_INSTALLED}}</mat-label>
+          <input matInput type="number" [(ngModel)]="recordToEdit.NoOfPolesInstalled">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{TKey.UG.OVERHEAD_CABLE_USED}}</mat-label>
+          <input matInput type="number" [(ngModel)]="recordToEdit.OverheadCableUsed_m">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{TKey.UG.OVERHEAD_CABLE_CAPACITY}}</mat-label>
+          <mat-select [(ngModel)]="recordToEdit.OverheadCableCapacity">
+            <mat-option *ngFor="let capacity of options.cableCapacity" [value]="capacity">{{capacity}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{TKey.UG.OVERHEAD_SPLICING_4F6F}}</mat-label>
+          <input matInput type="number" [(ngModel)]="recordToEdit.OverheadCableSplicing_4F6F">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{TKey.UG.OVERHEAD_SPLICING_12F24F}}</mat-label>
+          <input matInput type="number" [(ngModel)]="recordToEdit.OverheadCableSplicing_12F24F">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{TKey.UG.OVERHEAD_SPLICING_48F96F}}</mat-label>
+          <input matInput type="number" [(ngModel)]="recordToEdit.OverheadCableSplicing_48F96F">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{TKey.UG.OVERHEAD_SPLICING_144F}}</mat-label>
+          <input matInput type="number" [(ngModel)]="recordToEdit.OverheadCableSplicing_144F">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>{{TKey.UG.OVERHEAD_SPLICING_288F}}</mat-label>
+          <input matInput type="number" [(ngModel)]="recordToEdit.OverheadCableSplicing_288F">
+        </mat-form-field>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </ng-container>
+
+  <ng-container de-dialog-footer>
+    <button mat-raised-button color="warn" (click)="recordToEdit = null"><mat-icon>close</mat-icon>{{TKey.COMMON.CANCEL}}</button>
+    <button mat-raised-button color="primary" (click)="updateRecord()">
+      <div class="de-f-aligncenter de-sm-rsmall-nolast">
+        <mat-icon>save</mat-icon>
+        <span>{{TKey.COMMON.SAVE}}</span>
+      </div>
+    </button>
+  </ng-container>
+</de-dialog>
+
+<de-confirmation-dialog *ngIf="recordToDelete"
+  [title]="'Delete Patrol?'"
+  [content]="'Are you sure you want to delete patrol \'' + recordToDelete.RouteName + '\'?'"
+  (onSuccess)="deleteRecord()" (onCancel)="recordToDelete = null">
+</de-confirmation-dialog>

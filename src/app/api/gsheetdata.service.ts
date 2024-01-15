@@ -1,6 +1,6 @@
 import { Network } from '@capacitor/network';
 import { Injectable } from '@angular/core';
-import { Observable, concatMap, delay, map, of } from 'rxjs';
+import { Observable, concatMap, delay, map, of, throwError } from 'rxjs';
 
 import { BaseModel, CustomerModel } from '../models';
 import { ApiAuthService } from './auth.service';

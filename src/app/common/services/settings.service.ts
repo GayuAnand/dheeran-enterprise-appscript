@@ -165,15 +165,19 @@ export class SettingsService implements OnDestroy {
 
     if (this.authService.hasAnyUGPermission()) {
       navigationData.push({
-        name: EN_MAPPING.COMMON.UG_PATROL,
+        name: EN_MAPPING.COMMON.UG,
         children: [
           {
-            name: EN_MAPPING.COMMON.LIST,
-            routerLink: ['/app/ug-patrol/list'],
+            name: EN_MAPPING.UG.PATROL_LIST,
+            routerLink: ['/app/ug/patrol-list'],
           },
           {
-            name: EN_MAPPING.COMMON.STATISTICS,
-            routerLink: ['/app/ug-patrol/statistics'],
+            name: EN_MAPPING.UG.PATROL_STATISTICS,
+            routerLink: ['/app/ug/patrol-statistics'],
+          },
+          {
+            name: EN_MAPPING.UG.WORK_LIST,
+            routerLink: ['/app/ug/work-list'],
           },
         ],
       });

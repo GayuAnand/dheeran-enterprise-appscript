@@ -77,3 +77,13 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  background: url(https://mywildalberta.ca/images/GFX-MWA-Parks-Reservations.png) no-repeat;
+  border-width: thin;
+  color: rgba(0, 0, 0, 0);
+  display: block;
+  opacity: 1;
+  height: 20px;
+  width: 20px;
+}

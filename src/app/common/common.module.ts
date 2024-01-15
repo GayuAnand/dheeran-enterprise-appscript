@@ -8,6 +8,7 @@ import { OverlayModule } from '@angular/cdk/overlay';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
@@ -29,12 +30,14 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS, MatFormFieldModule } from '@angular/material/form-field';
+import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { CanvasJSAngularChartsModule } from '@canvasjs/angular-charts';
 
 import { AutocompleteComponent, CopyableTextComponent, DialogComponent, EmptyLayoutComponent, ConfirmationDialogComponent,
-         IframeComponent, MobileNumberComponent, PageLayoutComponent, SpinnerComponent, RefreshDataComponent } from './components';
+         IframeComponent, MobileNumberComponent, PageLayoutComponent, SpinnerComponent, RefreshDataComponent, MapComponent } from './components';
 import { AuthService, EventService, GeoLocationService, SettingsService, UiBundleUpdaterService, UtilService } from './services';
 import { MatSortModule } from '@angular/material/sort';
+import { LeafletMarkerClusterModule } from '@asymmetrik/ngx-leaflet-markercluster';
 
 @NgModule({
   imports: [
@@ -45,9 +48,12 @@ import { MatSortModule } from '@angular/material/sort';
     ReactiveFormsModule,
 
     CanvasJSAngularChartsModule,
+    LeafletModule,
+    LeafletMarkerClusterModule,
 
     MatAutocompleteModule,
     MatButtonModule,
+    MatButtonToggleModule,
     MatCardModule,
     MatCheckboxModule,
     MatChipsModule,
@@ -82,6 +88,7 @@ import { MatSortModule } from '@angular/material/sort';
     DialogComponent,
     EmptyLayoutComponent,
     IframeComponent,
+    MapComponent,
     MobileNumberComponent,
     PageLayoutComponent,
     RefreshDataComponent,
@@ -92,9 +99,12 @@ import { MatSortModule } from '@angular/material/sort';
     ReactiveFormsModule,
 
     CanvasJSAngularChartsModule,
+    LeafletModule,
+    LeafletMarkerClusterModule,
 
     MatAutocompleteModule,
     MatButtonModule,
+    MatButtonToggleModule,
     MatCardModule,
     MatCheckboxModule,
     MatChipsModule,
@@ -126,6 +136,7 @@ import { MatSortModule } from '@angular/material/sort';
     DialogComponent,
     EmptyLayoutComponent,
     IframeComponent,
+    MapComponent,
     MobileNumberComponent,
     PageLayoutComponent,
     RefreshDataComponent,

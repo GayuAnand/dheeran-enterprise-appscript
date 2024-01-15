@@ -94,5 +94,9 @@ export class BaseComponent implements OnDestroy {
     };
   }
 
+  encodeURIComponent(text: string) {
+    return encodeURIComponent(text);
+  }
+
   onFilterChange() {}
 }

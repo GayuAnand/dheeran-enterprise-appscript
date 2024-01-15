@@ -10,6 +10,10 @@
   <de-mobile-number [mobile]="mobile" displayType="WHATSAPP"></de-mobile-number>
 </div>
 
+<div>
+  {{uiUpdaterService.latestVersionInfo | json}}
+</div>
+
 <ng-container *ngIf="!storageService.isNative">
   <button mat-raised-button color="primary" class="de-m-bbase" (click)="clearData()">Clear Data</button>
 </ng-container>
