@@ -27,7 +27,7 @@
         });
 
       if (params.upiUrl) {
-        document.getElementById('paylink').href = upiUrl;
+        document.getElementById('paylink').href = params.upiUrl;
       } else {
         document.body.innerText = 'Invalid request.'
       }
