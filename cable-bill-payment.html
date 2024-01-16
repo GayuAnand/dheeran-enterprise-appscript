@@ -87,9 +87,9 @@
     }
 
     .title {
-      font-size: 16px;
+      font-size: 18px;
+      font-weight: bold;
       margin: 0px 0px 10px 0px;
-      text-decoration: underline;
     }
 
     .info {
@@ -136,6 +136,7 @@
 
   <img id="qrcode" src="" />
   <p class="upi-info">UPI: 7204413241@paytm</p>
+  <p class="upi-info">Banking Name: Dheeran A Minor</p>
 
   <p class="company-name">Powered by Dheeran Enterprise</p>
   <p class="company-description">HighSpeed BroadBand internet and Cable service provider.</p>
@@ -164,10 +165,10 @@
       document.getElementById('gpaylink').href = params.upiUrl.replace(/^upi:\/\//, 'tez://upi/');
       document.getElementById('phonepaylink').href = params.upiUrl.replace(/^upi:\/\//, 'phonepe://');
       document.getElementById('paytmlink').href = params.upiUrl.replace(/^upi:\/\//, 'paytmmp://');
-      var tn = (getParams(params.upiUrl.split('?')[1]).tn || '').split(',');
+      var tn = (getParams(params.upiUrl.split('?')[1]).tn || '').split(' ');
       var customerId = tn[0] || '';
       var customerName = tn[1] || '';
-      var customerArea = tn[2] || '';
+      var customerArea = tn.slice(2).join(' ') || '';
       document.getElementById('custName').innerText = customerName;
       document.getElementById('custArea').innerText = customerArea;
       document.getElementById('custId').innerText = customerId;
