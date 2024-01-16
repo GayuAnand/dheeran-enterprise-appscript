@@ -13,13 +13,14 @@
   <meta property="og:image:width" content="640" />
   <meta property="og:image:height" content="403" />
   
-  <base href="/">
+  <base href="/dheeran-enterprise-appscript/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
     * {
       box-sizing: border-box;
       font-family: monospace;
+      text-align: center;
     }
 
     body {
@@ -34,9 +35,20 @@
       width: 100vw;
     }
 
-    #paylink {
+    .payment-links {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 6px;
+    }
+
+    .paylink {
       align-items: center;
       background-color: #007bff;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
       border-color: #007bff;
       border-radius: 4px;
       box-sizing: border-box;
@@ -45,10 +57,14 @@
       font-size: 16px;
       height: 40px;
       justify-content: center;
-      margin: 16px 0px 0px 0px;
+      margin: 6px;
       padding: 10px 16px;
       text-decoration: none;
       width: fit-content;
+    }
+
+    #gpaylink {
+      background-image: url('assets/images/gpay.png');
     }
 
     .title {
@@ -84,7 +100,13 @@
   <p class="info">Name: <span id="custName"></span></p>
   <p class="info">Area: <span id="custArea"></span></p>
   <p class="info">Customer ID: <span id="custId"></span></p>
-  <a id="paylink" href="" target="_blank">Pay bill</a>
+
+  <div class="payment-links">
+    <a class="paylink" id="upipaylink" href="" target="_blank">Pay bill</a>
+    <a class="paylink" id="gpaylink" href="" target="_blank">Google Pay</a>
+    <a class="paylink" id="phonepaylink" href="" target="_blank">Phone Pay</a>
+    <a class="paylink" id="paytmlink" href="" target="_blank">Paytm</a>
+  </div>
 
   <p class="company-name">Powered by Dheeran Enterprise</p>
   <p class="company-description">HighSpeed BroadBand internet and Cable service provider.</p>
@@ -108,7 +130,10 @@
 
   if (params.upiUrl) {
     try {
-      document.getElementById('paylink').href = params.upiUrl;
+      document.getElementById('upipaylink').href = params.upiUrl;
+      document.getElementById('gpaylink').href = params.upiUrl.replace(/^upi:\/\//, 'tez://upi/');
+      document.getElementById('phonepaylink').href = params.upiUrl.replace(/^upi:\/\//, 'phonepe://');
+      document.getElementById('paytmlink').href = params.upiUrl.replace(/^upi:\/\//, 'paytmmp://');
       var tn = (getParams(params.upiUrl.split('?')[1]).tn || '').split(',');
       var customerId = tn[0] || '';
       var customerName = tn[1] || '';
