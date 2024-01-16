@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" http-equiv="Content-Security-Policy" content="default-src * data: mediastream: blob: filesystem: about: ws: wss: 'unsafe-eval' 'wasm-unsafe-eval' 'unsafe-inline'">
   <title>Cable Bill Payment - Dheeran Enterprise</title>
-  <meta name="description" content="Cable bill payment portal for Dheeran Enterprise." />
+  <meta name="description" content="No more waiting for collection agent. Pay your monthly cable bill from anywhere at your ease." />
   <meta property="og:title" content="Cable Bill Payment - Dheeran Enterprise" />
-  <meta property="og:description" content="Cable bill payment portal for Dheeran Enterprise." />
+  <meta property="og:description" content="No more waiting for collection agent. Pay your monthly cable bill from anywhere at your ease." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://dheeranenterprise.com/" />
   <meta property="og:site_name" content="CableTV" />
@@ -16,27 +16,112 @@
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <script>
-    setTimeout(function () {
-      var searchStr = (window.location.search || '').slice(1);
-      var params = {};
-      searchStr
-        .split('&')
-        .filter(x => !!x)
-        .forEach((pair) => {
-          var paramPair = pair.split('=');
-          params[paramPair[0]] = decodeURIComponent(paramPair[1]);
-        });
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: monospace;
+    }
 
-      if (params.upiUrl) {
-        document.getElementById('paylink').href = params.upiUrl;
-      } else {
-        document.body.innerText = 'Invalid request.'
-      }
-    }, 2000);
-  </script>
+    body {
+      align-items: center;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      justify-content: center;
+      margin: 0px;
+      padding: 0px;
+      width: 100vw;
+    }
+
+    #paylink {
+      align-items: center;
+      background-color: #007bff;
+      border-color: #007bff;
+      border-radius: 4px;
+      box-sizing: border-box;
+      color: #fff;
+      display: flex;
+      font-size: 16px;
+      height: 40px;
+      justify-content: center;
+      margin: 16px 0px 0px 0px;
+      padding: 10px 16px;
+      text-decoration: none;
+      width: fit-content;
+    }
+
+    .title {
+      font-size: 16px;
+      margin: 0px 0px 10px 0px;
+      text-decoration: underline;
+    }
+
+    .info {
+      color: black;
+      font-size: 14px;
+      margin: 10px 0px 0px 0px;
+    }
+
+    .company-name {
+      color: gray;
+      font-size: 14px;
+      font-style: italic;
+      margin: 12px 0px 3px 0px;
+    }
+    
+    .company-description {
+      color: gray;
+      font-size: 12px;
+      font-style: italic;
+      margin: 0px;
+    }
+  </style>
 </head>
+
 <body>
+  <p class="title">Cable Bill Payment</p>
+  <p class="info">Name: <span id="custName"></span></p>
+  <p class="info">Area: <span id="custArea"></span></p>
+  <p class="info">Customer ID: <span id="custId"></span></p>
   <a id="paylink" href="" target="_blank">Pay bill</a>
+
+  <p class="company-name">Powered by Dheeran Enterprise</p>
+  <p class="company-description">HighSpeed BroadBand internet and Cable service provider.</p>
 </body>
+
+<script>
+  function getParams(searchStr) {
+    var params = {};
+    searchStr
+      .split('&')
+      .filter(x => !!x)
+      .forEach((pair) => {
+        var paramPair = pair.split('=');
+        params[paramPair[0]] = decodeURIComponent(paramPair[1]);
+      });
+    return params;
+  }
+
+  var searchStr = (window.location.search || '').slice(1);
+  var params = getParams(searchStr);
+
+  if (params.upiUrl) {
+    try {
+      document.getElementById('paylink').href = params.upiUrl;
+      var tn = (getParams(params.upiUrl.split('?')[1]).tn || '').split(',');
+      var customerId = tn[0] || '';
+      var customerName = tn[1] || '';
+      var customerArea = tn[2] || '';
+      document.getElementById('custName').innerText = customerName;
+      document.getElementById('custArea').innerText = customerArea;
+      document.getElementById('custId').innerText = customerId;
+    } catch(e) {
+      document.body.innerText = 'Error: Bad request.';
+      console.error(e);
+    }
+  } else {
+    document.body.innerText = 'Error: Missing billing information.';
+  }
+</script>
 </html>
