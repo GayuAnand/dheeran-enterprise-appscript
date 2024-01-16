@@ -51,6 +51,7 @@ export const EN_MAPPING = {
     PHONE_NUMBER: 'Phone Number',
     PAYMENT_QR_CODE: 'Payment QR Code',
     REMARKS: 'Remarks',
+    RESET_MAP: 'Reset Map',
     ROUTE: 'Route',
     SAVE: 'Save',
     SEARCH: 'Search',
