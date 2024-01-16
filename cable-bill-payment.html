@@ -15,24 +15,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <script>
-    var searchStr = (window.location.search || '').slice(1);
-    var params = {};
-    searchStr
-      .split('&')
-      .filter(x => !!x)
-      .forEach((pair) => {
-        var paramPair = pair.split('=');
-        params[paramPair[0]] = decodeURIComponent(paramPair[1]);
-      });
+    setTimeout(function () {
+      var searchStr = (window.location.search || '').slice(1);
+      var params = {};
+      searchStr
+        .split('&')
+        .filter(x => !!x)
+        .forEach((pair) => {
+          var paramPair = pair.split('=');
+          params[paramPair[0]] = decodeURIComponent(paramPair[1]);
+        });
 
-    if (params.upiUrl) {
-      window.open(params.upiUrl, '_blank');
-    } else {
-      document.body.innerText = 'Invalid request.'
-    }
+      // if (params.upiUrl) {
+      //   window.open(params.upiUrl, '_blank');
+      // } else {
+      //   document.body.innerText = 'Invalid request.'
+      // }
+    }, 2000);
   </script>
 </head>
 <body>
-  Redirecting to Cable bill payment... Please wait...
+  <a href="upi://pay?pa=7204413241@paytm&pn=Dheeran Enterprise&cu=INR&tn=CDE00003 Anbalagan 4 Road D2" target="_blank">Pay bill</a>
 </body>
 </html>
