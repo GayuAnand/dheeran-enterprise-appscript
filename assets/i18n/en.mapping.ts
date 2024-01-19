@@ -46,6 +46,7 @@ export const EN_MAPPING = {
     NOTES: 'Notes',
     OFFLINE_UPDATES: 'Offline Updates',
     OK: 'Ok',
+    OLT: 'OLT',
     PAY_BILL: 'Pay Bill',
     PLAN: 'Plan',
     PHONE_NUMBER: 'Phone Number',

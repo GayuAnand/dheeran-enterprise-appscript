@@ -161,7 +161,9 @@
   }
 
   function reflow() {
-    void(document.body.offsetHeight);
+    setTimeout(function () {
+      void(document.body.offsetHeight);
+    }, 500);
   }
 
   var searchStr = (window.location.search || '').slice(1);
