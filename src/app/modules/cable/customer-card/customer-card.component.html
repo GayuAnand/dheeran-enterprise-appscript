@@ -33,7 +33,7 @@
         <div class="de-f-aligncenter de-sm-rbase-nolast">
           <de-mobile-number [mobile]="mobile" displayType="CALL"></de-mobile-number>
           <de-mobile-number [mobile]="mobile" displayType="WHATSAPP"></de-mobile-number>
-          <de-mobile-number *ngIf="customer.hasPendingPayment()" [mobile]="mobile" [whatsAppMessage]="customer.getReminderText()" displayType="WHATSAPP_REMINDER"></de-mobile-number>
+          <de-mobile-number *ngIf="authService.isCableAdmin() && customer.hasPendingPayment()" [mobile]="mobile" [whatsAppMessage]="customer.getReminderText()" displayType="WHATSAPP_REMINDER"></de-mobile-number>
         </div>
       </div>
     </td>
@@ -73,8 +73,8 @@
 
   <tr *ngIf="showPaymentQrCode">
     <td colspan="2">
-      <img [src]="utilService.qrCodeUrl(customer)" class="de-block" />
-      <a mat-raised-button [href]="utilService.upiUrl(customer)" target="_blank">{{TKey.COMMON.PAY_BILL}}</a>
+      <img [src]="customer.qrCodeUrl()" class="de-block" />
+      <a mat-raised-button [href]="customer.upiUrl()" target="_blank">{{TKey.COMMON.PAY_BILL}}</a>
     </td>
   </tr>
 </table>

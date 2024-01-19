@@ -14,22 +14,21 @@ export class CableLocationComponent extends BaseComponent implements OnChanges {
 
   mapOptions = {};
 
-  overlays: Record<string, any> = {};
+  markerClusterData: L.Marker[] = [];
 
   ngOnChanges(): void {
     if (this.customer?.hasLocationInfo()) {
       this.mapOptions = {
         layers: [BaseMapLayers[MapLayers.SATELLITE]],
         center: latLng(this.customer.getLatitudeAsNum(), this.customer.getLongitudeAsNum()),
-        zoomControl: false,
+        zoomControl: true,
         zoom: 17,
+        maxZoom: 19
       };
     } else {
       this.mapOptions = {};
     }
 
-    this.overlays = {
-      'Customer': marker([this.customer.getLatitudeAsNum(), this.customer.getLongitudeAsNum()]),
-    };
+    this.markerClusterData = [marker([this.customer.getLatitudeAsNum(), this.customer.getLongitudeAsNum()])];
   }
 }

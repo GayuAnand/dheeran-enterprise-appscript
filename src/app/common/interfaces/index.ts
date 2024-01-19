@@ -208,6 +208,9 @@ export interface ISheetsInfo {
       AREA: { label: 'Area' },
       LATITUDE: { label: 'Latitude' },
       LONGITUDE: { label:	'Longitude' },
+      OLTNAME: { label: 'OLTName' },
+      INTERNALOLT: { label: 'InternalOLT' },
+      EXTERNALOLT: { label: 'ExternalOLT' },
       EMAIL: { label: 'Email' },
       USERNAME: { label: 'UserName' },
       TASKPRIORITY: { label: 'TaskPriority' },
@@ -330,6 +333,12 @@ export interface ISheetsInfo {
   },
 };
 
+export interface IOltInfo {
+  name: string,
+  internalAddr: string,
+  externalAddr: string,
+}
+
 export interface IMetadata {
   area?: string[],
   deployIds?: string[],
@@ -339,4 +348,5 @@ export interface IMetadata {
   taskPriority?: ('High' | 'Medium' | 'Low')[],
   taskStatus?: ('Done' | 'Open' | 'Closed')[],
   ugWorkType?: string[],
+  oltInfo?: IOltInfo[],
 }

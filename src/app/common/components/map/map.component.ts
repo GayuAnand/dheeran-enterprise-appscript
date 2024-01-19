@@ -1,7 +1,7 @@
 import * as L from 'leaflet';
-import { icon, Marker } from 'leaflet';
+export * as AwesomeMarkers from 'leaflet.awesome-markers';
+import { icon, Marker, LatLng, Layer, TileLayer, tileLayer } from 'leaflet';
 import { AfterViewInit, Component, Input, OnChanges, ViewChild } from '@angular/core';
-import { LatLng, Layer, TileLayer, tileLayer } from 'leaflet';
 import { LeafletControlLayersConfig, LeafletDirective } from '@asymmetrik/ngx-leaflet';
 
 import { BaseComponent } from '../base.component';
@@ -20,6 +20,10 @@ const iconDefault = icon({
   shadowSize: [41, 41]
 });
 Marker.prototype.options.icon = iconDefault;
+
+export function AwesomeIcon(options: L.AwesomeMarkers.AwesomeMarkersIconOptions) {
+  return L.AwesomeMarkers.icon(Object.assign({ prefix: 'fa' }, options));
+}
 
 export const MapLayers = {
   DEFAULT: 'DEFAULT',
@@ -54,6 +58,11 @@ export class MapComponent extends BaseComponent implements OnChanges, AfterViewI
     maxZoom?: number,
   };
 
+  /**
+   * Overlay can contain markers.
+   * 
+   * Example: overlays = { 'Customer': marker([lat, lng]) }
+   */
   @Input() overlays: Record<string, Layer> = {};
 
   @Input() markerClusterData!: Layer[];
@@ -90,6 +99,12 @@ export class MapComponent extends BaseComponent implements OnChanges, AfterViewI
     this.refreshMap();
   }
 
+  fitBounds() {
+    if (this.leaflet?.map && this.markerClusterData) {
+      this.leaflet.map.fitBounds(this.markerClusterGroup.getBounds());
+    }
+  }
+
   refreshMap() {
     if (this.options) {
       this.processedOptions = Object.assign(this.defaultOptions, { layers: [BaseMapLayers[MapLayers.DEFAULT]] }, this.options);
@@ -107,7 +122,7 @@ export class MapComponent extends BaseComponent implements OnChanges, AfterViewI
       this.markerClusterGroup.removeLayers(this.markerClusterGroup.getLayers());
       this.markerClusterData.forEach(d => this.markerClusterGroup.addLayer(d));
       this.leaflet.map.addLayer(this.markerClusterGroup);
-      this.leaflet.map.fitBounds(this.markerClusterGroup.getBounds());
+      this.fitBounds();
     }
   }
 }

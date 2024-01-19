@@ -155,6 +155,10 @@ export class SettingsService implements OnDestroy {
           routerLink: ['/app/bsnl/utility']
         });
         bsnlNavigationData.children.push({
+          name: EN_MAPPING.COMMON.OLT,
+          routerLink: ['/app/bsnl/olt']
+        });
+        bsnlNavigationData.children.push({
           name: EN_MAPPING.COMMON.SYNC,
           routerLink: ['/app/bsnl/sync']
         });

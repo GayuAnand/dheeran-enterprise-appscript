@@ -148,20 +148,4 @@ export class UtilService {
     a.click();
     document.body.removeChild(a);
   }
-
-  qrCodeUrl(customer: CustomerModel) {
-    return 'https://chart.googleapis.com/chart?chs=200x200&&cht=qr&chl=' + encodeURIComponent(this.upiUrl(customer));
-  }
-
-  upiUrl(customer: CustomerModel) {
-    return `upi://pay?pa=7204413241@paytm&pn=Dheeran Enterprise&cu=INR&tn=${this.processedPaymentNote(customer)}`;
-  }
-
-  processedPaymentNote(customer: CustomerModel) {
-    return this.rawPaymentNote(customer).replace(/[^a-z0-9 ]/ig, '').replace(/\s+/g, ' ').slice(0, 49);
-  }
-
-  rawPaymentNote(customer: CustomerModel) {
-    return `${customer?.ID} - ${customer?.Name} - ${customer?.Area}`;
-  }
 }

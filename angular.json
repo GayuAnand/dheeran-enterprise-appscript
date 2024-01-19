@@ -33,14 +33,24 @@
                 "glob": "**/*",
                 "input": "node_modules/leaflet/dist/images/",
                 "output": "./assets/"
+              },
+              {
+                "glob": "cable-bill-payment.html",
+                "input": "src",
+                "output": "./"
               }
             ],
             "styles": [
+              "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
               "src/styles.scss",
               "./node_modules/leaflet/dist/leaflet.css",
-              "./node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css"
+              "./node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css",
+              "./node_modules/leaflet.awesome-markers/dist/leaflet.awesome-markers.css"
             ],
-            "scripts": []
+            "scripts": [
+              "./node_modules/leaflet/dist/leaflet.js",
+              "./node_modules/leaflet.awesome-markers/dist/leaflet.awesome-markers.min.js"
+            ]
           },
           "configurations": {
             "production": {

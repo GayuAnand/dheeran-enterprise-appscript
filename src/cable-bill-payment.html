@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" http-equiv="Content-Security-Policy" content="default-src * data: mediastream: blob: filesystem: about: ws: wss: 'unsafe-eval' 'wasm-unsafe-eval' 'unsafe-inline'">
+  <title>Cable Bill Payment - Dheeran Enterprise</title>
+  <meta name="description" content="No more waiting for collection agent. Pay your monthly cable bill from anywhere at your ease." />
+  <meta property="og:title" content="Cable Bill Payment - Dheeran Enterprise" />
+  <meta property="og:description" content="No more waiting for collection agent. Pay your monthly cable bill from anywhere at your ease." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://dheeranenterprise.com/" />
+  <meta property="og:site_name" content="CableTV" />
+  <meta property="og:image" content="https://gayuanand.github.io/dheeran-enterprise-appscript/assets/images/bill-payment.png" />
+  <meta property="og:image:width" content="640" />
+  <meta property="og:image:height" content="403" />
+  
+  <base href="/dheeran-enterprise-appscript/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: monospace;
+      text-align: center;
+    }
+
+    body {
+      align-items: center;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      justify-content: center;
+      margin: 0px;
+      padding: 0px;
+      width: 100vw;
+    }
+
+    .payment-links {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 6px;
+      margin-top: 16px;
+    }
+
+    .paylink {
+      align-items: center;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      border: 0px solid black;
+      border-radius: 4px;
+      box-sizing: border-box;
+      color: #fff;
+      display: flex;
+      font-size: 16px;
+      height: 40px;
+      justify-content: center;
+      margin: 6px;
+      padding: 10px 16px;
+      text-decoration: none;
+      width: fit-content;
+
+      width: 160px;
+      height: 50px;
+      padding: 6px 10px;
+      box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+    }
+
+    #upipaylink {
+      background-image: url('./assets/images/upi.png');
+      background-size: 70% 55%;
+    }
+
+    #gpaylink {
+      background-image: url('./assets/images/gpay.png');
+      background-size: 85% 55%;
+    }
+
+    #phonepaylink {
+      background-image: url('./assets/images/phonepe.png');
+      background-size: 81% 68%;
+    }
+
+    #paytmlink {
+      background-image: url('./assets/images/paytm.png');
+      background-size: 65% 55%;
+    }
+
+    .title {
+      font-size: 24px;
+      margin: 0px 0px 10px 0px;
+    }
+
+    .info {
+      color: black;
+      font-size: 14px;
+      margin: 10px 0px 0px 0px;
+    }
+
+    .upi-info, .banking-name {
+      font-size: 16px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      margin: 0px 0px 16px 0px;
+    }
+
+    .upi-info {
+      margin-bottom: 6px;
+    }
+
+    .company-name {
+      color: gray;
+      font-size: 14px;
+      font-style: italic;
+      margin: 12px 0px 3px 0px;
+    }
+    
+    .company-description {
+      color: gray;
+      font-size: 12px;
+      font-style: italic;
+      margin: 0px;
+    }
+  </style>
+</head>
+
+<body>
+  <p class="title">Cable Bill Payment</p>
+  <p class="info"><span>Name: </span><span id="custName"></span></p>
+  <p class="info"><span>Area: </span><span id="custArea"></span></p>
+  <p class="info"><span>Customer ID: </span><span id="custId"></span></p>
+
+  <div class="payment-links">
+    <a class="paylink" id="upipaylink" href="" target="_blank"></a>
+    <a class="paylink" id="gpaylink" href="" target="_blank"></a>
+    <a class="paylink" id="phonepaylink" href="" target="_blank"></a>
+    <a class="paylink" id="paytmlink" href="" target="_blank"></a>
+  </div>
+
+  <img id="qrcode" src="" />
+  <p class="upi-info">UPI: 7204413241@paytm</p>
+  <p class="banking-name">Banking Name: Dheeran A Minor</p>
+
+  <p class="company-name">Powered by Dheeran Enterprise</p>
+  <p class="company-description">HighSpeed BroadBand internet and Cable service provider.</p>
+</body>
+
+<script>
+  function getParams(searchStr) {
+    var params = {};
+    searchStr
+      .split('&')
+      .filter(x => !!x)
+      .forEach((pair) => {
+        var paramPair = pair.split('=');
+        params[paramPair[0]] = decodeURIComponent(paramPair[1]);
+      });
+    return params;
+  }
+
+  function reflow() {
+    setTimeout(function () {
+      void(document.body.offsetHeight);
+    }, 500);
+  }
+
+  var searchStr = (window.location.search || '').slice(1);
+  var params = getParams(searchStr);
+
+  if (params.upiUrl) {
+    try {
+      document.getElementById('qrcode').src = 'https://chart.googleapis.com/chart?chs=200x200&&cht=qr&chl=' + encodeURIComponent(params.upiUrl);
+      document.getElementById('upipaylink').href = params.upiUrl;
+      document.getElementById('gpaylink').href = params.upiUrl.replace(/^upi:\/\//, 'tez://upi/');
+      document.getElementById('phonepaylink').href = params.upiUrl.replace(/^upi:\/\//, 'phonepe://');
+      document.getElementById('paytmlink').href = params.upiUrl.replace(/^upi:\/\//, 'paytmmp://');
+      var tn = (getParams(params.upiUrl.split('?')[1]).tn || '').split(' ');
+      var customerId = tn[0] || '';
+      var customerName = tn[1] || '';
+      var customerArea = tn.slice(2).join(' ') || '';
+      document.getElementById('custName').innerText = customerName;
+      document.getElementById('custArea').innerText = customerArea;
+      document.getElementById('custId').innerText = customerId;
+      reflow();
+    } catch(e) {
+      document.body.innerText = 'Error: Bad request.';
+      console.error(e);
+    }
+  } else {
+    document.body.innerText = 'Error: Missing billing information.';
+  }
+</script>
+</html>

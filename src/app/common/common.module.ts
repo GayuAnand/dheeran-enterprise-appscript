@@ -32,12 +32,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS, MatFormFieldModule } from '@angular/material/form-field';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { CanvasJSAngularChartsModule } from '@canvasjs/angular-charts';
+import { MatSortModule } from '@angular/material/sort';
+import { LeafletMarkerClusterModule } from '@asymmetrik/ngx-leaflet-markercluster';
 
 import { AutocompleteComponent, CopyableTextComponent, DialogComponent, EmptyLayoutComponent, ConfirmationDialogComponent,
          IframeComponent, MobileNumberComponent, PageLayoutComponent, SpinnerComponent, RefreshDataComponent, MapComponent } from './components';
 import { AuthService, EventService, GeoLocationService, SettingsService, UiBundleUpdaterService, UtilService } from './services';
-import { MatSortModule } from '@angular/material/sort';
-import { LeafletMarkerClusterModule } from '@asymmetrik/ngx-leaflet-markercluster';
 
 @NgModule({
   imports: [

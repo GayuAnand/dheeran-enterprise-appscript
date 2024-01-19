@@ -96,15 +96,40 @@ export class CustomerModel extends BaseModel implements Record<string, any> {
       if (month === this.getCurrentMonth()) break;
     }
 
-    return `Hello _${this.Name}_,
+    return `Hello *${this.Name}*,
 
-A friendly reminder for your ${pendingMonths.map(m => '`' + m + '`').join(', ')} cable payment. Total *Rs.${pendingMonths.length * lastKnownPaymentInfo}/-*
+A friendly reminder for your ${pendingMonths.map(m => '_' + m + '_').join(', ')} cable payment. Total *Rs.${pendingMonths.length * lastKnownPaymentInfo}/-*.
 
-CustomerID: ${this.ID}
-Area: ${this.Area}
+> Payment link: _https://gayuanand.github.io/dheeran-enterprise-appscript/cable-bill-payment.html?upiUrl=${encodeURIComponent(this.upiUrl())}_
+
+Customer Details:
+- Name: ${this.Name || ''}
+- Area: ${this.Area || ''}
+- Mobile: ${(this.Mobile || '').replace(/\n/g, ', ')}
+- CustomerID: ${this.ID}
 
 Best Regards,
-*_Dheeran Enterprise_*`
+*_Dheeran Enterprise_*
+_HighSpeed BroadBand internet and Cable service provider_`;
+  }
+
+  qrCodeUrl() {
+    return 'https://chart.googleapis.com/chart?chs=200x200&&cht=qr&chl=' + encodeURIComponent(this.upiUrl());
+  }
+
+  upiUrl() {
+    return `upi://pay?pa=7204413241@paytm&pn=Dheeran Enterprise&cu=INR&tn=${this.processedPaymentNote()}`;
+  }
+
+  processedPaymentNote() {
+    return this.rawPaymentNote().slice(0, 49);
+  }
+
+  rawPaymentNote() {
+    return [this?.ID, (this?.Name || '').replace(/\s*/g, ''), this?.Area]
+      .map((info) => info.replace(/[^a-z0-9 ]/ig, '').replace(/\s+/g, ' '))
+      .filter((info) => !!info)
+      .join(' ')
   }
 
   isActive() {

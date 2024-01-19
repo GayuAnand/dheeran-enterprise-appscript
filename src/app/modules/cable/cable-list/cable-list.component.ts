@@ -9,7 +9,7 @@ import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular
 
 import { CustomerModel } from 'src/app/models';
 import { CableService } from '../cable.service';
-import { BaseComponent, BaseMapLayers, MapLayers } from 'src/app/common';
+import { AwesomeIcon, BaseComponent, BaseMapLayers, MapComponent, MapLayers } from 'src/app/common';
 
 @Component({
   selector: 'de-cable-list',
@@ -82,7 +82,6 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
 
   mapOptions = {
     layers: [BaseMapLayers[MapLayers.SATELLITE]],
-    zoomControl: false,
     zoom: 17,
   };
 
@@ -335,7 +334,12 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     this.data.data = this.fullData.filter(filterGpay).filter(filterArea).filter(filterStatus).filter(filterSearch).filter(filterSearchPhoneNumber).filter(filterCollection).filter(filterPendingSettlement);
     this.markers = this.data.data
       .filter((d) => d.hasLocationInfo())
-      .map((d) => marker([d.getLatitudeAsNum(), d.getLongitudeAsNum()]).bindPopup(d.getInfoAsText()))
+      .map((d) => marker(
+          [d.getLatitudeAsNum(), d.getLongitudeAsNum()],
+          { icon: AwesomeIcon({ icon: 'tv', markerColor: d.isActive() ? 'green' : 'red', iconColor: d.hasPendingPayment() ? 'orange' : 'white' })}
+        )
+        .bindPopup(d.getInfoAsText())
+      );
 
     if (this.showPendingSettlement) {
       this.data.data.forEach((d) => this.pendingSettlementAmount += d.getPendingSettlement(false, this.agentsFilter.control.value) as number);
@@ -512,11 +516,11 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
           this.utilService.escapeCSVCell(d.Name),
           this.utilService.escapeCSVCell(d.Area),
           this.utilService.escapeCSVCell(d.Mobile),
-          this.utilService.escapeCSVCell(this.utilService.rawPaymentNote(d)),
-          this.utilService.escapeCSVCell(this.utilService.processedPaymentNote(d)),
-          this.utilService.escapeCSVCell(this.utilService.upiUrl(d)),
-          this.utilService.escapeCSVCell(encodeURIComponent(this.utilService.upiUrl(d))),
-          this.utilService.escapeCSVCell(this.utilService.qrCodeUrl(d)),
+          this.utilService.escapeCSVCell(d.rawPaymentNote()),
+          this.utilService.escapeCSVCell(d.processedPaymentNote()),
+          this.utilService.escapeCSVCell(d.upiUrl()),
+          this.utilService.escapeCSVCell(encodeURIComponent(d.upiUrl())),
+          this.utilService.escapeCSVCell(d.qrCodeUrl()),
         ];
       });
     csvData.unshift(['ID', 'Name', 'Area', 'Mobile', 'Raw Payment Note', 'Processed Payment Note', 'UPI Url', 'Encoded UPI Url', 'QR Code URL']);
