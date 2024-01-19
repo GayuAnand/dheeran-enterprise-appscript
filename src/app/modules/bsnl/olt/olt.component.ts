@@ -23,7 +23,10 @@ export class BSNLOltComponent extends BaseComponent implements OnInit {
   }
 
   activeOltChange() {
-    console.log('Active olt changed: ', this.activeOlt);
-    this.oltUrl = this.sanitizer.bypassSecurityTrustResourceUrl(`${this.activeOlt.externalAddr}/action/main.html`);
+    if (this.activeOlt.externalAddr) {
+      this.oltUrl = this.sanitizer.bypassSecurityTrustResourceUrl(`${this.activeOlt.externalAddr}/action/main.html`);
+    } else {
+      this.oltUrl = '';
+    }
   }
 }

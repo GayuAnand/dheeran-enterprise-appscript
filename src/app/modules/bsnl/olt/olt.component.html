@@ -1,4 +1,4 @@
-<div class="">
+<div class="de-f-column de-f-grow de-h-full">
   <mat-form-field>
     <mat-label>{{TKey.COMMON.OLT}}</mat-label>
     <mat-select [(ngModel)]="activeOlt" (ngModelChange)="activeOltChange()">
@@ -6,5 +6,6 @@
     </mat-select>
   </mat-form-field>
 
-  <iframe *ngIf="activeOlt" [src]="oltUrl"></iframe>
+  <iframe *ngIf="oltUrl" class="de-f-grow" [src]="oltUrl"></iframe>
+  <span *ngIf="activeOlt && !oltUrl">Not able to connect.</span>
 </div>
