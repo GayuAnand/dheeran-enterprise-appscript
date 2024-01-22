@@ -85,7 +85,11 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     zoom: 17,
   };
 
-  markers: L.Marker[] = []
+  markers: L.Marker[] = [];
+
+  get canShare(): boolean {
+    return !!navigator.share || true;
+  }
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -525,5 +529,11 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
       });
     csvData.unshift(['ID', 'Name', 'Area', 'Mobile', 'Raw Payment Note', 'Processed Payment Note', 'UPI Url', 'Encoded UPI Url', 'QR Code URL']);
     this.utilService.exportToCSV(csvData, 'customers');
+  }
+
+  shareData(element: CustomerModel) {
+    if (navigator.share) {
+      navigator.share({ text: element.getInfoAsText(true) });
+    }
   }
 }
