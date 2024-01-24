@@ -1,3 +1,4 @@
+import { App } from '@capacitor/app';
 import { Component } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { CallDetector } from 'capacitor-plugin-incoming-call';
@@ -23,6 +24,11 @@ export class AppComponent extends BaseComponent {
     BaseModel.AuthService = this.authService;
     this.uiBundleUpdaterService.initialize();
     this.fileSystemService.cleanupUnknownFiles();
+
+    App.addListener('backButton', (event) => {
+      if (!event.canGoBack) App.exitApp();
+    });
+
     this.matIconRegistry.addSvgIcon('whatsapp', this.setPath(`assets/images/whatsapp.svg`));
     this.matIconRegistry.addSvgIcon('whatsappwhite', this.setPath(`assets/images/whatsapp-white.svg`));
     this.matIconRegistry.addSvgIcon('whatsappreminder', this.setPath(`assets/images/whatsappreminder.svg`));
