@@ -4,17 +4,17 @@ const config: CapacitorConfig = {
   appId: 'com.depco.management',
   appName: 'depco-management',
   webDir: 'dist/cap-webview',
-  server: {
-    androidScheme: 'https'
-  },
   // server: {
-  //   url: 'http://192.168.1.7:4200', // ifconfig => en0 -> inet
-  //   cleartext: true
+  //   androidScheme: 'https'
   // },
+  server: {
+    url: 'http://192.168.1.7:8200', // ifconfig => en0 -> inet
+    cleartext: true
+  },
   plugins: {
     CapacitorUpdater: {
-			autoUpdate: false,
-		}
+      autoUpdate: false,
+    }
   }
 };
 

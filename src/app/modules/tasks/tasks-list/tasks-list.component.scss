@@ -1,0 +1,133 @@
+.filter-row {
+  .advanced-filter-label {
+    color: var(--primary);
+    justify-content: end;
+    margin-top: 6px;
+    margin-bottom: 6px;
+    text-decoration: underline;
+    width: 100%;
+  }
+}
+
+mat-table ::ng-deep {
+  mat-header-row mat-header-cell:not([colspan]):last-child, mat-row mat-cell:not([colspan]):last-child {
+    max-width: 90px;
+    min-width: 90px;
+  }
+}
+
+.highlight-row {
+  background-color: #f0f0f0;
+}
+
+.select-all {
+  padding: 6px;
+}
+
+.expanded-detail-row, .expanded-detail-cell {
+  min-height: 0px;
+}
+
+.collection-filter, .pending-settlement-filter, .location-container {
+  align-items: flex-start;
+  border: 1px solid rgba(0, 0, 0, 0.38);
+  border-radius: 4px;
+  flex-direction: column;
+  padding: 20px;
+  position: relative;
+
+  > label {
+    background: #fafafa;
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 12px;
+    left: 12px;
+    padding: 0px 6px;
+    position: absolute;
+    top: -11px;
+  }
+
+  > mat-slide-toggle {
+    margin-bottom: 16px;
+  }
+
+  > mat-form-field {
+    width: 100%;
+  }
+}
+
+.location-container {
+  padding-bottom: 0px;
+}
+
+.mobile-cell {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.customer-details {
+  width: 100%;
+
+  td:first-child {
+    max-width: 150px;
+  }
+}
+
+table.customer-card {
+  border-collapse: collapse;
+  border-color: rgb(222, 226, 230);
+  display: table;
+  margin-bottom: 24px;
+  max-width: 400px;
+  text-align: center;
+  width: 100%;
+
+  th {
+    background-color: #d2d8ff;
+    font-weight: 500;
+  }
+
+  th, td {
+    border: 1px solid rgb(222, 226, 230);
+    border-collapse: collapse;
+    padding: 6px;
+  }
+}
+
+table.customer-card, table.customer-details {
+  &.full-width {
+    min-width: 100%;
+  }
+
+  tr td:last-child {
+    text-align: left;
+  }
+
+  input:not([matinput]) {
+    border: 0px;
+    outline: none;
+    width: 50px;
+
+    &:focus {
+      outline: none;
+    }
+
+    &.notes {
+      width: 200px;
+    }
+  }
+
+  input.mat-datepicker-input {
+    width: auto;
+  }
+
+  textarea {
+    border-color: #cacaca;
+    border-radius: 4px;
+  }
+}
+
+::ng-deep .customer-card-dialog {
+  max-width: 600px !important;
+}

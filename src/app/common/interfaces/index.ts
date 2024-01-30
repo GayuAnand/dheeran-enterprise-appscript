@@ -9,6 +9,7 @@ export enum IApps {
   BSNL = 'bsnl',
   CABLE = 'cable',
   UG = 'ug',
+  TASKS = 'tasks',
 }
 
 export interface IRole {
@@ -16,6 +17,7 @@ export interface IRole {
   [IApps.BSNL]: IRoleValue,
   [IApps.CABLE]: IRoleValue,
   [IApps.UG]: IRoleValue,
+  [IApps.TASKS]: IRoleValue,
 }
 
 export interface IUser {
@@ -224,6 +226,20 @@ export interface ISheetsInfo {
     label: 'Tasks',
     cols: {
       ID: { label: 'ID' },
+      PRIORITY: { label: 'Priority' },
+      TYPE: { label: 'Type' },
+      DETAILS: { label: 'Details' },
+      ASSIGNEDTO: { label: 'AssignedTo' },
+      STATUS: { label: 'Status' },
+      NOTES: { label: 'Notes' },
+      OPENDATE: { label: 'OpenDate' },
+      CLOSEDATE: { label: 'CloseDate' },
+    },
+  },
+  OLD_TASKS: {
+    label: 'Old_Tasks',
+    cols: {
+      ID: { label: 'ID' },
       TITLE: { label: 'Title' },
       DETAILS: { label: 'Details' },
       ASSIGNEDTO: { label: 'AssignedTo' },
@@ -318,6 +334,7 @@ export interface ISheetsInfo {
       ASSIGNED_TO: { label: 'ASSIGNED_TO' },
       RURAL_URBAN: { label: 'RURAL_URBAN' },
       ACQUISITION_TYPE: { label: 'ACQUISITION_TYPE' },
+      MISSING_SINCE: { label: 'MISSING_SINCE' },
     }
   },
   ANALYSIS: {

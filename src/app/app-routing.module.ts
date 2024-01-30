@@ -25,6 +25,11 @@ const routes: Routes = [
         canActivate: [RoleGuard(IApps.BSNL)],
       },
       {
+        path: 'tasks',
+        loadChildren: () => import('./modules/tasks').then((m) => m.TasksModule),
+        canActivate: [RoleGuard(IApps.TASKS)],
+      },
+      {
         path: 'ug',
         loadChildren: () => import('./modules/ug').then((m) => m.UGPatrolModule),
         canActivate: [RoleGuard(IApps.UG)],

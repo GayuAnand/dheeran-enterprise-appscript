@@ -167,6 +167,20 @@ export class SettingsService implements OnDestroy {
       navigationData.push(bsnlNavigationData);
     }
 
+    if (this.authService.hasAnyTasksPermission()) {
+      const tasksNavigationData = {
+        name: EN_MAPPING.COMMON.TASKS,
+        children: [
+          {
+            name: EN_MAPPING.COMMON.LIST,
+            routerLink: ['/app/tasks/list']
+          },
+        ]
+      };
+
+      navigationData.push(tasksNavigationData);
+    }
+
     if (this.authService.hasAnyUGPermission()) {
       navigationData.push({
         name: EN_MAPPING.COMMON.UG,

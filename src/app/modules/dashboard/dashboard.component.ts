@@ -34,6 +34,14 @@ export class DashboardComponent extends BaseComponent implements OnInit {
       })
     }
 
+    if (this.authService.hasAnyTasksPermission()) {
+      this.cards.push({
+        routerLink: '../tasks',
+        icon: 'task',
+        text: this.TKey.COMMON.TASKS,
+      })
+    }
+
     if (this.authService.hasAnyUGPermission()) {
       this.cards.push({
         routerLink: '../ug',

@@ -1,0 +1,63 @@
+<mat-tab-group mat-stretch-tabs="true" mat-align-tabs="center">
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon class="de-m-rbase">checklist</mat-icon>
+      Open
+    </ng-template>
+    Content 1
+  </mat-tab>
+
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon class="de-m-rbase">done</mat-icon>
+      Done
+    </ng-template>
+    Content 2
+  </mat-tab>
+
+  <mat-tab *ngIf="authService.isTasksAdmin()">
+    <ng-template mat-tab-label>
+      <mat-icon class="de-m-rbase">check_circle</mat-icon>
+      Verified
+    </ng-template>
+    Content 3
+  </mat-tab>
+</mat-tab-group>
+
+<de-refresh-data [cacheInfo]="cacheInfo" [refreshTriggerInterval]="4320" (refresh)="refreshData(true)"></de-refresh-data>
+
+<mat-table matSort [dataSource]="data" matSortActive="CUSTOMER_NAME" matSortDirection="asc" class="mat-elevation-z8" multiTemplateDataRows>
+  <ng-container matColumnDef="{{column}}" *ngFor="let column of displayedColumns">
+    <mat-header-cell mat-sort-header *matHeaderCellDef [ngClass]="'de-f-justifycenter'">{{column === 'ACTIONS' ? '' : column}}</mat-header-cell>
+
+    <mat-cell *matCellDef="let element" [ngClass]="getCellClassNames(element, column)">
+      <ng-container [ngSwitch]="column">
+        <ng-container *ngSwitchCase="'MOBILE'">
+          <div class="mobile-cell de-sm-rsmall-nolast" *ngIf="element[column]">
+            <de-copyable-text [text]="element[column]"></de-copyable-text>
+            <div class="de-f-aligncenter de-sm-rbase-nolast">
+              <de-mobile-number [mobile]="element[column]" displayType="CALL"></de-mobile-number>
+              <de-mobile-number [mobile]="element[column]" displayType="WHATSAPP"></de-mobile-number>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngSwitchDefault>{{element[column]}}</ng-container>
+      </ng-container>
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="expandedDetail">
+    <mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length" class="expanded-detail-cell" [ngClass]="element !== expandedElement ? 'de-noborder--force' : ''">
+      <div *ngIf="element === expandedElement" class="de-p-bmedium de-p-tbase de-w-full">
+        DETAIL VIEW
+      </div>
+    </mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+  <mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="expandedElement === row ? 'highlight-row' : ''" (click)="toggleExpandedRow(row)"></mat-row>
+  <mat-row mat-row *matRowDef="let row; columns: ['expandedDetail']" class="expanded-detail-row"></mat-row>
+</mat-table>
+
+<mat-paginator [pageSizeOptions]="[25, 50, 100, 20]" pageSize="50" showFirstLastButtons></mat-paginator>

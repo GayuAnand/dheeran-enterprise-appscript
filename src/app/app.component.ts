@@ -26,7 +26,12 @@ export class AppComponent extends BaseComponent {
     this.fileSystemService.cleanupUnknownFiles();
 
     App.addListener('backButton', (event) => {
-      if (!event.canGoBack) App.exitApp();
+      console.log('BACK BUTTON EVENT: ', event);
+      if (event.canGoBack) {
+        window.history.back();
+      } else {
+        App.exitApp();
+      }
     });
 
     this.matIconRegistry.addSvgIcon('whatsapp', this.setPath(`assets/images/whatsapp.svg`));

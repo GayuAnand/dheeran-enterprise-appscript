@@ -177,8 +177,20 @@
           <p class="bold-text de-m-hsmall--force de-m-vbase--force mat-headline-6">{{informationType}} - {{informationFor}}</p>
           <table class="fms-customer-info-table">
             <tr *ngFor="let infoKey of utilService.getObjectKeys(information)">
-              <td>{{infoKey}}: </td>
-              <td>{{information[infoKey]}}</td>
+              <ng-container [ngSwitch]="infoKey">
+                <ng-container *ngSwitchCase="'BILL_STATUS'">
+                  <td>{{infoKey}}: </td>
+                  <td>
+                    <span class="de-m-rsmall">{{information[infoKey]}}</span>
+                    <span [ngClass]="isBillStatusPaid(information[infoKey]) ? 'success-text' : 'danger-text'">{{isBillStatusPaid(information[infoKey]) ? '(Paid)' : '(Unpaid)'}}</span>
+                  </td>
+                </ng-container>
+                
+                <ng-container *ngSwitchDefault>
+                  <td>{{infoKey}}: </td>
+                  <td>{{information[infoKey]}}</td>
+                </ng-container>
+              </ng-container>
             </tr>
           </table>
         </ng-container>

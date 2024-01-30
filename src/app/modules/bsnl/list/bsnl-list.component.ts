@@ -293,4 +293,8 @@ export class BSNLListComponent extends BaseComponent implements OnInit, AfterVie
     this.informationFor = '';
     this.information = null;
   }
+
+  isBillStatusPaid(code = '') {
+    return (code === 'P') || (code === 'W');
+  }
 }

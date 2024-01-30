@@ -35,6 +35,8 @@ export class FMSCustomerModel extends BaseModel implements Record<string, any> {
   
   ACQUISITION_TYPE!: string;
 
+  MISSING_SINCE!: string;
+
   freeTextSearch(searchTextRegexp = new RegExp('')) {
     return [this.PHONE_NO || '', this.OLT_IP || '', this.MOBILE_NO || '', this.EMAIL_ID || '', this.CUSTOMER_NAME || ''].some(value => searchTextRegexp.test(value));
   }

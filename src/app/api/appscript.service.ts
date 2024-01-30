@@ -59,7 +59,7 @@ export class ApiAppScriptService {
       this.storageService.getData('x-auth-token')
         .subscribe(token => {
           let s = document.createElement('script');
-          s.setAttribute('src', `https://script.google.com/macros/s/${this.useProd ? this.prodDeployId : this.devDeployId}/${this.useProd ? 'exec' : 'dev'}?api=1&functionName=${functionName}&functionParameters=${encodeURIComponent(JSON.stringify(parameters))}&callbackId=${callbackId}&token=${token}`);
+          s.setAttribute('src', `https://script.google.com/macros/s/${this.useProd ? this.prodDeployId : this.devDeployId}/${this.useProd ? 'exec' : 'dev'}?api=1&functionName=${functionName}&functionParameters=${encodeURIComponent(JSON.stringify(parameters))}&callbackId=${callbackId}`);
           s.setAttribute('id', callbackId);
           document.head.appendChild(s);
         });

@@ -5,6 +5,8 @@
     "ng": "ng",
     "start": "ng serve --host 0.0.0.0 --port 8200",
     "start:server": "nodemon server/app.js",
+    "start:apiserver": "cd server && nodemon app.js",
+    "start:apiserver:debug": "cd server && nodemon --inspect app.js",
     "build": "ng build --configuration development",
     "build:prod": "ng build --configuration production",
     "build:ghpages": "ng build --configuration production --base-href /dheeran-enterprise-appscript/",
