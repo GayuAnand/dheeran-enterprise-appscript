@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkcap_webview=self.webpackChunkcap_webview||[]).push([[485],{4485:(u,n,e)=>{e.r(n),e.d(n,{SplashScreenWeb:()=>a});var s=e(5861),_=e(2726);class a extends _.Uw{show(r){return(0,s.Z)(function*(){})()}hide(r){return(0,s.Z)(function*(){})()}}}}]);
