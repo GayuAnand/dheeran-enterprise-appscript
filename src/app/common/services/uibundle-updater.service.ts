@@ -29,7 +29,7 @@ export class UiBundleUpdaterService {
       .subscribe(
         (res: any) => {
           this.latestVersionInfo = {
-            url: this.settingsService.getGhPageAssetUrl(`zip/${res.latest}.zip`),
+            url: this.settingsService.getGhPageAssetUrl(`android.zip`),
             version: res.latest
           };
         }

@@ -21,8 +21,9 @@ CONSTANTS.DEST_ZIP_FOLDERPATH = path.join(CONSTANTS.WEB_BUILD_OUTPUT, 'zip');
 CONSTANTS.DEST_ZIPFILE_PATH = path.join(CONSTANTS.DEST_ZIP_FOLDERPATH, `${CONSTANTS.VERSIONINFO.latest}.zip`);
 
 CONSTANTS.SRC_APKPATH = path.join(__dirname, '..', 'android', 'app', 'build', 'outputs', 'apk', 'debug', 'app-debug.apk');
+CONSTANTS.DEST_APKPATH = path.join(CONSTANTS.WEB_BUILD_OUTPUT, `android.apk`);
 CONSTANTS.DEST_APKFOLDERPATH = path.join(CONSTANTS.WEB_BUILD_OUTPUT, 'apk');
-CONSTANTS.DEST_APKPATH = path.join(CONSTANTS.DEST_APKFOLDERPATH, `${CONSTANTS.VERSIONINFO.latest}.apk`);
+CONSTANTS.DEST_APKPATH_OLD = path.join(CONSTANTS.DEST_APKFOLDERPATH, `${CONSTANTS.VERSIONINFO.latest}.apk`);
 
 CONSTANTS.cleanupDir = function cleanupDir(dirPath) {
   if (CONSTANTS.fs.existsSync(dirPath)) CONSTANTS.fs.rmSync(dirPath, { recursive: true });
