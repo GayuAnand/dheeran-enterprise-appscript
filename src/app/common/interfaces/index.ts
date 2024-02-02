@@ -215,6 +215,7 @@ export interface ISheetsInfo {
       EXTERNALOLT: { label: 'ExternalOLT' },
       EMAIL: { label: 'Email' },
       USERNAME: { label: 'UserName' },
+      TASKTYPE: { label: 'TaskType' },
       TASKPRIORITY: { label: 'TaskPriority' },
       TASKSTATUS: { label: 'TaskStatus' },
       DEPLOYID: { label: 'DeployID' },
@@ -226,6 +227,7 @@ export interface ISheetsInfo {
     label: 'Tasks',
     cols: {
       ID: { label: 'ID' },
+      BY: { label: 'By' },
       PRIORITY: { label: 'Priority' },
       TYPE: { label: 'Type' },
       DETAILS: { label: 'Details' },
@@ -233,7 +235,7 @@ export interface ISheetsInfo {
       STATUS: { label: 'Status' },
       NOTES: { label: 'Notes' },
       OPENDATE: { label: 'OpenDate' },
-      CLOSEDATE: { label: 'CloseDate' },
+      DONEDATE: { label: 'DoneDate' },
     },
   },
   OLD_TASKS: {
@@ -362,8 +364,10 @@ export interface IMetadata {
   gtplWAGroupID?: string,
   position?: Record<string, { Latitude: string, Longitude: string, area: string }>,
   sheetsInfo?: ISheetsInfo,
-  taskPriority?: ('High' | 'Medium' | 'Low')[],
-  taskStatus?: ('Done' | 'Open' | 'Closed')[],
+  taskPriority?: ('High' | 'Medium' | 'Low' | string)[],
+  taskStatus?: ('Done' | 'Open' | 'Closed' | string)[],
+  taskType?: ('Internet Lead' | 'Internet Fault' | 'Cable Lead' | 'Cable Fault' | 'Maintenance' | string)[],
+  loginUsers?: string[],
   ugWorkType?: string[],
   oltInfo?: IOltInfo[],
 }

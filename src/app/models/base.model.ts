@@ -4,6 +4,10 @@ import { AuthService } from '../common';
 
 export class BaseModel {
   constructor(data: any) {
+    this.loadFromObj(data);
+  }
+
+  protected loadFromObj(data: any) {
     Object.keys(data || {}).forEach((k: string) => (this as any)[k] = data[k]);
   }
 
@@ -27,9 +31,9 @@ export class BaseModel {
     return JSON.parse(JSON.stringify(this));
   }
 
-  static formatDate(dateStr: string | number, format = 'DD MMM YY') {
+  static formatDate(dateStr: string | number, format = 'DD MMM YY'): string {
     const d = moment(dateStr);
-    return d.isValid() ? d.format(format || 'DD MMM YY') : dateStr;
+    return d.isValid() ? d.format(format || 'DD MMM YY') : dateStr.toString();
   }
 
   static AuthService: AuthService;

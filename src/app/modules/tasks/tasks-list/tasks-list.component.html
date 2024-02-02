@@ -1,10 +1,9 @@
-<mat-tab-group mat-stretch-tabs="true" mat-align-tabs="center">
+<mat-tab-group mat-stretch-tabs="true" mat-align-tabs="center" (selectedTabChange)="selectedTabChange($event)">
   <mat-tab>
     <ng-template mat-tab-label>
       <mat-icon class="de-m-rbase">checklist</mat-icon>
       Open
     </ng-template>
-    Content 1
   </mat-tab>
 
   <mat-tab>
@@ -12,7 +11,6 @@
       <mat-icon class="de-m-rbase">done</mat-icon>
       Done
     </ng-template>
-    Content 2
   </mat-tab>
 
   <mat-tab *ngIf="authService.isTasksAdmin()">
@@ -20,11 +18,13 @@
       <mat-icon class="de-m-rbase">check_circle</mat-icon>
       Verified
     </ng-template>
-    Content 3
   </mat-tab>
 </mat-tab-group>
 
-<de-refresh-data [cacheInfo]="cacheInfo" [refreshTriggerInterval]="4320" (refresh)="refreshData(true)"></de-refresh-data>
+<div class="de-f-aligncenter de-f-justifyright de-m-vbase de-sm-rbase-nolast">
+  <button mat-raised-button color="accent" *ngIf="settingsService.isOnline && (activeTaskStatus === 'Open')" (click)="createRecord()"><mat-icon>add</mat-icon>{{TKey.COMMON.ADD}}</button>
+  <de-refresh-data [cacheInfo]="cacheInfo" [refreshTriggerInterval]="4320" (refresh)="refreshData(true)"></de-refresh-data>
+</div>
 
 <mat-table matSort [dataSource]="data" matSortActive="CUSTOMER_NAME" matSortDirection="asc" class="mat-elevation-z8" multiTemplateDataRows>
   <ng-container matColumnDef="{{column}}" *ngFor="let column of displayedColumns">
@@ -32,6 +32,10 @@
 
     <mat-cell *matCellDef="let element" [ngClass]="getCellClassNames(element, column)">
       <ng-container [ngSwitch]="column">
+        <ng-container *ngSwitchCase="'OpenDate'">{{element.OpenDateStr}}</ng-container>
+
+        <ng-container *ngSwitchCase="'DoneDate'">{{element.DoneDateStr}}</ng-container>
+
         <ng-container *ngSwitchCase="'MOBILE'">
           <div class="mobile-cell de-sm-rsmall-nolast" *ngIf="element[column]">
             <de-copyable-text [text]="element[column]"></de-copyable-text>
@@ -40,6 +44,13 @@
               <de-mobile-number [mobile]="element[column]" displayType="WHATSAPP"></de-mobile-number>
             </div>
           </div>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'ACTIONS'">
+          <ng-container *ngIf="element?.ID">
+            <mat-icon color="primary" class="de-cursorpointer de-m-rbase" (click)="editRecord(element)">edit</mat-icon>
+            <mat-icon *ngIf="authService.isTasksAdmin()" color="warn" class="de-cursorpointer" (click)="recordToDelete = element">delete</mat-icon>
+          </ng-container>
         </ng-container>
 
         <ng-container *ngSwitchDefault>{{element[column]}}</ng-container>
@@ -60,4 +71,83 @@
   <mat-row mat-row *matRowDef="let row; columns: ['expandedDetail']" class="expanded-detail-row"></mat-row>
 </mat-table>
 
-<mat-paginator [pageSizeOptions]="[25, 50, 100, 20]" pageSize="50" showFirstLastButtons></mat-paginator>
+<mat-paginator [pageSizeOptions]="[25, 50, 100, 150]" pageSize="50" showFirstLastButtons></mat-paginator>
+
+<de-dialog *ngIf="recordToEdit" (closeDialog)="hideEditDetailsDialog()" classNames="customer-card-dialog">
+  <ng-container de-dialog-header>
+    <span *ngIf="recordToEdit.ID">{{TKey.COMMON.EDIT}} - {{recordToEdit.Type}}</span>
+    <span *ngIf="!recordToEdit.ID">{{TKey.COMMON.ADD}}</span>
+  </ng-container>
+
+  <ng-container de-dialog-body>
+    <ng-container *ngTemplateOutlet="taskDetailView; context: { $implicit: recordToEdit, readonly: false };"></ng-container>
+  </ng-container>
+
+  <ng-container de-dialog-footer>
+    <button mat-raised-button color="warn" (click)="hideEditDetailsDialog()">
+      <div class="de-f-aligncenter de-sm-rsmall-nolast">
+        <mat-icon>close</mat-icon>
+        <span>{{TKey.COMMON.CANCEL}}</span>
+      </div>
+    </button>
+    <button mat-raised-button color="primary" (click)="saveOrUpdateTask()">
+      <div class="de-f-aligncenter de-sm-rsmall-nolast">
+        <mat-icon>check</mat-icon>
+        <span>{{recordToEdit.ID ? TKey.COMMON.UPDATE : TKey.COMMON.SAVE}}</span>
+      </div>
+    </button>
+  </ng-container>
+</de-dialog>
+
+<ng-template #taskDetailView let-record let-readonly="readonly">
+  <mat-form-field [ngClass]="{ 'readonly': readonly || !authService.isTasksAdmin() }">
+    <mat-label>{{TKey.COMMON.PRIORITY}}</mat-label>
+    <mat-select [(ngModel)]="record.Priority">
+      <mat-option *ngFor="let priority of settingsService.metadata.taskPriority" [value]="priority">{{priority}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field class="readonly" *ngIf="record.ID">
+    <mat-label>{{TKey.COMMON.OPEN_DATE}}</mat-label>
+    <input matInput type="text" [(ngModel)]="record.OpenDateStr" />
+  </mat-form-field>
+
+  <mat-form-field [ngClass]="{ 'readonly': readonly || !authService.isTasksAdmin() }">
+    <mat-label>{{TKey.COMMON.TYPE}}</mat-label>
+    <mat-select [(ngModel)]="record.Type">
+      <mat-option *ngFor="let taskType of settingsService.metadata.taskType" [value]="taskType">{{taskType}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field [ngClass]="{ 'readonly': readonly || !authService.isTasksAdmin() }">
+    <mat-label>{{TKey.COMMON.ASSIGNED_TO}}</mat-label>
+    <mat-select [(ngModel)]="record.AssignedToArr" multiple>
+      <mat-option *ngFor="let person of loginUsers" [value]="person">{{person}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field [ngClass]="{ 'readonly': readonly || !authService.isTasksAdmin() }">
+    <mat-label>{{TKey.COMMON.DETAILS}}</mat-label>
+    <textarea matInput type="text" [(ngModel)]="record.Details"></textarea>
+    <button matSuffix mat-icon-button (click)="record.Details=''"><mat-icon>close</mat-icon></button>
+  </mat-form-field>
+
+  <mat-form-field [ngClass]="readonly ? 'readonly' : ''">
+    <mat-label>{{TKey.COMMON.NOTES}}</mat-label>
+    <textarea matInput type="text" [(ngModel)]="record.Notes"></textarea>
+    <button matSuffix mat-icon-button (click)="record.Notes=''"><mat-icon>close</mat-icon></button>
+  </mat-form-field>
+
+  <mat-form-field [ngClass]="readonly ? 'readonly' : ''">
+    <mat-label>{{TKey.COMMON.STATUS}}</mat-label>
+    <mat-select [(ngModel)]="record.Status">
+      <mat-option *ngFor="let status of tasksStatus" [value]="status">{{status}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+</ng-template>
+
+<de-confirmation-dialog *ngIf="recordToDelete"
+  [title]="'Delete Patrol?'"
+  [content]="'Are you sure you want to delete task \'' + recordToDelete.Type + '\'?'"
+  (onSuccess)="deleteRecord()" (onCancel)="recordToDelete = null">
+</de-confirmation-dialog>

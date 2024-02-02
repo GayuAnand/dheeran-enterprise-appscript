@@ -107,7 +107,6 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     this._subscriptions.push(this.eventService.isMobile.subscribe(() => this.refreshDisplayedColumns()));
 
     this.settingsService.pageTitle = this.TKey.COMMON.CABLE;
-    this.geolocationService.getCurrentPosition().subscribe(s => console.log(s));
   }
 
   ngAfterViewInit() {

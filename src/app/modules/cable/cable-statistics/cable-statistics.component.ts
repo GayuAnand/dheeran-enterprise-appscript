@@ -17,11 +17,12 @@ export class CableStatisticsComponent extends BaseComponent implements OnInit, A
   rawCustomersData: CustomerModel[] = [];
 
   visibleAgents: Record<string, boolean> = {
-    Anand: true,
-    Sarath: true,
+    Anand: false,
+    Sarath: false,
+    Total: true,
   };
 
-  collectionType: 'month' | 'collectionDate' = 'collectionDate';
+  collectionType: 'month' | 'collectionDate' = 'month';
 
   chartType = 'line';
 

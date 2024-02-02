@@ -12,11 +12,12 @@ const routes: Routes = [
   {
     path: 'list',
     component: BSNLListComponent,
+    canActivate: [RoleGuard(IApps.BSNL)],
   },
   {
     path: 'utility',
     component: BSNLConnectComponent,
-    canActivate: [RoleGuard(IApps.BSNL, IRoleValue.ADMIN)],
+    canActivate: [RoleGuard(IApps.BSNL)],
   },
   {
     path: 'sync',

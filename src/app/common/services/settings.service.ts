@@ -93,6 +93,7 @@ export class SettingsService implements OnDestroy {
     private eventService: EventService,
   ) {
     this.init();
+    console.log(this);
   }
 
   ngOnDestroy(): void {
@@ -146,14 +147,14 @@ export class SettingsService implements OnDestroy {
             name: EN_MAPPING.COMMON.LIST,
             routerLink: ['/app/bsnl/list']
           },
+          {
+            name: EN_MAPPING.COMMON.UTILITY,
+            routerLink: ['/app/bsnl/utility']
+          }
         ]
       };
 
       if (this.authService.isBSNLAdmin()) {
-        bsnlNavigationData.children.push({
-          name: EN_MAPPING.COMMON.UTILITY,
-          routerLink: ['/app/bsnl/utility']
-        });
         bsnlNavigationData.children.push({
           name: EN_MAPPING.COMMON.OLT,
           routerLink: ['/app/bsnl/olt']

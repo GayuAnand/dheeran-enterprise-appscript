@@ -206,7 +206,7 @@
     <mat-row mat-row *matRowDef="let row; columns: ['expandedDetail']" class="expanded-detail-row"></mat-row>
   </mat-table>
 
-  <mat-paginator [pageSizeOptions]="[25, 50, 100, 20]" pageSize="50" showFirstLastButtons></mat-paginator>
+  <mat-paginator [pageSizeOptions]="[25, 50, 100, 150]" pageSize="50" showFirstLastButtons></mat-paginator>
 </ng-container>
 
 <ng-container *ngIf="viewType === 'map_view'">
@@ -215,6 +215,7 @@
 
 <de-dialog *ngIf="editCustomerOrig" (closeDialog)="hideEditDetailsDialog()" classNames="customer-card-dialog">
   <ng-container de-dialog-header>{{TKey.COMMON.EDIT}} - {{editCustomerOrig.Name}}</ng-container>
+
   <ng-container de-dialog-body>
     <div>
       <table class="customer-card full-width">
