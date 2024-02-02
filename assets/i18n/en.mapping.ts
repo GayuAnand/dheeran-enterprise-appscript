@@ -76,6 +76,7 @@ export const EN_MAPPING = {
     USER: 'User',
     UG: 'UG',
     UTILITY: 'Utility',
+    UPDATE: 'Update',
     VERSION: 'Version',
   },
   CUSTOMERS: {
