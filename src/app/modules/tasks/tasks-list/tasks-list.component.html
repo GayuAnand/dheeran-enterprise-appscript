@@ -136,7 +136,7 @@
 <ng-template #taskDetailViewReadOnly let-record>
   <table class="de-w-full">
     <tr *ngFor="let col of detailViewInfo">
-      <td style="min-width: 90px;">{{col}}: </td>
+      <td style="min-width: 90px; max-width: 120px;">{{col}}: </td>
       <td [ngClass]="{ 'bold-text': col === 'Priority', 'danger-text': record[col] === 'High', 'warning-text': record[col] === 'Medium', 'primary-text': record[col] === 'Low' }">{{record[col + 'Str'] || record[col]}}</td>
     </tr>
   </table>

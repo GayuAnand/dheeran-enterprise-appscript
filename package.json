@@ -14,6 +14,7 @@
     "pipeline:apk": "npm run inc:buildnumber && npm run build:prod && node bin/build-zip.js && npm run sync && npm run android:build",
     "pipeline:ghpages": "npm run pipeline:apk && npm run build:ghpages && node bin/copy-zip.js && node bin/populate-dist-apks.js && node bin/publish-ghpages.js",
     "pipeline:amplify": "npm run pipeline:apk && node bin/copy-zip.js && node bin/populate-dist-apks.js && node bin/publish-ghpages.js",
+    "build:publish:commit:sync": "npm run pipeline:amplify && git add . && git commit -s -m 'Update' && git push && git checkout gh-pages && git pull && git push ent gh-pages && git checkout main && git fetch origin --tags && git push ent --tags",
     "watch": "ng build --watch --configuration development",
     "android:add": "npx cap add android",
     "android:run": "npx cap run android",
