@@ -18,6 +18,11 @@ mat-table {
     padding: 0px 12px !important;
   }
 
+  .cdk-column-ACTIONS, .mat-column-ACTIONS {
+    max-width: fit-content;
+    width: fit-content;
+  }
+
   mat-row mat-cell {
     padding: 12px;
     word-break: break-word;

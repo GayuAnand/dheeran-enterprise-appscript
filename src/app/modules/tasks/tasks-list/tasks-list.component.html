@@ -1,5 +1,5 @@
 <mat-tab-group mat-stretch-tabs="true" mat-align-tabs="center" (selectedTabChange)="selectedTabChange($event)">
-  <mat-tab>
+  <mat-tab labelClass="de-p-hsmall--force">
     <ng-template mat-tab-label>
       <mat-icon class="de-m-rbase">checklist</mat-icon>
       Open
@@ -26,12 +26,46 @@
   <de-refresh-data [cacheInfo]="cacheInfo" [refreshTriggerInterval]="4320" (refresh)="refreshData(true)"></de-refresh-data>
 </div>
 
-<mat-table matSort [dataSource]="data" matSortActive="CUSTOMER_NAME" matSortDirection="asc" class="mat-elevation-z8" multiTemplateDataRows>
+<mat-table matSort [dataSource]="data" matSortActive="Priority" matSortDirection="asc" class="mat-elevation-z8" multiTemplateDataRows>
   <ng-container matColumnDef="{{column}}" *ngFor="let column of displayedColumns">
-    <mat-header-cell mat-sort-header *matHeaderCellDef [ngClass]="'de-f-justifycenter'">{{column === 'ACTIONS' ? '' : column}}</mat-header-cell>
+    <mat-header-cell mat-sort-header *matHeaderCellDef [ngClass]="'de-f-justifycenter'">
+      <ng-container [ngSwitch]="column">
+        <ng-container *ngSwitchCase="'ACTIONS'"></ng-container>
+        <ng-container *ngSwitchCase="'Priority'"></ng-container>
+        <ng-container *ngSwitchCase="'Type'"></ng-container>
+        <ng-container *ngSwitchCase="durationColName">{{TKey.COMMON.DURATION}}</ng-container>
+        <ng-container *ngSwitchDefault>{{column}}</ng-container>
+      </ng-container>
+    </mat-header-cell>
 
     <mat-cell *matCellDef="let element" [ngClass]="getCellClassNames(element, column)">
       <ng-container [ngSwitch]="column">
+        <ng-container *ngSwitchCase="'Priority'">
+          <mat-icon [ngClass]="{ 'danger-text': element[column] === 'High', 'primary-text': element[column] === 'Medium', 'warning-text': element[column] === 'Low' }">stars</mat-icon>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'Type'">
+          <ng-container [ngSwitch]="element[column]">
+            <ng-container *ngSwitchCase="'Internet Lead'">
+              <mat-icon class="success-text">wifi</mat-icon>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Internet Fault'">
+              <mat-icon class="danger-text">wifi</mat-icon>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Cable Lead'">
+              <mat-icon class="success-text">cable</mat-icon>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Cable Fault'">
+              <mat-icon class="danger-text">cable</mat-icon>
+            </ng-container>
+            <ng-container *ngSwitchDefault>
+              <mat-icon class="primary-text">task</mat-icon>
+            </ng-container>
+          </ng-container>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="durationColName">{{element.DurationInHumanizeFormat}}</ng-container>
+
         <ng-container *ngSwitchCase="'OpenDate'">{{element.OpenDateStr}}</ng-container>
 
         <ng-container *ngSwitchCase="'DoneDate'">{{element.DoneDateStr}}</ng-container>
@@ -59,15 +93,15 @@
   </ng-container>
 
   <ng-container matColumnDef="expandedDetail">
-    <mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length" class="expanded-detail-cell" [ngClass]="element !== expandedElement ? 'de-noborder--force' : ''">
+    <mat-cell *matCellDef="let element" [attr.colspan]="10" class="expanded-detail-cell" [ngClass]="element !== expandedElement ? 'de-noborder--force' : ''">
       <div *ngIf="element === expandedElement" class="de-p-bmedium de-p-tbase de-w-full">
-        DETAIL VIEW
+        <ng-container *ngTemplateOutlet="taskDetailViewReadOnly; context: { $implicit: element };"></ng-container>
       </div>
     </mat-cell>
   </ng-container>
 
   <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
-  <mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="expandedElement === row ? 'highlight-row' : ''" (click)="toggleExpandedRow(row)"></mat-row>
+  <mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{ 'highlight-row': expandedElement === row }" (click)="toggleExpandedRow(row)"></mat-row>
   <mat-row mat-row *matRowDef="let row; columns: ['expandedDetail']" class="expanded-detail-row"></mat-row>
 </mat-table>
 
@@ -80,7 +114,7 @@
   </ng-container>
 
   <ng-container de-dialog-body>
-    <ng-container *ngTemplateOutlet="taskDetailView; context: { $implicit: recordToEdit, readonly: false };"></ng-container>
+    <ng-container *ngTemplateOutlet="taskDetailView; context: { $implicit: recordToEdit };"></ng-container>
   </ng-container>
 
   <ng-container de-dialog-footer>
@@ -99,11 +133,58 @@
   </ng-container>
 </de-dialog>
 
-<ng-template #taskDetailView let-record let-readonly="readonly">
-  <mat-form-field [ngClass]="{ 'readonly': readonly || !authService.isTasksAdmin() }">
+<ng-template #taskDetailViewReadOnly let-record>
+  <table class="de-w-full">
+    <tr *ngFor="let col of detailViewInfo">
+      <td style="min-width: 90px;">{{col}}: </td>
+      <td [ngClass]="{ 'bold-text': col === 'Priority', 'danger-text': record[col] === 'High', 'warning-text': record[col] === 'Medium', 'primary-text': record[col] === 'Low' }">{{record[col + 'Str'] || record[col]}}</td>
+    </tr>
+  </table>
+</ng-template>
+
+<ng-template #taskDetailView let-record>
+  <mat-form-field [ngClass]="{ 'readonly': !authService.isTasksAdmin() }">
     <mat-label>{{TKey.COMMON.PRIORITY}}</mat-label>
     <mat-select [(ngModel)]="record.Priority">
       <mat-option *ngFor="let priority of settingsService.metadata.taskPriority" [value]="priority">{{priority}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field [ngClass]="{ 'readonly': !authService.isTasksAdmin() }">
+    <mat-label>{{TKey.COMMON.TYPE}}</mat-label>
+    <mat-select [(ngModel)]="record.Type">
+      <mat-option *ngFor="let taskType of settingsService.metadata.taskType" [value]="taskType">{{taskType}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field [ngClass]="{ 'readonly': !authService.isTasksAdmin() }">
+    <mat-label>{{TKey.COMMON.ASSIGNED_TO}}</mat-label>
+    <mat-select [(ngModel)]="record.AssignedToArr" multiple>
+      <mat-option *ngFor="let person of loginUsers" [value]="person">{{person}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field [ngClass]="{ 'readonly': !authService.isTasksAdmin() }" *ngIf="record.ID">
+    <mat-label>{{TKey.COMMON.TITLE}}</mat-label>
+    <input matInput type="text" [(ngModel)]="record.Title" />
+  </mat-form-field>
+
+  <mat-form-field [ngClass]="{ 'readonly': !authService.isTasksAdmin() }">
+    <mat-label>{{TKey.COMMON.DETAILS}}</mat-label>
+    <textarea matInput type="text" [(ngModel)]="record.Details"></textarea>
+    <button matSuffix mat-icon-button (click)="record.Details=''"><mat-icon>close</mat-icon></button>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>{{TKey.COMMON.NOTES}}</mat-label>
+    <textarea matInput type="text" [(ngModel)]="record.Notes"></textarea>
+    <button matSuffix mat-icon-button (click)="record.Notes=''"><mat-icon>close</mat-icon></button>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>{{TKey.COMMON.STATUS}}</mat-label>
+    <mat-select [(ngModel)]="record.Status">
+      <mat-option *ngFor="let status of tasksStatus" [value]="status">{{status}}</mat-option>
     </mat-select>
   </mat-form-field>
 
@@ -112,37 +193,9 @@
     <input matInput type="text" [(ngModel)]="record.OpenDateStr" />
   </mat-form-field>
 
-  <mat-form-field [ngClass]="{ 'readonly': readonly || !authService.isTasksAdmin() }">
-    <mat-label>{{TKey.COMMON.TYPE}}</mat-label>
-    <mat-select [(ngModel)]="record.Type">
-      <mat-option *ngFor="let taskType of settingsService.metadata.taskType" [value]="taskType">{{taskType}}</mat-option>
-    </mat-select>
-  </mat-form-field>
-
-  <mat-form-field [ngClass]="{ 'readonly': readonly || !authService.isTasksAdmin() }">
-    <mat-label>{{TKey.COMMON.ASSIGNED_TO}}</mat-label>
-    <mat-select [(ngModel)]="record.AssignedToArr" multiple>
-      <mat-option *ngFor="let person of loginUsers" [value]="person">{{person}}</mat-option>
-    </mat-select>
-  </mat-form-field>
-
-  <mat-form-field [ngClass]="{ 'readonly': readonly || !authService.isTasksAdmin() }">
-    <mat-label>{{TKey.COMMON.DETAILS}}</mat-label>
-    <textarea matInput type="text" [(ngModel)]="record.Details"></textarea>
-    <button matSuffix mat-icon-button (click)="record.Details=''"><mat-icon>close</mat-icon></button>
-  </mat-form-field>
-
-  <mat-form-field [ngClass]="readonly ? 'readonly' : ''">
-    <mat-label>{{TKey.COMMON.NOTES}}</mat-label>
-    <textarea matInput type="text" [(ngModel)]="record.Notes"></textarea>
-    <button matSuffix mat-icon-button (click)="record.Notes=''"><mat-icon>close</mat-icon></button>
-  </mat-form-field>
-
-  <mat-form-field [ngClass]="readonly ? 'readonly' : ''">
-    <mat-label>{{TKey.COMMON.STATUS}}</mat-label>
-    <mat-select [(ngModel)]="record.Status">
-      <mat-option *ngFor="let status of tasksStatus" [value]="status">{{status}}</mat-option>
-    </mat-select>
+  <mat-form-field class="readonly" *ngIf="record.ID">
+    <mat-label>{{TKey.COMMON.DONE_DATE}}</mat-label>
+    <input matInput type="text" [(ngModel)]="record.DoneDateStr" />
   </mat-form-field>
 </ng-template>
 

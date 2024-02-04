@@ -24,7 +24,7 @@ export class SettingsService implements OnDestroy {
 
   currentVersion = versionInfo.latest;
 
-  ghPageUrl = 'https://gayuanand.github.io/dheeran-enterprise-appscript';
+  assetDomain = 'https://portal.dheeranenterprise.in';
 
   isMobile = false;
 
@@ -212,8 +212,8 @@ export class SettingsService implements OnDestroy {
     this.navigationData = navigationData;
   }
 
-  getGhPageAssetUrl(filename: string) {
-    return `${this.ghPageUrl}/${filename}`;
+  getAssetUrl(filename: string) {
+    return `${this.assetDomain}/${filename}`;
   }
 
   getCustomerCols() {

@@ -230,6 +230,7 @@ export interface ISheetsInfo {
       BY: { label: 'By' },
       PRIORITY: { label: 'Priority' },
       TYPE: { label: 'Type' },
+      TITLE: { label: 'Title' },
       DETAILS: { label: 'Details' },
       ASSIGNEDTO: { label: 'AssignedTo' },
       STATUS: { label: 'Status' },

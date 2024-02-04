@@ -25,11 +25,11 @@ export class UiBundleUpdaterService {
   }
 
   async getLatestVersionInfo() {
-    return this.http.get(this.settingsService.getGhPageAssetUrl('versionInfo.json'))
+    return this.http.get(this.settingsService.getAssetUrl('versionInfo.json'))
       .subscribe(
         (res: any) => {
           this.latestVersionInfo = {
-            url: this.settingsService.getGhPageAssetUrl(`${res.latest}.zip`),
+            url: this.settingsService.getAssetUrl(`${res.latest}.zip`),
             version: res.latest
           };
         }

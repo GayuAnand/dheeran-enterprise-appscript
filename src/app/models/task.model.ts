@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 import { BaseModel } from './base.model';
 
 export class TaskModel extends BaseModel implements Record<string, any> {
@@ -8,6 +10,8 @@ export class TaskModel extends BaseModel implements Record<string, any> {
   Priority!: string;
 
   Type!: string;
+
+  Title!: string;
 
   Details!: string;
 
@@ -40,6 +44,17 @@ export class TaskModel extends BaseModel implements Record<string, any> {
     this.AssignedTo = this.AssignedToArr.filter(x => !!x).join(',');
   }
 
+  get Duration() {
+    if (this.OpenDate) {
+      return moment(this.OpenDate).diff(moment());
+    }
+    return '';
+  }
+
+  get DurationInHumanizeFormat() {
+    return moment.duration(this.Duration).humanize(true);
+  }
+
   protected override loadFromObj(data: any): void {
     super.loadFromObj(data);
     this.AssignedToArr = (this.AssignedTo || '').split(/\s*,\s*/);
@@ -51,6 +66,10 @@ export class TaskModel extends BaseModel implements Record<string, any> {
 
   getOpenCloseDate(d: string | number) {
     return BaseModel.formatDate(d, TaskModel.DATE_FORMAT);
+  }
+
+  isAssignedTo(username: string) {
+    return this.AssignedToArr.some(u => u === username);
   }
 
   static DATE_FORMAT = 'DD MMM YYYY hh:mmA';

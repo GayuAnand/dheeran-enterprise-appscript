@@ -1,4 +1,5 @@
 import { concatMap, map } from 'rxjs';
+import { MatSort } from '@angular/material/sort';
 import { Component, ViewChild } from '@angular/core';
 import { debounce } from 'typescript-debounce-decorator';
 import { MatTabChangeEvent } from '@angular/material/tabs';
@@ -22,6 +23,8 @@ import { BaseComponent } from 'src/app/common';
   ],
 })
 export class TasksListComponent extends BaseComponent {
+  durationColName = 'Duration';
+
   data = new MatTableDataSource<TaskModel>([]);
 
   fullData: TaskModel[] = [];
@@ -32,10 +35,22 @@ export class TasksListComponent extends BaseComponent {
 
   taskColumns = this.settingsService.metadata.sheetsInfo?.TASKS?.cols;
 
-  allColumns = [
+  detailViewInfo = [
     this.taskColumns?.TYPE?.label || '',
     this.taskColumns?.PRIORITY?.label || '',
+    this.taskColumns?.TITLE?.label || '',
+    this.taskColumns?.ASSIGNEDTO?.label || '',
+    this.taskColumns?.DETAILS?.label || '',
+    this.taskColumns?.NOTES?.label || '',
     this.taskColumns?.OPENDATE?.label || '',
+    this.taskColumns?.DONEDATE?.label || '',
+  ];
+
+  allColumns = [
+    this.taskColumns?.PRIORITY?.label || '',
+    this.taskColumns?.TYPE?.label || '',
+    this.taskColumns?.TITLE?.label || '',
+    this.durationColName,
     this.taskColumns?.ASSIGNEDTO?.label || '',
   ];
 
@@ -55,7 +70,9 @@ export class TasksListComponent extends BaseComponent {
 
   tasksStatus = this.settingsService.metadata.taskStatus;
 
-  loginUsers = this.settingsService.metadata.loginUsers?.filter(u => !u.match(/(test|service)/i))
+  loginUsers = this.settingsService.metadata.loginUsers?.filter(u => !u.match(/(test|service)/i));
+
+  @ViewChild(MatSort) sort!: MatSort;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -73,6 +90,7 @@ export class TasksListComponent extends BaseComponent {
   }
 
   ngAfterViewInit() {
+    this.data.sort = this.sort;
     this.data.paginator = this.paginator;
     this.refreshDisplayedColumns();
     this.refreshData(false, true);
@@ -84,10 +102,10 @@ export class TasksListComponent extends BaseComponent {
   }
 
   refreshDisplayedColumns() {
-    if (this.authService.isTasksAdmin()) {
-      this.displayedColumns = this.allColumns.slice(0, 4);
+    if (this.authService.isTasksAdmin() && !this.settingsService.isMobile) {
+      this.displayedColumns = this.allColumns.slice(0, 5);
     } else {
-      this.displayedColumns = this.allColumns.slice(0, 3);
+      this.displayedColumns = this.allColumns.slice(0, 4);
     }
     this.displayedColumns.push('ACTIONS');
   }
@@ -140,7 +158,11 @@ export class TasksListComponent extends BaseComponent {
       .subscribe({
         next: (data) => {
           this.settingsService.processingText = '';
-          this.fullData = data;
+          if (this.authService.isTasksAdmin()) {
+            this.fullData = data;
+          } else {
+            this.fullData = data.filter(d => d.isAssignedTo(this.authService.Username));
+          }
           this.initializeFilters(resetFilters);
         },
         error: () => this.settingsService.processingText = '',
