@@ -41,7 +41,7 @@
     <mat-cell *matCellDef="let element" [ngClass]="getCellClassNames(element, column)">
       <ng-container [ngSwitch]="column">
         <ng-container *ngSwitchCase="'Priority'">
-          <mat-icon [ngClass]="{ 'danger-text': element[column] === 'High', 'primary-text': element[column] === 'Medium', 'warning-text': element[column] === 'Low' }">stars</mat-icon>
+          <mat-icon [ngClass]="{ 'danger-text': element[column] === 'High', 'warning-text': element[column] === 'Medium', 'primary-text': element[column] === 'Low' }">stars</mat-icon>
         </ng-container>
 
         <ng-container *ngSwitchCase="'Type'">
@@ -164,7 +164,7 @@
     </mat-select>
   </mat-form-field>
 
-  <mat-form-field [ngClass]="{ 'readonly': !authService.isTasksAdmin() }" *ngIf="record.ID">
+  <mat-form-field [ngClass]="{ 'readonly': !authService.isTasksAdmin() }">
     <mat-label>{{TKey.COMMON.TITLE}}</mat-label>
     <input matInput type="text" [(ngModel)]="record.Title" />
   </mat-form-field>
