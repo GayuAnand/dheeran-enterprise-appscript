@@ -1,6 +1,6 @@
 <div class="filter-row de-p-vbase">
   <mat-form-field>
-    <mat-label>{{TKey.COMMON.SEARCH}}</mat-label>
+    <mat-label>{{TKey.COMMON.SEARCH_ANYTHING}}</mat-label>
     <input matInput type="text" [(ngModel)]="searchText" (ngModelChange)="onFilterChange()">
     <button *ngIf="searchText" matSuffix mat-icon-button (click)="searchText=''; onFilterChange();">
       <mat-icon>close</mat-icon>
@@ -11,6 +11,14 @@
     <mat-label>{{TKey.COMMON.SEARCH_PHONE_NUMBER}}</mat-label>
     <input matInput type="number" [(ngModel)]="searchPhoneNumber" (ngModelChange)="onFilterChange()">
     <button *ngIf="searchPhoneNumber" matSuffix mat-icon-button (click)="searchPhoneNumber=''; onFilterChange();">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>{{TKey.COMMON.ID}}</mat-label>
+    <input matInput type="text" [(ngModel)]="searchID" (ngModelChange)="onFilterChange()">
+    <button *ngIf="searchID" matSuffix mat-icon-button (click)="searchID=null; onFilterChange();">
       <mat-icon>close</mat-icon>
     </button>
   </mat-form-field>
@@ -27,18 +35,6 @@
     </mat-select>
   </mat-form-field>
 
-  <mat-form-field>
-    <mat-label>{{TKey.COMMON.STATUS}}</mat-label>
-    <mat-select [formControl]="statusFilter.control" multiple>
-      <div class="select-all">
-        <mat-checkbox [(ngModel)]="statusFilter.selectAll"
-                      [ngModelOptions]="{ standalone: true }"
-                      (change)="statusFilter.toggleSelectAll()">Select All</mat-checkbox>
-      </div>
-      <mat-option *ngFor="let status of statusFilter.controlOptions" [value]="status" (click)="statusFilter.onSelectionChange()">{{status}}</mat-option>
-    </mat-select>
-  </mat-form-field>
-
   <button *ngIf="authService.isCableAdmin() && settingsService.configurations.showCableCSVExport" mat-raised-button color="primary" (click)="exportQrCSV()" class="de-f-grow">
     <mat-icon matPrefix>payments</mat-icon>
     Export QR CSV
@@ -50,6 +46,18 @@
   </p>
 
   <ng-container *ngIf="showAdvancedFilters">
+    <mat-form-field>
+      <mat-label>{{TKey.COMMON.STATUS}}</mat-label>
+      <mat-select [formControl]="statusFilter.control" multiple>
+        <div class="select-all">
+          <mat-checkbox [(ngModel)]="statusFilter.selectAll"
+                        [ngModelOptions]="{ standalone: true }"
+                        (change)="statusFilter.toggleSelectAll()">Select All</mat-checkbox>
+        </div>
+        <mat-option *ngFor="let status of statusFilter.controlOptions" [value]="status" (click)="statusFilter.onSelectionChange()">{{status}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
     <mat-form-field>
       <mat-label>{{TKey.COMMON.ALLOW_CREDIT}}</mat-label>
       <mat-select [formControl]="allowCreditFilter.control" multiple>

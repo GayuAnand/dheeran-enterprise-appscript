@@ -44,6 +44,8 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
 
   viewType: 'table_view' | 'map_view' = 'table_view';
 
+  searchID: number | null = null;
+
   searchText = '';
 
   searchTextRegexp = new RegExp('');
@@ -100,6 +102,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     this.filterGpay = this.filterGpay.bind(this);
     this.filterStatus = this.filterStatus.bind(this);
     this.filterSearch = this.filterSearch.bind(this);
+    this.filterSearchID = this.filterSearchID.bind(this);
     this.filterSearchPhoneNumber = this.filterSearchPhoneNumber.bind(this);
     this.filterCollection = this.filterCollection.bind(this);
     this.filterPendingSettlement = this.filterPendingSettlement.bind(this);
@@ -227,6 +230,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
   }
 
   clearFilters() {
+    this.searchID = 0;
     this.searchText = '';
     this.searchPhoneNumber = '';
 
@@ -273,6 +277,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     let filterGpay = this.filterGpay;
     let filterStatus = this.filterStatus;
     let filterSearch = this.filterSearch;
+    let filterSearchID = this.filterSearchID;
     let filterSearchPhoneNumber = this.filterSearchPhoneNumber;
     let filterCollection = this.filterCollection;
     let filterPendingSettlement = this.filterPendingSettlement;
@@ -304,6 +309,10 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
       filterStatus = byPassFilter;
     }
 
+    if (!this.searchID) {
+      filterSearchID = byPassFilter;
+    }
+
     if (!this.searchText) {
       filterSearch = byPassFilter;
     } else {
@@ -330,7 +339,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
       filterPendingSettlement = byPassFilter;
     }
 
-    this.data.data = this.fullData.filter(filterGpay).filter(filterArea).filter(filterStatus).filter(filterSearch).filter(filterSearchPhoneNumber).filter(filterCollection).filter(filterPendingSettlement);
+    this.data.data = this.fullData.filter(filterGpay).filter(filterSearchID).filter(filterArea).filter(filterStatus).filter(filterSearch).filter(filterSearchPhoneNumber).filter(filterCollection).filter(filterPendingSettlement);
     this.markers = this.data.data
       .filter((d) => d.hasLocationInfo())
       .map((d) => marker(
@@ -345,12 +354,16 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     }
   }
 
+  filterSearchID(data: CustomerModel) {
+    return data.idSearch(this.searchID);
+  }
+
   filterSearch(data: CustomerModel) {
     return data.freeTextSearch(this.searchTextRegexp);
   }
 
   filterSearchPhoneNumber(data: CustomerModel) {
-    return data.freeTextSearch(this.searchPhoneNumberRegexp);
+    return data.phoneNumberSearch(this.searchPhoneNumberRegexp);
   }
 
   filterArea(data: CustomerModel) {

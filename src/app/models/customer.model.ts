@@ -148,6 +148,14 @@ _HighSpeed BroadBand internet and Cable service provider_`;
     return (this.Mobile || '').split(/\s+/);
   }
 
+  idSearch(idNum: number | null) {
+    return parseInt(((this.ID || '').match(/\d+/) || [''])[0]) == idNum;
+  }
+
+  phoneNumberSearch(searchTextRegexp = new RegExp('')) {
+    return searchTextRegexp.test(this.Mobile || '');
+  }
+
   freeTextSearch(searchTextRegexp = new RegExp('')) {
     return [this.ID || '', this.Name || '', this.Mobile || '', this.STB || '', this['Own Notes'] || '', this.Notes || ''].some(value => searchTextRegexp.test(value));
   }
