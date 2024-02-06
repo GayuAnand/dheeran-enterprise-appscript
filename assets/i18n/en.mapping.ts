@@ -61,6 +61,7 @@ export const EN_MAPPING = {
     ROUTE: 'Route',
     SAVE: 'Save',
     SEARCH: 'Search',
+    SEARCH_ANYTHING: 'Search Anything',
     SEARCH_PHONE_NUMBER: 'Search Phone Number',
     SETTLE: 'Settle',
     SETTLE_PENDING_COLLECTIONS: 'Settle Pending Collections',
