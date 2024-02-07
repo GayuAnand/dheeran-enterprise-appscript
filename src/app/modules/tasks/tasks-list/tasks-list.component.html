@@ -139,7 +139,7 @@
       <td>{{col}}: </td>
 
       <ng-container [ngSwitch]="col">
-        <td *ngSwitchCase="'Reminders'" class="reminders-cell de-f-aligncenter de-sm-rsmall-nolast">
+        <td *ngSwitchCase="'Reminders'" class="reminders-cell de-f-aligncenter de-sm-rsmall-nolast de-sm-vsmall de-f-wrap">
           <button mat-raised-button (click)="sendTaskReminder(record, true, true)"><mat-icon class="reminder-icon" svgIcon="whatsappreminder"></mat-icon>FTTH New</button>
           <button mat-raised-button (click)="sendTaskReminder(record, true, false)"><mat-icon class="reminder-icon" svgIcon="whatsappreminder"></mat-icon>FTTH Updated</button>
           <button mat-raised-button (click)="sendTaskReminder(record, false, true)"><mat-icon class="reminder-icon" svgIcon="whatsappreminder"></mat-icon>UG New</button>
