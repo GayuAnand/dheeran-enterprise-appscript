@@ -55,6 +55,10 @@ export class TaskModel extends BaseModel implements Record<string, any> {
     return moment.duration(this.Duration).humanize(true);
   }
 
+  get UiPriority() {
+    return this.Priority === 'Medium' ? 'Intermediate' : this.Priority;
+  }
+
   protected override loadFromObj(data: any): void {
     super.loadFromObj(data);
     this.AssignedToArr = (this.AssignedTo || '').split(/\s*,\s*/);
@@ -70,6 +74,38 @@ export class TaskModel extends BaseModel implements Record<string, any> {
 
   isAssignedTo(username: string) {
     return this.AssignedToArr.some(u => u === username);
+  }
+
+  getAssignedUsersList() {
+    return (this.AssignedTo || '')
+      .split(/\s*,\s*/)
+      .filter(userName => userName);
+  }
+
+  getMobileNumbersFromDetail() {
+    return [
+      ...((this.Details || '').match(/(\+91)?\d{10,10}/g) || []),
+      ...((this.Notes || '').match(/(\+91)?\d{10,10}/g) || []),
+    ];
+  }
+
+  getLocationInfoFromDetail() {
+    return [
+      ...((this.Details || '').match(/https:\/\/www.google.com\/maps\/place\/([\d.]+),([\d.]+)/g) || []).map(m => m.match(/(\d+.\d+)/g)),
+      ...((this.Notes || '').match(/https:\/\/www.google.com\/maps\/place\/([\d.]+),([\d.]+)/g) || []).map(m => m.match(/(\d+.\d+)/g)),
+    ];
+  }
+
+  getReminderText(isNew = false) {
+    return `*${isNew ? 'NEW TASK:' : 'UPDATED TASK:'}*
+Assignee: _${this.AssignedTo}_
+Type: _${this.Type}_
+Priority: _${this.Priority}_
+Title: _${this.Title}_
+Details: _${this.Details}_
+Notes: _${this.Notes}_
+Open Date: _${this.OpenDateStr}_
+Done Date: _${this.DoneDateStr}_`;
   }
 
   static DATE_FORMAT = 'DD MMM YYYY hh:mmA';

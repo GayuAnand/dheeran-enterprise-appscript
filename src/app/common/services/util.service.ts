@@ -16,7 +16,7 @@ export class UtilService {
     private settingsService: SettingsService,
   ) {}
 
-  openSnackBar(message: string, action?: string, options: MatSnackBarConfig = {}) {
+  openSnackBar(message: string, action: string = 'Close', options: MatSnackBarConfig = {}) {
     const defaultOptions = Object.assign({
       horizontalPosition: 'center',
       verticalPosition: 'top',

@@ -12,7 +12,8 @@ export class RefreshDataComponent extends BaseComponent implements OnChanges {
   @Input() cacheInfo!: ITimeDiffObservable | null;
 
   /**
-   * 4hrs (60 * 4)
+   * In minutes.
+   * Default: 4hrs (60 * 4)
    */
   @Input() refreshTriggerInterval = 240;
 
@@ -22,7 +23,7 @@ export class RefreshDataComponent extends BaseComponent implements OnChanges {
     if (changes.cacheInfo) {
       this.cacheInfo?.observable.subscribe((info) => {
         if (this.settingsService.isOnline && info.duration > this.refreshTriggerInterval) {
-          // If online and cache duration is greater than 4hrs (60 * 4), trigger refresh.
+          // If online and cache duration is greater than refreshTriggerInterval, trigger refresh.
           this.refresh.emit();
         }
       })

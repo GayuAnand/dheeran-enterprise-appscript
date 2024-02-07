@@ -212,6 +212,10 @@ export class SettingsService implements OnDestroy {
     this.navigationData = navigationData;
   }
 
+  getUserMobileNumber(userName: string) {
+    return this.metadata.loginUsers?.find(user => user.name === userName)?.mobile?.toString() || '';
+  }
+
   getAssetUrl(filename: string) {
     return `${this.assetDomain}/${filename}`;
   }

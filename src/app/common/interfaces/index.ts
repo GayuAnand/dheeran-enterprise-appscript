@@ -368,7 +368,7 @@ export interface IMetadata {
   taskPriority?: ('High' | 'Medium' | 'Low' | string)[],
   taskStatus?: ('Done' | 'Open' | 'Closed' | string)[],
   taskType?: ('Internet Lead' | 'Internet Fault' | 'Cable Lead' | 'Cable Fault' | 'Maintenance' | string)[],
-  loginUsers?: string[],
+  loginUsers?: { name: string, mobile: string | number }[],
   ugWorkType?: string[],
   oltInfo?: IOltInfo[],
 }

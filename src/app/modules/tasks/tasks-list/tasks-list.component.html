@@ -23,15 +23,15 @@
 
 <div class="de-f-aligncenter de-f-justifyright de-m-vbase de-sm-rbase-nolast">
   <button mat-raised-button color="accent" *ngIf="settingsService.isOnline && (activeTaskStatus === 'Open')" (click)="createRecord()"><mat-icon>add</mat-icon>{{TKey.COMMON.ADD}}</button>
-  <de-refresh-data [cacheInfo]="cacheInfo" [refreshTriggerInterval]="4320" (refresh)="refreshData(true)"></de-refresh-data>
+  <de-refresh-data [cacheInfo]="cacheInfo" [refreshTriggerInterval]="60" (refresh)="refreshData(true)"></de-refresh-data>
 </div>
 
-<mat-table matSort [dataSource]="data" matSortActive="Priority" matSortDirection="asc" class="mat-elevation-z8" multiTemplateDataRows>
+<mat-table matSort [dataSource]="data" matSortActive="UiPriority" matSortDirection="asc" class="mat-elevation-z8" multiTemplateDataRows>
   <ng-container matColumnDef="{{column}}" *ngFor="let column of displayedColumns">
     <mat-header-cell mat-sort-header *matHeaderCellDef [ngClass]="'de-f-justifycenter'">
       <ng-container [ngSwitch]="column">
         <ng-container *ngSwitchCase="'ACTIONS'"></ng-container>
-        <ng-container *ngSwitchCase="'Priority'"></ng-container>
+        <ng-container *ngSwitchCase="'UiPriority'"></ng-container>
         <ng-container *ngSwitchCase="'Type'"></ng-container>
         <ng-container *ngSwitchCase="durationColName">{{TKey.COMMON.DURATION}}</ng-container>
         <ng-container *ngSwitchDefault>{{column}}</ng-container>
@@ -40,8 +40,8 @@
 
     <mat-cell *matCellDef="let element" [ngClass]="getCellClassNames(element, column)">
       <ng-container [ngSwitch]="column">
-        <ng-container *ngSwitchCase="'Priority'">
-          <mat-icon [ngClass]="{ 'danger-text': element[column] === 'High', 'warning-text': element[column] === 'Medium', 'primary-text': element[column] === 'Low' }">stars</mat-icon>
+        <ng-container *ngSwitchCase="'UiPriority'">
+          <mat-icon [ngClass]="{ 'danger-text': element[column] === 'High', 'warning-text': element[column] === 'Intermediate', 'primary-text': element[column] === 'Low' }">stars</mat-icon>
         </ng-container>
 
         <ng-container *ngSwitchCase="'Type'">
@@ -134,10 +134,61 @@
 </de-dialog>
 
 <ng-template #taskDetailViewReadOnly let-record>
-  <table class="de-w-full">
+  <table class="de-w-full details-table">
     <tr *ngFor="let col of detailViewInfo">
-      <td style="min-width: 90px; max-width: 120px;">{{col}}: </td>
-      <td [ngClass]="{ 'bold-text': col === 'Priority', 'danger-text': record[col] === 'High', 'warning-text': record[col] === 'Medium', 'primary-text': record[col] === 'Low' }">{{record[col + 'Str'] || record[col]}}</td>
+      <td>{{col}}: </td>
+
+      <ng-container [ngSwitch]="col">
+        <td *ngSwitchCase="'Reminders'" class="reminders-cell de-f-aligncenter de-sm-rsmall-nolast">
+          <button mat-raised-button (click)="sendTaskReminder(record, true, true)"><mat-icon class="reminder-icon" svgIcon="whatsappreminder"></mat-icon>FTTH New</button>
+          <button mat-raised-button (click)="sendTaskReminder(record, true, false)"><mat-icon class="reminder-icon" svgIcon="whatsappreminder"></mat-icon>FTTH Updated</button>
+          <button mat-raised-button (click)="sendTaskReminder(record, false, true)"><mat-icon class="reminder-icon" svgIcon="whatsappreminder"></mat-icon>UG New</button>
+          <button mat-raised-button (click)="sendTaskReminder(record, false, false)"><mat-icon class="reminder-icon" svgIcon="whatsappreminder"></mat-icon>UG Updated</button>
+        </td>
+
+        <td *ngSwitchCase="'Priority'" class="bold-text" [ngClass]="{ 'danger-text': record[col] === 'High', 'warning-text': record[col] === 'Medium', 'primary-text': record[col] === 'Low' }">{{record[col]}}</td>
+
+        <ng-container *ngSwitchCase="'More Details'">
+          <td>
+            <div class="de-f-aligncenter de-sm-rsmall-nolast" *ngFor="let mobile of record.getMobileNumbersFromDetail()">
+              <de-copyable-text [text]="mobile"></de-copyable-text>
+              <div class="de-f-aligncenter de-sm-rbase-nolast">
+                <de-mobile-number [mobile]="mobile" displayType="CALL"></de-mobile-number>
+                <de-mobile-number [mobile]="mobile" displayType="WHATSAPP"></de-mobile-number>
+              </div>
+            </div>
+
+            <div class="de-f-aligncenter" *ngFor="let locationInfo of record.getLocationInfoFromDetail()">
+              <a [href]="geolocationService.getGoogleLocationUrl(locationInfo[0], locationInfo[1])" class="de-if-aligncenter" target="_blank">
+                <mat-icon>location_on</mat-icon>
+              </a>
+
+              <de-copyable-text
+                [text]="geolocationService.getGoogleLocationUrl(locationInfo[0], locationInfo[1])"
+                displayText="{{TKey.COMMON.LAT_ABBR}}: {{locationInfo[0] || 0}}, {{TKey.COMMON.LON_ABBR}}: {{locationInfo[1] || 0}}">
+              </de-copyable-text>
+            </div>
+          </td>
+        </ng-container>
+
+        <td *ngSwitchCase="'AssignedTo'">
+          <div class="de-f-aligncenter de-sm-rsmall-nolast" *ngFor="let userInfo of getAssignedUsersInfo(record)">
+            <ng-container *ngIf="!userInfo.mobile">{{userInfo.name}}</ng-container>
+
+            <ng-container *ngIf="userInfo.mobile">
+              <de-copyable-text [text]="userInfo.mobile" [displayText]="userInfo.name"></de-copyable-text>
+              <div class="de-f-aligncenter de-sm-rbase-nolast">
+                <de-mobile-number [mobile]="userInfo.mobile" displayType="CALL"></de-mobile-number>
+                <de-mobile-number [mobile]="userInfo.mobile" displayType="WHATSAPP"></de-mobile-number>
+              </div>
+            </ng-container>
+          </div>
+        </td>
+
+        <ng-container *ngSwitchDefault>
+          <td>{{record[col + 'Str'] || record[col]}}</td>
+        </ng-container>
+      </ng-container>
     </tr>
   </table>
 </ng-template>
@@ -160,7 +211,7 @@
   <mat-form-field [ngClass]="{ 'readonly': !authService.isTasksAdmin() }">
     <mat-label>{{TKey.COMMON.ASSIGNED_TO}}</mat-label>
     <mat-select [(ngModel)]="record.AssignedToArr" multiple>
-      <mat-option *ngFor="let person of loginUsers" [value]="person">{{person}}</mat-option>
+      <mat-option *ngFor="let person of loginUsers" [value]="person.name">{{person.name}}</mat-option>
     </mat-select>
   </mat-form-field>
 

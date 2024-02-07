@@ -36,6 +36,7 @@ export class TasksListComponent extends BaseComponent {
   taskColumns = this.settingsService.metadata.sheetsInfo?.TASKS?.cols;
 
   detailViewInfo = [
+    'Reminders',
     this.taskColumns?.TYPE?.label || '',
     this.taskColumns?.PRIORITY?.label || '',
     this.taskColumns?.TITLE?.label || '',
@@ -44,10 +45,11 @@ export class TasksListComponent extends BaseComponent {
     this.taskColumns?.NOTES?.label || '',
     this.taskColumns?.OPENDATE?.label || '',
     this.taskColumns?.DONEDATE?.label || '',
+    'More Details',
   ];
 
   allColumns = [
-    this.taskColumns?.PRIORITY?.label || '',
+    'UiPriority',
     this.taskColumns?.TYPE?.label || '',
     this.taskColumns?.TITLE?.label || '',
     this.durationColName,
@@ -70,7 +72,7 @@ export class TasksListComponent extends BaseComponent {
 
   tasksStatus = this.settingsService.metadata.taskStatus;
 
-  loginUsers = this.settingsService.metadata.loginUsers?.filter(u => !u.match(/(test|service)/i));
+  loginUsers = this.settingsService.metadata.loginUsers?.filter(u => !u.name.match(/(test|service)/i));
 
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -86,6 +88,7 @@ export class TasksListComponent extends BaseComponent {
 
     if (!this.authService.isTasksAdmin()) {
       this.tasksStatus = this.settingsService.metadata.taskStatus?.slice(0, this.settingsService.metadata.taskStatus.length - 1);
+      this.detailViewInfo.shift();
     }
   }
 
@@ -223,6 +226,19 @@ export class TasksListComponent extends BaseComponent {
 
   toggleExpandedRow(row: TaskModel) {
     this.expandedElement = this.expandedElement === row ? null : row;
+  }
+
+  getAssignedUsersInfo(record: TaskModel) {
+    return record.getAssignedUsersList()
+      .map(userName => ({
+        name: userName,
+        mobile: this.settingsService.getUserMobileNumber(userName),
+      }));
+  }
+
+  async sendTaskReminder(record: TaskModel, isFTTHGroup: boolean, isNew = false) {
+    await this.utilService.copyToClipboard(record.getReminderText(isNew));
+    window.open(isFTTHGroup ? 'https://chat.whatsapp.com/JH13RCt5pu8JkmFkiQgDif' : 'https://chat.whatsapp.com/GvB66u4eL3THScCIsuK9NY', '_blank');
   }
 
   selectedTabChange(e: MatTabChangeEvent) {

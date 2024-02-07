@@ -22,3 +22,20 @@ mat-header-cell:first-child:not([colspan="10"]), mat-cell:first-child:not([colsp
 table {
   line-height: 24px;
 }
+
+.details-table {
+  td:first-child {
+    max-width: 120px;
+    min-width: 90px;
+  }
+}
+
+.reminders-cell button {
+  padding: 0px 12px;
+}
+
+mat-icon.reminder-icon {
+  font-size: 36px;
+  height: 36px;
+  width: 36px;
+}
