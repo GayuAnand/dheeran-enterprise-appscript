@@ -98,14 +98,23 @@ export class TaskModel extends BaseModel implements Record<string, any> {
 
   getReminderText(isNew = false) {
     return `*${isNew ? 'NEW TASK:' : 'UPDATED TASK:'}*
+
 Assignee: _${this.AssignedTo}_
+
 Type: _${this.Type}_
+
 Priority: _${this.Priority}_
+
 Title: _${this.Title}_
+
 Details: _${this.Details}_
-Notes: _${this.Notes}_
+${this.Notes ? `
+_` + this.Notes + `_
+` : ''}
 Open Date: _${this.OpenDateStr}_
-Done Date: _${this.DoneDateStr}_`;
+${this.DoneDateStr ? `
+_` + this.DoneDateStr + `_
+` : ''}`;
   }
 
   static DATE_FORMAT = 'DD MMM YYYY hh:mmA';
