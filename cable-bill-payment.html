@@ -168,9 +168,6 @@
   renderLoadingScreen();
 
   function renderDetailsPage(customerDetails) {
-    const title = React.createElement('p', { className: 'title' }, 'Cable Bill Payment');
-    const name = React.createElement('p', { class: 'info' }, 'Cable Bill Payment');
-
     render(<>
   <p class="title">Cable Bill Payment</p>
   <p class="info"><span>Name: </span><span>{customerDetails.Name}</span></p>
