@@ -45,6 +45,7 @@ export const EN_MAPPING = {
     MOBILE: 'Mobile',
     MONTHS: 'Months',
     NAME: 'Name',
+    NKL_CABLE: 'Nkl Cable',
     NO: 'No',
     NOTES: 'Notes',
     OFFLINE_UPDATES: 'Offline Updates',

@@ -9,11 +9,10 @@ function getApiUrl() {
 
 async function callGsheetApi(functionName, parameters) {
   const url = `${getApiUrl()}?api=1&functionName=${functionName}&functionParameters=${encodeURIComponent(JSON.stringify(parameters))}&rawData=1`;
-  return await CommonImportUtil.Fetch(url, {
+  return await CommonImportUtil.FetchJson(url, {
     redirect: 'follow',
     follow: 10,
-  })
-    .then(res => res.json());
+  });
 }
 
 async function postGsheetData(payload) {
@@ -27,6 +26,10 @@ async function postGsheetData(payload) {
     .then(res => res.text());
 }
 
+async function saveOrUpdateRecordById(sheetName, idColumns, data) {
+  return await callGsheetApi('saveOrUpdateRecordById', [sheetName, idColumns, data, GSHEET_SERVICE_TOKEN]);
+}
+
 async function getSheetData(sheetName) {
   return await callGsheetApi('getSheetData', [sheetName, GSHEET_SERVICE_TOKEN]);
 }
@@ -34,4 +37,5 @@ async function getSheetData(sheetName) {
 module.exports = exports = {
   getSheetData,
   postGsheetData,
+  saveOrUpdateRecordById,
 };

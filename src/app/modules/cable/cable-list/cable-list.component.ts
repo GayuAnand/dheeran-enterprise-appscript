@@ -1,6 +1,7 @@
 import * as L from 'leaflet';
 import { marker } from 'leaflet';
 import { concatMap, map } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 import { debounce } from 'typescript-debounce-decorator';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
@@ -41,6 +42,8 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
   ];
 
   displayedColumns: string[] = [];
+
+  nklAccount = false;
 
   viewType: 'table_view' | 'map_view' = 'table_view';
 
@@ -92,9 +95,11 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(
+    private routeSnapshot: ActivatedRoute,
     private cableService: CableService,
   ) {
     super();
+    this.nklAccount = !!this.routeSnapshot.snapshot.data.nklAccount;
   }
 
   ngOnInit(): void {
@@ -123,6 +128,11 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     this.cacheInfo?.destroy();
   }
 
+  getCustomerSheetLabel() {
+    const sheetsInfo = this.settingsService.metadata.sheetsInfo;
+    return this.nklAccount ? sheetsInfo?.NKLCUSTOMERS.label : sheetsInfo?.CUSTOMERS.label;
+  }
+
   getLatLng(customer: CustomerModel) {
     this.processingLatLng = true;
     this.geolocationService.getCurrentPosition()
@@ -144,16 +154,16 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
 
   refreshData(force = false, resetFilters = false) {
     this.settingsService.processingText = `Refreshing data...`;
-    this.apiGSheetDataService.getSheetData<CustomerModel>(this.settingsService.metadata.sheetsInfo?.CUSTOMERS.label as string, CustomerModel, force)
+    this.apiGSheetDataService.getSheetData<CustomerModel>(this.getCustomerSheetLabel() as string, CustomerModel, force)
       .pipe(
-        concatMap((res) => this.getRefreshCacheInfo(`SHEET_${this.settingsService.metadata.sheetsInfo?.CUSTOMERS.label}` as string, this.cacheInfo)
+        concatMap((res) => this.getRefreshCacheInfo(`SHEET_${this.getCustomerSheetLabel()}` as string, this.cacheInfo)
           .pipe(
             map((value) => {
               this.cacheInfo = value;
               return res;
             }))
           ),
-        concatMap((res) => this.storageService.getCableOfflieData()
+        concatMap((res) => this.storageService.getCableOfflieData(this.nklAccount)
           .pipe(
             map((offlineDataArr) => {
               this.fullData = res;
@@ -411,6 +421,10 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     // No collection yet, no collection by and settlement information
     return (!editCustomerOrig[month] && !editCustomerOrig.getCollectionBy(month) && !editCustomerOrig.getSettlementDate(month));
   }
+
+  isCableAdmin() {
+    return this.nklAccount ? this.authService.isNklCableAdmin() : this.authService.isCableAdmin();
+  }
   
   checkUpdateCollections(offlineUpdate = false) {
     try {
@@ -451,7 +465,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
             payload[this.editCustomer.getCollectionDateKey(month)] = this.editCustomer.formatDate(Date.now());
           }
           payload[this.editCustomer.getNotesKey(month)] = this.editCustomer.getNotes(month) || '';
-        } else if (this.authService.isCableAdmin() &&
+        } else if (this.isCableAdmin() &&
           (this.editCustomer[month] != editCustomerOrig[month]) || (this.editCustomer.getNotes(month) != editCustomerOrig.getNotes(month))) {
           payload[month] = this.editCustomer[month];
           payload[this.editCustomer.getNotesKey(month)] = this.editCustomer.getNotes(month) || '';
@@ -469,13 +483,13 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
       }
 
       if (offlineUpdate) {
-        this.cableService.saveOfflineUpdate(payload);
+        this.cableService.saveOfflineUpdate(payload, this.nklAccount);
         this.mergeOfflineData(payload);
         this.hideEditDetailsDialog();
       } else {
         this.settingsService.processingText = `Updating '${editCustomerOrig?.Name}'...`;
         
-        this.cableService.saveCollectionUpdates(payload, (err: any) => {
+        this.cableService.saveCollectionUpdates(payload, false, (err: any) => {
           this.settingsService.processingText = '';
           if (err) {
             this.utilService.openErrorSnackBar(err, 'Close');

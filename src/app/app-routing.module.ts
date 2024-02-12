@@ -20,6 +20,12 @@ const routes: Routes = [
         canActivate: [RoleGuard(IApps.CABLE)],
       },
       {
+        path: 'nklcable',
+        loadChildren: () => import('./modules/nklcable').then((m) => m.NklCableModule),
+        canActivate: [RoleGuard(IApps.NKLCABLE)],
+        data: { nklAccount: true },
+      },
+      {
         path: 'bsnl',
         loadChildren: () => import('./modules/bsnl').then((m) => m.BSNLConnectModule),
         canActivate: [RoleGuard(IApps.BSNL)],

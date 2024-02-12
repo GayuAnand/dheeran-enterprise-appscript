@@ -26,6 +26,10 @@ export class AuthService {
     return this.hasPermission(IApps.CABLE, IRoleValue.ADMIN);
   }
 
+  isNklCableAdmin() {
+    return this.hasPermission(IApps.NKLCABLE, IRoleValue.ADMIN);
+  }
+
   isBSNLAdmin() {
     return this.hasPermission(IApps.BSNL, IRoleValue.ADMIN);
   }
@@ -40,6 +44,10 @@ export class AuthService {
 
   hasAnyCablePermission() {
     return this.hasAnyPermission(IApps.CABLE);
+  }
+
+  hasAnyNklCablePermission() {
+    return this.hasAnyPermission(IApps.NKLCABLE);
   }
 
   hasAnyBSNLPermission() {

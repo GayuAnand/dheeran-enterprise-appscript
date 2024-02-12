@@ -7,12 +7,17 @@ import { CustomerModel } from '../models';
 
 const INFO_JSON_KEY = 'info.json';
 const CABLE_OFFLINE_UPDATE_FILENAME = 'cable-offline-update.json';
+const NKL_CABLE_OFFLINE_UPDATE_FILENAME = 'nkl-cable-offline-update.json';
 
 @Injectable()
 export class ApiStorageService {
   isNative = Capacitor.isNativePlatform();
 
   constructor(private fs: ApiFileSystemService) {}
+
+  getOfflineCableFilename(nklAccount = false) {
+    return nklAccount ? NKL_CABLE_OFFLINE_UPDATE_FILENAME : CABLE_OFFLINE_UPDATE_FILENAME;
+  }
 
   setData<T>(key: string, data: T): Observable<T> {
     let retval = of(data);
@@ -61,25 +66,27 @@ export class ApiStorageService {
     return retval;
   }
 
-  getCableOfflieData(): Observable<any[]> {
+  getCableOfflieData(nklAccount = false): Observable<any[]> {
     let retval = of([] as any[]);
+    const cableOfflineUpdateFilename = this.getOfflineCableFilename(nklAccount);
 
     try {
       if (this.isNative) {
-        retval = from(this.fs.readDataFromFile<any[]>(CABLE_OFFLINE_UPDATE_FILENAME));
+        retval = from(this.fs.readDataFromFile<any[]>(cableOfflineUpdateFilename));
       } else {
-        retval = of(JSON.parse(localStorage.getItem(CABLE_OFFLINE_UPDATE_FILENAME) || '[]'));
+        retval = of(JSON.parse(localStorage.getItem(cableOfflineUpdateFilename) || '[]'));
       }
     } catch (e) {
-      console.error(`Error in getting '${CABLE_OFFLINE_UPDATE_FILENAME}' data.`);
+      console.error(`Error in getting '${cableOfflineUpdateFilename}' data.`);
     }
 
     return retval;
   }
 
-  updateCableOfflineData(payload: CustomerModel | CustomerModel[], idKey: keyof CustomerModel, reset = false) {
+  updateCableOfflineData(payload: CustomerModel | CustomerModel[], idKey: keyof CustomerModel, reset = false, nklAccount = false) {
     payload = Array.isArray(payload) ? payload : [payload];
     let retval = of([] as any[]);
+    const cableOfflineUpdateFilename = this.getOfflineCableFilename(nklAccount);
 
     function mergeData(oldData: any[]) {
       oldData = oldData || [];
@@ -98,17 +105,17 @@ export class ApiStorageService {
 
     try {
       if (this.isNative) {
-        retval = this.getCableOfflieData()
+        retval = this.getCableOfflieData(nklAccount)
           .pipe(
             map((data) => mergeData(reset ? [] : data)),
-            concatMap((data) => this.fs.writeDataToFile<any[]>(CABLE_OFFLINE_UPDATE_FILENAME, data))
+            concatMap((data) => this.fs.writeDataToFile<any[]>(cableOfflineUpdateFilename, data))
           );
       } else {
-        localStorage.setItem(CABLE_OFFLINE_UPDATE_FILENAME, JSON.stringify(mergeData(reset ? [] : JSON.parse(localStorage.getItem(CABLE_OFFLINE_UPDATE_FILENAME) || '[]'))));
+        localStorage.setItem(cableOfflineUpdateFilename, JSON.stringify(mergeData(reset ? [] : JSON.parse(localStorage.getItem(cableOfflineUpdateFilename) || '[]'))));
       }
-      retval = retval.pipe(concatMap(() => this.getCableOfflieData()));
+      retval = retval.pipe(concatMap(() => this.getCableOfflieData(nklAccount)));
     } catch(e) {
-      console.error(`Error in setting data to file '${CABLE_OFFLINE_UPDATE_FILENAME}'.`);
+      console.error(`Error in setting data to file '${cableOfflineUpdateFilename}'.`);
     }
 
     return retval;

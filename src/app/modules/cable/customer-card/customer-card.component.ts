@@ -11,7 +11,13 @@ import { CustomerModel } from 'src/app/models';
 export class CustomerCardComponent extends BaseComponent {
   @Input() customer!: CustomerModel;
 
+  @Input() nklAccount = false;
+
   showPaymentQrCode = false;
 
   showMiniMap = false;
+
+  isCableAdmin() {
+    return this.nklAccount ? this.authService.isNklCableAdmin() : this.authService.isCableAdmin();
+  }
 }

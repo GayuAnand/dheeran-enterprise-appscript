@@ -4,11 +4,12 @@ import { NestedTreeControl } from '@angular/cdk/tree';
 import { Injectable, NgZone, OnDestroy } from '@angular/core';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
 
-import { IApps, IMetadata } from '../interfaces';
+import { IMetadata } from '../interfaces';
+import { AuthService } from './auth.service';
 import { EventService } from './event.service';
 import versionInfo from './../../../versionInfo.json';
+import { environment } from 'src/environments/environment';
 import { EN_MAPPING } from './../../../../src/assets/i18n/en.mapping';
-import { AuthService } from './auth.service';
 
 export interface NavMenuItem {
   name: string;
@@ -93,7 +94,7 @@ export class SettingsService implements OnDestroy {
     private eventService: EventService,
   ) {
     this.init();
-    console.log(this);
+    if (!environment.production) console.log(this);
   }
 
   ngOnDestroy(): void {
@@ -134,6 +135,26 @@ export class SettingsService implements OnDestroy {
           {
             name: EN_MAPPING.COMMON.OFFLINE_UPDATES,
             routerLink: ['/app/cable/offline-updates'],
+          },
+        ]
+      });
+    }
+
+    if (this.authService.hasAnyNklCablePermission()) {
+      navigationData.push({
+        name: EN_MAPPING.COMMON.NKL_CABLE,
+        children: [
+          {
+            name: EN_MAPPING.COMMON.LIST,
+            routerLink: ['/app/nklcable/list'],
+          },
+          {
+            name: EN_MAPPING.COMMON.STATISTICS,
+            routerLink: ['/app/nklcable/statistics'],
+          },
+          {
+            name: EN_MAPPING.COMMON.OFFLINE_UPDATES,
+            routerLink: ['/app/nklcable/offline-updates'],
           },
         ]
       });

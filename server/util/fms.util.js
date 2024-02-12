@@ -64,14 +64,11 @@ async function getAllFranchiseCustomerAccounts() {
  * @returns 
  */
 async function getFaults(franchise, faultType = 'DEFAULT') {
-  return await CommonImportUtil.Fetch(`https://fms.bsnl.in/${faultType === 'MSO' ? 'fetchMSOFaultOrders' : 'fetchFaultOrdersMs'}`, {
+  return await CommonImportUtil.FetchJson(`https://fms.bsnl.in/${faultType === 'MSO' ? 'fetchMSOFaultOrders' : 'fetchFaultOrdersMs'}`, {
       method: 'POST',
       body: `userName=${franchise}`,
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-      },
+      headers: CommonImportUtil.HEADER_FORMURLENCODED,
     })
-    .then(res => res.json())
     .then((jsonRes) => {
       Util.addCustomInfoToDataObj(jsonRes, { FAULT_TYPE: faultType });
       return jsonRes;
@@ -119,8 +116,81 @@ async function getAllFranchiseFaults() {
 //   "credentials": "include"
 // });
 
+function parsePhoneNumber(str = '') {
+  return str.replace(/[^\d]/g, '');
+}
+
+async function getBillView(phoneNumber) {
+  return await CommonImportUtil.FetchJson(`https://portal.bsnl.in/myBsnlApp/rest/billsummary/svctype/CDR/phoneno/${parsePhoneNumber(phoneNumber)}`).then(val => val?.ROWSET?.ROW?.[0] || val);
+}
+
+async function getStatement(phoneNumber) {
+  const billView = await getBillView(phoneNumber);
+  if (billView.REMARKS) {
+    throw new Error(billView.REMARKS);
+  }
+
+  const body = {
+      StatementIdentifier: 'HTML',
+      SystemIdentifier: 'CWSC',
+      InvoiceDate: billView.INVOICE_DATE, // 20240203
+      InvoiceNumber: billView.INVOICE_NO, // SDCTN0073580356
+      BillingAccountNumber: billView.ACCOUNT_NO, // 9039976354
+      SSACode: billView.SSA_CODE, // SLM
+      // InvoiceDate: '20240203', // 20240203
+      // InvoiceNumber: 'SDCTN0077791956', // SDCTN0073580356
+      // BillingAccountNumber: '9039976354', // 9039976354
+      // SSACode: 'SLM', // SLM
+  };
+
+  return await CommonImportUtil.FetchText(`https://mybillview.bsnl.co.in/BSNLSelfcare_OntheFlyV1.0.6/CRSOntheFlyService/OntheFly/statement`, {
+      method: 'POST',
+      headers: CommonImportUtil.HEADER_FORMURLENCODED,
+      body: CommonImportUtil.FetchObjToUrlEncodedStr(body)
+  });
+}
+
+function parseStatementCharges(statement) {
+  const charges = {};
+  let [_, ccChargesType, ccCharges] = statement.replace(/[^ -~]/g, '').match(/var\s+ccSummary\s*=\s*(.*)?\s*;\s*var\s+ccValue\s*=\s*(.*)?\s*;\s*var\s+categoriesArray/);
+  ccChargesType = JSON.parse(ccChargesType.replace(',]', ']'));
+  ccCharges = JSON.parse(ccCharges.replace(',]', ']'));
+  ccChargesType.forEach((charge, index) => charges[charge] = ccCharges[index]);
+  return charges;
+}
+
+function parseStatementPlanInfo(statement) {
+  let [_, planInfo] = statement.split('TARRIF PLAN')[1].replace(/[^ -~]/g, '').match(/<p.*?>([^<>]*)<\/p>/);
+  return planInfo;
+}
+
+function parseDataVoiceUsage(statement) {
+  let [_any1, months, voiceUsage, dataUsage] = statement.replace(/[^ -~]/g, '').match(/var\s+categoriesArray\s*=\s*(.*)?\s*;\s*var\s+data1\s*=\s*(.*)?\s*;\s*var\s+data2\s*=\s*(.*?);/);
+  // months = JSON.parse(months.replace(',]', ']'));
+  // voiceUsage = JSON.parse(voiceUsage.replace(',]', ']'));
+  // dataUsage = JSON.parse(dataUsage.replace(',]', ']'));
+  return { months, voiceUsage, dataUsage };
+}
+
+function getStatementInfo(statement) {
+  const retval = {};
+  Object.assign(retval, parseStatementCharges(statement));
+  Object.assign(retval, parseDataVoiceUsage(statement));
+  Object.assign(retval, { Plan: parseStatementPlanInfo(statement) });
+  return retval;
+}
+
 module.exports = exports = {
   FRANCHISES,
+
+  parsePhoneNumber,
+  parseDataVoiceUsage,
+  parseStatementCharges,
+  parseStatementPlanInfo,
+
+  getBillView,
+  getStatement,
+  getStatementInfo,
 
   getCustomerServiceAccounts,
   getAllCustomerAccounts,

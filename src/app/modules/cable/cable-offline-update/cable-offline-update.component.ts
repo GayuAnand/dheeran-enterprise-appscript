@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { BaseComponent } from 'src/app/common';
 import { CableService } from '../cable.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'de-cable-offline-update',
@@ -11,10 +12,14 @@ import { CableService } from '../cable.service';
 export class CableOfflineUpdateComponent extends BaseComponent implements OnInit {
   offlineUpdateData: any[] = [];
 
+  nklAccount = false;
+
   constructor(
+    private routeSnapshot: ActivatedRoute,
     private cableService: CableService,
   ) {
     super();
+    this.nklAccount = !!this.routeSnapshot.snapshot.data.nklAccount;
   }
 
   ngOnInit(): void {
@@ -24,7 +29,7 @@ export class CableOfflineUpdateComponent extends BaseComponent implements OnInit
   }
 
   refreshOfflineData() {
-    this.storageService.getCableOfflieData()
+    this.storageService.getCableOfflieData(this.nklAccount)
       .subscribe({
         next: (data) => this.offlineUpdateData = data,
         error: (err) => this.utilService.openErrorSnackBar(`Error in getting cable offline update data. ERROR: '${err}'.`, 'Close'),
@@ -32,6 +37,6 @@ export class CableOfflineUpdateComponent extends BaseComponent implements OnInit
   }
 
   syncOfflineUpdates() {
-    this.cableService.syncOfflineUpdates();
+    this.cableService.syncOfflineUpdates(this.nklAccount);
   }
 }

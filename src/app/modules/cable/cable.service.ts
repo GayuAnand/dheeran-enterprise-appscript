@@ -17,6 +17,10 @@ export class CableService {
     return this.settingsService.metadata.sheetsInfo?.CUSTOMERS.label as keyof CustomerModel;
   }
 
+  get nklCustomerSheetName(): keyof CustomerModel {
+    return this.settingsService.metadata.sheetsInfo?.NKLCUSTOMERS.label as keyof CustomerModel;
+  }
+
   constructor(
     private utilService: UtilService,
     private settingsService: SettingsService,
@@ -24,10 +28,17 @@ export class CableService {
     private apiGSheetDataService: ApiGSheetDataService,
   ) {}
 
-  
-  saveCollectionUpdates(payload: CustomerModel, callback: (err?: any) => any) {
+  getCustomerSheetName(nklAccount = false) {
+    if (nklAccount) {
+      return this.nklCustomerSheetName;
+    } else {
+      return this.customerSheetName;
+    }
+  }
+
+  saveCollectionUpdates(payload: CustomerModel, nklAccount = false, callback: (err?: any) => any) {
     this.apiGSheetDataService.saveOrUpdateRecord(
-      this.customerSheetName,
+      this.getCustomerSheetName(nklAccount),
       [this.customerIdLabel as string],
       payload
     )
@@ -42,8 +53,8 @@ export class CableService {
       });
   }
 
-  saveOfflineUpdate(payload: CustomerModel) {
-    this.storageService.updateCableOfflineData(payload, this.customerIdLabel)
+  saveOfflineUpdate(payload: CustomerModel, nklAccount = false) {
+    this.storageService.updateCableOfflineData(payload, this.customerIdLabel, false, nklAccount)
       .subscribe({
         next: (data) => {
           this.utilService.openSnackBar(`Successfully saved '${payload?.Name}' to offline data.`, 'Close');
@@ -54,17 +65,17 @@ export class CableService {
       });
   }
 
-  syncOfflineUpdates() {
+  syncOfflineUpdates(nklAccount = false) {
     let offlineData: any[] = [];
 
-    this.storageService.getCableOfflieData()
+    this.storageService.getCableOfflieData(nklAccount)
       .pipe(
         concatMap((data) => {
           offlineData = data || [];
           return from(data)
             .pipe(
               mergeMap((datum) => {
-                return this.apiGSheetDataService.saveOrUpdateRecord(this.customerSheetName, [this.customerIdLabel as string], datum)
+                return this.apiGSheetDataService.saveOrUpdateRecord(this.getCustomerSheetName(nklAccount), [this.customerIdLabel as string], datum)
                   .pipe(
                     map((savedData) => {
                       // Remove successfully saved data from offlineData
@@ -79,13 +90,13 @@ export class CableService {
             )
         }),
         concatMap((savedData) => {
-          return this.storageService.updateCableOfflineData(offlineData, this.customerIdLabel, true)
+          return this.storageService.updateCableOfflineData(offlineData, this.customerIdLabel, true, nklAccount)
             .pipe(map(() => {
               this.offlineDataUpdated$.next(true);
               return savedData;
             }));
         }),
-        finalize(() => this.apiGSheetDataService.getSheetData<CustomerModel>(this.settingsService.metadata.sheetsInfo?.CUSTOMERS.label as string, CustomerModel, true)
+        finalize(() => this.apiGSheetDataService.getSheetData<CustomerModel>(this.getCustomerSheetName(nklAccount) as string, CustomerModel, true)
           .subscribe()
         )
       )
@@ -95,7 +106,7 @@ export class CableService {
         },
         error: (err) => this.utilService.openErrorSnackBar(`Error in syncing offline changes. ERROR: '${err}'.`, 'Close'),
         complete: () => {
-          this.storageService.updateCableOfflineData(offlineData, this.customerIdLabel, true);
+          this.storageService.updateCableOfflineData(offlineData, this.customerIdLabel, true, nklAccount);
         }
       });
   }

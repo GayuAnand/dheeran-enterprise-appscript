@@ -7,9 +7,7 @@ async function login(olt) {
     redirect: 'follow',
     follow: 10,
     rejectUnauthorized: false,
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-    },
+    headers: CommonImportUtil.HEADER_FORMURLENCODED,
     body: 'user=admin&pass=ljso8@DR&button=Login&who=100'
   })
     .then(r => r.text());
@@ -78,9 +76,7 @@ async function getOnuList(olt, includeDetails = false) {
       getOltPageUrl(olt, CommonImportUtil.CONSTANTS.OLT_PAGES.ONUAUTHINFO),
       "POST",
       `select=255&SessionKey=${SessionKey}`,
-      {
-        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-      }
+      CommonImportUtil.HEADER_FORMURLENCODED
     );
 
     const { document } = (new CommonImportUtil.JSDOM(onulist)).window;

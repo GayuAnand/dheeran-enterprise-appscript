@@ -3,6 +3,7 @@ import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 
 import { BaseComponent } from 'src/app/common';
 import { CustomerModel } from 'src/app/models';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'de-cable-statistics',
@@ -23,6 +24,8 @@ export class CableStatisticsComponent extends BaseComponent implements OnInit, A
   };
 
   collectionType: 'month' | 'collectionDate' = 'month';
+
+  nklAccount = false;
 
   chartType = 'line';
 
@@ -65,6 +68,13 @@ export class CableStatisticsComponent extends BaseComponent implements OnInit, A
     },
     data: []
   };
+
+  constructor(
+    private routeSnapshot: ActivatedRoute,
+    ) {
+    super();
+    this.nklAccount = !!this.routeSnapshot.snapshot.data.nklAccount;
+  }
 
   ngOnInit(): void {
     this.settingsService.pageTitle = this.TKey.COMMON.CABLE;
@@ -127,11 +137,16 @@ export class CableStatisticsComponent extends BaseComponent implements OnInit, A
     this.renderChart();
   }
 
+  getCustomerSheetLabel() {
+    const sheetsInfo = this.settingsService.metadata.sheetsInfo;
+    return this.nklAccount ? sheetsInfo?.NKLCUSTOMERS.label : sheetsInfo?.CUSTOMERS.label;
+  }
+
   refreshRawData(force = false): void {
     this.settingsService.processingText = `Refreshing data...`;
-    this.apiGSheetDataService.getSheetData<CustomerModel>(this.settingsService.metadata.sheetsInfo?.CUSTOMERS.label as string, CustomerModel, force)
+    this.apiGSheetDataService.getSheetData<CustomerModel>(this.getCustomerSheetLabel() as string, CustomerModel, force)
       .pipe(
-        concatMap((res) => this.getRefreshCacheInfo(`SHEET_${this.settingsService.metadata.sheetsInfo?.CUSTOMERS.label}` as string, this.cacheInfo)
+        concatMap((res) => this.getRefreshCacheInfo(`SHEET_${this.getCustomerSheetLabel()}` as string, this.cacheInfo)
           .pipe(
             map((value) => {
               this.cacheInfo = value;

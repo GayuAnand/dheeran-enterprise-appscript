@@ -25,6 +25,14 @@ export class DashboardComponent extends BaseComponent implements OnInit {
       })
     }
 
+    if (this.authService.hasAnyNklCablePermission()) {
+      this.cards.push({
+        routerLink: '../nklcable',
+        icon: 'cable',
+        text: this.TKey.COMMON.NKL_CABLE,
+      })
+    }
+
     if (this.authService.hasAnyBSNLPermission()) {
       this.cards.push({
         routerLink: '../bsnl',

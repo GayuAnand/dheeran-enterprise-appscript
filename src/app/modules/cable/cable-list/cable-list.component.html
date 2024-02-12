@@ -35,7 +35,7 @@
     </mat-select>
   </mat-form-field>
 
-  <button *ngIf="authService.isCableAdmin() && settingsService.configurations.showCableCSVExport" mat-raised-button color="primary" (click)="exportQrCSV()" class="de-f-grow">
+  <button *ngIf="isCableAdmin() && settingsService.configurations.showCableCSVExport" mat-raised-button color="primary" (click)="exportQrCSV()" class="de-f-grow">
     <mat-icon matPrefix>payments</mat-icon>
     Export QR CSV
   </button>
@@ -196,6 +196,7 @@
           </div>
           <de-customer-card
             [customer]="element"
+            [nklAccount]="nklAccount"
             [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'"
             (onCustomerUpdate)="refreshData(true)"
           >
@@ -238,7 +239,7 @@
           <td>{{month}}</td>
           <td>{{editCustomer.getCollectionDateStrFormat(month)}}</td>
           <td>
-            <ng-container [ngSwitch]="authService.isCableAdmin() || canEditMonth(month)">
+            <ng-container [ngSwitch]="isCableAdmin() || canEditMonth(month)">
               <ng-container *ngSwitchCase="true">
                 <input type="number" [(ngModel)]="editCustomer[month]">
               </ng-container>
@@ -247,7 +248,7 @@
           </td>
           <td>{{editCustomerOrig.getSettlementDateStrFormat(month)}}</td>
           <td>
-            <ng-container [ngSwitch]="authService.isCableAdmin() || canEditMonth(month)">
+            <ng-container [ngSwitch]="isCableAdmin() || canEditMonth(month)">
               <ng-container *ngSwitchCase="true">
                 <ng-container *ngTemplateOutlet="editMonthNotes; context: { editCustomer: editCustomer, notesKey: editCustomer.getNotesKey(month) }"></ng-container>
               </ng-container>
@@ -259,74 +260,74 @@
 
       <p class="mat-headline-5 de-m-bmedium">{{TKey.COMMON.DETAILS}}</p>
 
-      <mat-form-field [ngClass]="{ 'readonly': !authService.isCableAdmin() }">
+      <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
         <mat-label>{{TKey.COMMON.ID}}</mat-label>
         <input matInput type="text" [(ngModel)]="editCustomer.ID">
-        <button *ngIf="editCustomer.ID && authService.isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer.ID=''"><mat-icon>close</mat-icon></button>
+        <button *ngIf="editCustomer.ID && isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer.ID=''"><mat-icon>close</mat-icon></button>
       </mat-form-field>
 
-      <mat-form-field [ngClass]="{ 'readonly': !authService.isCableAdmin() }">
+      <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
         <mat-label>{{TKey.COMMON.NAME}}</mat-label>
         <input matInput type="text" [(ngModel)]="editCustomer.Name">
-        <button *ngIf="editCustomer.Name && authService.isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer.Name=''"><mat-icon>close</mat-icon></button>
+        <button *ngIf="editCustomer.Name && isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer.Name=''"><mat-icon>close</mat-icon></button>
       </mat-form-field>
 
-      <mat-form-field [ngClass]="{ 'readonly': !authService.isCableAdmin() }">
+      <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
         <mat-label>{{TKey.COMMON.AREA}}</mat-label>
         <mat-select [(ngModel)]="editCustomer.Area">
           <mat-option *ngFor="let area of areaFilter.controlOptions" [value]="area">{{area}}</mat-option>
         </mat-select>
       </mat-form-field>
 
-      <mat-form-field [ngClass]="{ 'readonly': !authService.isCableAdmin() }">
+      <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
         <mat-label>{{TKey.COMMON.STATUS}}</mat-label>
         <mat-select [(ngModel)]="editCustomer.Status">
           <mat-option *ngFor="let status of statusFilter.controlOptions" [value]="status">{{status}}</mat-option>
         </mat-select>
       </mat-form-field>
 
-      <mat-form-field [ngClass]="{ 'readonly': !authService.isCableAdmin() }">
+      <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
         <mat-label>{{TKey.COMMON.STB}}</mat-label>
         <input matInput type="text" [(ngModel)]="editCustomer.STB">
-        <button *ngIf="editCustomer.STB && authService.isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer.STB=''"><mat-icon>close</mat-icon></button>
+        <button *ngIf="editCustomer.STB && isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer.STB=''"><mat-icon>close</mat-icon></button>
       </mat-form-field>
 
-      <mat-form-field [ngClass]="{ 'readonly': !authService.isCableAdmin() }">
+      <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
         <mat-label>{{TKey.COMMON.STB_STATUS}}</mat-label>
         <mat-select [(ngModel)]="editCustomer['STB Status']">
           <mat-option *ngFor="let status of ['Active', 'Deactive', 'INACTIVE', 'SUSPENDED']" [value]="status">{{status}}</mat-option>
         </mat-select>
       </mat-form-field>
 
-      <mat-form-field [ngClass]="{ 'readonly': !authService.isCableAdmin() }">
+      <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
         <mat-label>{{TKey.COMMON.MOBILE}}</mat-label>
         <textarea matInput type="text" [(ngModel)]="editCustomer.Mobile"></textarea>
-        <button *ngIf="editCustomer.Mobile && authService.isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer.Mobile=''"><mat-icon>close</mat-icon></button>
+        <button *ngIf="editCustomer.Mobile && isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer.Mobile=''"><mat-icon>close</mat-icon></button>
       </mat-form-field>
 
-      <mat-form-field [ngClass]="{ 'readonly': !authService.isCableAdmin() }">
+      <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
         <mat-label>{{TKey.COMMON.ALLOW_CREDIT}}</mat-label>
         <mat-select [(ngModel)]="editCustomer.AllowCredit">
           <mat-option *ngFor="let option of [[TKey.COMMON.YES, '1'], [TKey.COMMON.NO, '0']]" [value]="option[1]">{{option[0]}}</mat-option>
         </mat-select>
       </mat-form-field>
       
-      <mat-form-field [ngClass]="{ 'readonly': !authService.isCableAdmin() }">
+      <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
         <mat-label>{{TKey.COMMON.CONNECTION_ON}}</mat-label>
         <input matInput [matDatepicker]="picker" [(ngModel)]="editCustomer['Connection On']">
         <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
 
-      <mat-form-field [ngClass]="{ 'readonly': !authService.isCableAdmin() }">
+      <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
         <mat-label>{{TKey.COMMON.NOTES}}</mat-label>
         <textarea matInput type="text" [(ngModel)]="editCustomer['Own Notes']"></textarea>
-        <button *ngIf="editCustomer['Own Notes'] && authService.isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer['Own Notes']=''"><mat-icon>close</mat-icon></button>
+        <button *ngIf="editCustomer['Own Notes'] && isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer['Own Notes']=''"><mat-icon>close</mat-icon></button>
       </mat-form-field>
 
       <div class="location-container">
         <label>{{TKey.COMMON.LOCATION}}</label>
-        <button mat-raised-button color="primary" *ngIf="authService.isCableAdmin()" (click)="getLatLng(editCustomer)" class="de-m-bmedium de-m-rbase">
+        <button mat-raised-button color="primary" *ngIf="isCableAdmin()" (click)="getLatLng(editCustomer)" class="de-m-bmedium de-m-rbase">
           <div class="de-f-aligncenter de-sm-rsmall-nolast">
             <mat-icon *ngIf="!processingLatLng">update</mat-icon>
             <de-spinner *ngIf="processingLatLng" [size]="16" color="white"></de-spinner>
@@ -342,16 +343,16 @@
           </div>
         </a>
 
-        <mat-form-field [ngClass]="{ 'readonly': !authService.isCableAdmin() }">
+        <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
           <mat-label>{{TKey.COMMON.LATITUDE}}</mat-label>
           <input matInput type="text" [(ngModel)]="editCustomer.Latitude">
-          <button *ngIf="editCustomer.Latitude && authService.isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer.Latitude=''"><mat-icon>close</mat-icon></button>
+          <button *ngIf="editCustomer.Latitude && isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer.Latitude=''"><mat-icon>close</mat-icon></button>
         </mat-form-field>
 
-        <mat-form-field [ngClass]="{ 'readonly': !authService.isCableAdmin() }">
+        <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
           <mat-label>{{TKey.COMMON.LONGITUDE}}</mat-label>
           <input matInput type="text" [(ngModel)]="editCustomer.Longitude">
-          <button *ngIf="editCustomer.Longitude && authService.isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer.Longitude=''"><mat-icon>close</mat-icon></button>
+          <button *ngIf="editCustomer.Longitude && isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer.Longitude=''"><mat-icon>close</mat-icon></button>
         </mat-form-field>
       </div>
     </div>

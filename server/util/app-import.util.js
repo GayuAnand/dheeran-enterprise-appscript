@@ -1,4 +1,5 @@
-const { Express, BodyParser, JSDOM, Fetch, CONSTANTS } = require("./common-import.util");
+const { Express, BodyParser, JSDOM, Fetch, FetchJson, FetchText, FetchObjToUrlEncodedStr,
+        HEADER_FORMURLENCODED, CONSTANTS } = require("./common-import.util");
 const AuthUtil = require("./auth.util");
 const FmsUtil = require("./fms.util");
 const GsheetUtil = require("./gsheet.util");
@@ -10,6 +11,10 @@ module.exports = exports = {
   BodyParser,
   JSDOM,
   Fetch,
+  FetchJson,
+  FetchText,
+  FetchObjToUrlEncodedStr,
+  HEADER_FORMURLENCODED,
 
   AuthUtil,
   FmsUtil,

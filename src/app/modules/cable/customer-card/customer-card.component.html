@@ -1,5 +1,5 @@
 <table class="customer-details">
-  <ng-container *ngIf="authService.isCableAdmin()">
+  <ng-container *ngIf="isCableAdmin()">
     <tr>
       <td>{{TKey.COMMON.ID}}:</td>
       <td><de-copyable-text [text]="customer.ID"></de-copyable-text></td>
