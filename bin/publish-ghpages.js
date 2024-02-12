@@ -9,6 +9,7 @@ var publishOptions = {
   add: false,
   repo: 'git@gayu.github.com:GayuAnand/dheeran-enterprise-appscript.git',
   tag: versionInfo.latest,
+  dotfiles: true, // To include .wellknown folder
 };
 
 ghpages.publish("dist/cap-webview", publishOptions, (err) =>
