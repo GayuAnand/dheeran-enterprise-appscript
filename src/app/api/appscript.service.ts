@@ -26,7 +26,7 @@ export class ApiAppScriptService {
   }
 
   callback(args: any) {
-    if (!environment.production) console.log('Callback: ', args);
+    if (!this.useProd) console.log('Callback: ', args);
     if (this.execPromises[args?.callbackId]) {
       this.ngZone.run(() => {
         const sub = this.execPromises[args.callbackId];

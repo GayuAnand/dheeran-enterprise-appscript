@@ -21,6 +21,7 @@
     "android:open": "npx cap open android",
     "android:build": "cd android && ./gradlew assembleDebug && cd ..",
     "sync": "npx cap sync",
+    "sha256:apk": "keytool -printcert -jarfile",
     "reset:ghpages": "rm -rf node_modules/.cache/gh-pages && git push origin :gh-pages",
     "generate:logos": "npx @capacitor/assets generate --assetPath 'logos' --iconBackgroundColor '#eeeeee' --iconBackgroundColorDark '#222222' --splashBackgroundColor '#eeeeee' --splashBackgroundColorDark '#111111'"
   },

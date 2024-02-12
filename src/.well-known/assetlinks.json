@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.depco.management",
+      "sha256_cert_fingerprints": [
+        "C9:1D:19:B6:E0:FB:71:8A:0D:0E:A8:3F:89:C5:0E:10:F8:CC:54:4B:FF:10:4A:9E:28:94:8C:6D:9A:16:DE:40"
+      ]
+    }
+  }
+]

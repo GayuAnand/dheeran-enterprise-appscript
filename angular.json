@@ -29,6 +29,7 @@
               "src/versionInfo.json",
               "src/favicon.ico",
               "src/assets",
+              "src/.well-known",
               {
                 "glob": "**/*",
                 "input": "node_modules/leaflet/dist/images/",
