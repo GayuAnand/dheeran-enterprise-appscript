@@ -33,6 +33,13 @@ export class ApiGSheetDataService {
       );
   }
 
+  getCableCustomerDetails(customerId: string) {
+    return this.appScriptService.exec<CustomerModel>('getCableCustomerDetails', [customerId])
+      .pipe(
+        map((res) => (new CustomerModel(res)))
+      );
+  }
+
   discoveryInfo(force = false): Observable<IMetadata & { activeUser: IUser } | null> {
     return this.storageService.getData<string>(this.apiAuthService.authTokenName)
       .pipe(

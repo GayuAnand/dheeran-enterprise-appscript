@@ -33,9 +33,15 @@ export class CustomerModel extends BaseModel implements Record<string, any> {
   
   Longitude!: string | number;
 
+  Bill!: string | number;
+
   DraftChanges!: any;
 
   private _monthsOrder!: (keyof CustomerModel)[];
+
+  monthlyBill() {
+    return parseInt(this.Bill?.toString() || '200');
+  }
 
   idNum() {
     return (this.ID || '').replace(/^cde0*/i, '');
@@ -62,7 +68,18 @@ export class CustomerModel extends BaseModel implements Record<string, any> {
   }
 
   hasPendingPayment(month?: keyof CustomerModel) {
-    return !this[month || this.getCurrentMonth() as keyof CustomerModel];
+    return this.isLiveMonth(month, false) && !this[month || this.getCurrentMonth() as keyof CustomerModel];
+  }
+
+  isLiveMonth(month?: keyof CustomerModel, inclusive = false) {
+    let retval = true;
+
+    if (this['Connection On']) {
+      let connectionDate = this.getMomentDate(this['Connection On']);
+      if (inclusive || connectionDate.get('date') <= 16) connectionDate = connectionDate.startOf('month');
+      retval = connectionDate.diff(this.getMomentDate(month as string)) <= 0;
+    }
+    return retval;
   }
 
   getCurrentMonth() {
@@ -80,8 +97,7 @@ export class CustomerModel extends BaseModel implements Record<string, any> {
       .join(' - ');
   }
 
-  getReminderText() {
-    let lastKnownPaymentInfo = 200;
+  getPendingMonths() {
     const pendingMonths = [];
     const monthsInOrder = this.getMonthsInOrder();
 
@@ -89,28 +105,37 @@ export class CustomerModel extends BaseModel implements Record<string, any> {
       if (this.hasPendingPayment(month)) {
         pendingMonths.push(month);
       } else {
-        lastKnownPaymentInfo = parseInt(this[month] || '200');
         pendingMonths.length = 0;
       }
 
       if (month === this.getCurrentMonth()) break;
     }
 
+    return pendingMonths;
+  }
+
+  getTotalPendingPayment() {
+    return this.getPendingMonths().length * this.monthlyBill();
+  }
+
+  getReminderText() {
+    const pendingMonths = this.getPendingMonths();
+
     return `Hello *${this.Name}*,
 
-A friendly reminder for your ${pendingMonths.map(m => '_' + m + '_').join(', ')} cable payment. Total *Rs.${pendingMonths.length * lastKnownPaymentInfo}/-*.
+A friendly reminder for your ${pendingMonths.map(m => '_' + m + '_').join(', ')} cable payment. Total *Rs.${pendingMonths.length * this.monthlyBill()}/-*.
 
-> Payment link: _https://gayuanand.github.io/dheeran-enterprise-appscript/cable-bill-payment.html?upiUrl=${encodeURIComponent(this.upiUrl())}_
+> _https://portal.dheeranenterprise.in/cablebill/${encodeURIComponent(btoa(this.ID))}_
 
 Customer Details:
 - Name: ${this.Name || ''}
 - Area: ${this.Area || ''}
-- Mobile: ${(this.Mobile || '').replace(/\n/g, ', ')}
-- CustomerID: ${this.ID}
+- Mobile: ${this.getMobileNumbers().join(', ')}
 
 Best Regards,
 *_Dheeran Enterprise_*
-_HighSpeed BroadBand internet and Cable service provider_`;
+_HighSpeed BroadBand internet and Cable service provider_
+_https://dheeranenterprise.in_`;
   }
 
   qrCodeUrl() {
@@ -158,6 +183,16 @@ _HighSpeed BroadBand internet and Cable service provider_`;
 
   freeTextSearch(searchTextRegexp = new RegExp('')) {
     return [this.ID || '', this.Name || '', this.Mobile || '', this.STB || '', this['Own Notes'] || '', this.Notes || ''].some(value => searchTextRegexp.test(value));
+  }
+
+  getMonthsInRange(pastMonths = 100, futureMonths = 100) {
+    let monthsOrder = this.getMonthsInOrder();
+    if (pastMonths >= 0 || futureMonths >= 0) {
+      const currentMonth = moment().format('MMMYYYY');
+      const index = monthsOrder.findIndex((m) => m === currentMonth);
+      monthsOrder = monthsOrder.slice(index - pastMonths, index + futureMonths);
+    }
+    return monthsOrder;
   }
   
   getMonthsInOrder(): (keyof CustomerModel)[] {

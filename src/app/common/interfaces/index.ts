@@ -40,6 +40,7 @@ export interface ICustomersSheet {
     AREA: { label: 'Area' },
     LATITUDE: { label: 'Latitude' },
     LONGITUDE: { label:	'Longitude' },
+    BILL: { label: 'Bill' },
     NOTES: { label: 'Notes' },
     OWN_NOTES: { label: 'Own Notes' },
     CONNECTION_ON: { label: 'Connection On' },

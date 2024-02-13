@@ -1,5 +1,7 @@
+import { map } from 'rxjs';
 import moment from 'moment';
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { MatSnackBar, MatSnackBarConfig, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
 
 import { CustomerModel } from 'src/app/models';
@@ -12,6 +14,7 @@ export class UtilService {
   snackBarRef!: MatSnackBarRef<TextOnlySnackBar>;
 
   constructor(
+    private http: HttpClient,
     private snackBar: MatSnackBar,
     private settingsService: SettingsService,
   ) {}
@@ -119,6 +122,14 @@ export class UtilService {
   async tactvActivation(customer: CustomerModel) {
     await this.copyToClipboard(`${customer.STB}`);
     window.open('https://sms.tactv.in','_blank');
+  }
+
+  getTranslation(text: string | string[]) {
+    text = Array.isArray(text) ? text.map(t => t.replace(/,/g, ' ')).join(',') : text.replace(/,/g, ' ');
+    return this.http.get(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ta&dt=t&q=${text}`)
+      .pipe(
+        map((res: any) => res?.[0]?.[0]?.[0]?.split(','))
+      );
   }
 
   exportObjectsToCSV(objects: Record<string, any>[], filename: string, keysToExport: string[] = []) {

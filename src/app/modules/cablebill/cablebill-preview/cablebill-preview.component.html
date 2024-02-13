@@ -1,0 +1,130 @@
+<div *ngIf="customer" class="de-f-aligncenter de-f-column">
+  <p class="title de-p-vbase">Dheeran Enterprise</p>
+  <p class="subtitle bold-text">Cable Bill</p>
+
+  <table class="details-table">
+    <tr class="de-textalign-center">
+      <th colspan="2">
+        <p>Customer Details</p>
+        <p>வாடிக்கையாளர் விவரங்கள்</p>
+      </th>
+    </tr>
+    <tr>
+      <td>
+        <p>Name</p>
+        <p>பெயர்</p>
+      </td>
+      <td>
+        <p>{{customer.Name}}</p>
+        <p>{{tamilCustomer.Name}}</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <p>Area</p>
+        <p>ஊர்</p>
+      </td>
+      <td>
+        <p>{{customer.Area}}</p>
+        <p>{{tamilCustomer.Area}}</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <p>Mobile</p>
+        <p>மொபைல்</p>
+      </td>
+      <td>{{customer.getMobileNumbers().join(', ')}}</td>
+    </tr>
+    <tr class="de-hide">
+      <td>
+        <p>Customer ID</p>
+        <p>வாடிக்கையாளர் எண்</p>
+      </td>
+      <td>{{customer.ID}}</td>
+    </tr>
+  </table>
+
+  <table>
+    <tr class="de-textalign-center">
+      <th colspan="2">
+        <p>Bill Details</p>
+        <p>கட்டண விவரங்கள்</p>
+      </th>
+    </tr>
+    <tr>
+      <td>
+        <p>Bill to pay</p>
+        <p>செலுத்த வேண்டிய கட்டணம்</p>
+      </td>
+      <td *ngIf="totalPendingAmount" class="pending-amount danger-text bold-text">Rs.{{totalPendingAmount}}/-</td>
+      <td *ngIf="!totalPendingAmount" class="success-text">
+        <p>Paid</p>
+        <p>செலுத்தப்பட்டது</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <p>Months</p>
+        <p>மாதங்கள்</p>
+      </td>
+      <td>
+        <p>{{pendingMonths}}</p>
+        <p>{{pendingMonthsTamil}}</p>
+      </td>
+    </tr>
+  </table>
+
+  <table>
+    <tr class="de-textalign-center">
+      <th colspan="2">
+        <p>Bank Details</p>
+        <p>வங்கி விவரங்கள்</p>
+      </th>
+    </tr>
+    <tr>
+      <td>
+        <p>UPI</p>
+        <p>யூபிஐ</p>
+      </td>
+      <td class="bold-text">7204413241@paytm</td>
+    </tr>
+    <tr>
+      <td>
+        <p>Banking Name</p>
+        <p>வங்கி பெயர்</p>
+      </td>
+      <td class="bold-text">Dheeran A Minor</td>
+    </tr>
+  </table>
+
+  <table class="collection-table">
+    <tr>
+      <th>
+        <p>Month</p>
+        <p>மாதம்</p>
+      </th>
+      <th>
+        <p>Payment Date</p>
+        <p>கட்டணம் தேதி</p>
+      </th>
+      <th>
+        <p>Amount</p>
+        <p>தொகை</p>
+      </th>
+    </tr>
+    <tr *ngFor="let month of customer.getMonthsInRange(4)">
+      <td>{{month}}</td>
+      <td>{{customer.getCollectionDateStrFormat(month)}}</td>
+      <td>{{customer.get(month)}}</td>
+    </tr>
+  </table>
+
+  <p class="company-name">Powered by Dheeran Enterprise</p>
+  <p class="company-description de-m-bbase">HighSpeed BroadBand internet and Cable service provider.</p>
+</div>
+
+<div *ngIf="error" class="de-f-aligncenter danger-text de-sm-rsmall-nolast">
+  <mat-icon color="warn">warning</mat-icon>
+  <span>{{error}}</span>
+</div>

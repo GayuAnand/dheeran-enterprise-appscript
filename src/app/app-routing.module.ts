@@ -57,6 +57,10 @@ const routes: Routes = [
     canActivate: [NonauthGuard],
   },
   {
+    path: 'cablebill',
+    loadChildren: () => import('./modules/cablebill').then((m) => m.CableBillModule),
+  },
+  {
     path: '**',
     redirectTo: 'app',
   },
