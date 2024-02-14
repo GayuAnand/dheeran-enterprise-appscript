@@ -123,8 +123,6 @@ export class CustomerModel extends BaseModel implements Record<string, any> {
 
     return `Hello *${this.Name}*,
 
-Greetings from *_Dheeran Enterprise_*.
-
 A friendly reminder for your ${pendingMonths.map(m => '_' + m + '_').join(', ')} cable payment. Total *Rs.${pendingMonths.length * this.monthlyBill()}/-*.
 
 Click _https://portal.dheeranenterprise.in/cablebill/${encodeURIComponent(btoa(this.ID))}_ for details and make payment.
@@ -134,7 +132,8 @@ Customer Details:
 - Area: ${this.Area || ''}
 - Mobile: ${this.getMobileNumbers().join(', ')}
 
-Thanks.`;
+Regards,
+*_Dheeran Enterprise_*`;
   }
 
   qrCodeUrl() {
@@ -206,7 +205,6 @@ Thanks.`;
     monthsOrder.sort();
     this._monthsOrder = monthsOrder.map(x => moment(x).format('MMMYYYY') as keyof CustomerModel);
 
-    console.log(this._monthsOrder);
     return this._monthsOrder;
   }
 

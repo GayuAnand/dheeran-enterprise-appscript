@@ -86,7 +86,6 @@ export class CableBillComponent extends BaseComponent implements OnInit {
     this.pendingMonths = pendingMonths.join(', ');
     this.pendingMonthsTamil = pendingMonths.map(pm => (this.tamilCustomer as any)[pm] || '').join(', ');
     this.totalPendingAmount = this.customer.getTotalPendingPayment();
-    // this.totalPendingAmount = 0;
     this.settingsService.processingText = '';
     console.log(this);
   }

@@ -128,7 +128,7 @@ export class UtilService {
     text = Array.isArray(text) ? text.map(t => t.replace(/,/g, ' ')).join(',') : text.replace(/,/g, ' ');
     return this.http.get(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ta&dt=t&q=${text}`)
       .pipe(
-        map((res: any) => res?.[0]?.[0]?.[0]?.split(','))
+        map((res: any) => res?.[0]?.map((r: any[]) => r[0] || '').join(' ').split(','))
       );
   }
 
@@ -142,12 +142,12 @@ export class UtilService {
   escapeCSVCell(cellData: string) {
     // Escape double quotes by doubling them
     let escapedData = (cellData || '').toString().replace(/"/g, '""');
-  
+
     // If the data contains a comma or newline, enclose it in double quotes
     if (escapedData.includes(',') || escapedData.includes('\n')) {
       escapedData = `"${escapedData}"`;
     }
-  
+
     return escapedData;
   }
 

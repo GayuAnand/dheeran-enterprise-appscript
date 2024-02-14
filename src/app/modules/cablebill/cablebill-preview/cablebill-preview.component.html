@@ -99,19 +99,25 @@
       </td>
       <td class="bold-text">Dheeran A Minor</td>
     </tr>
-    <tr>
+    <tr class="disclaimer">
       <td colspan="2" class="primary-text">
-        <p class="de-f-aligncenter"><mat-icon class="de-m-rsmall" color="primary">error</mat-icon>Important Note: Please type your name and area while making payment.</p>
+        <p class="de-f-aligncenter">
+          <mat-icon class="de-m-rsmall" color="primary">error</mat-icon>
+          <span>Important Note: Please type your name and area while making payment.</span>
+        </p>
       </td>
     </tr>
-    <tr>
+    <tr class="disclaimer">
       <td colspan="2" class="primary-text">
-        <p class="de-f-aligncenter"><mat-icon class="de-m-rsmall" color="primary">error</mat-icon>முக்கிய குறிப்பு: பணம் செலுத்தும் போது உங்கள் பெயரையும் ஊரையும் பதிவிடவும்.</p>
+        <p class="de-f-aligncenter">
+          <mat-icon class="de-m-rsmall" color="primary">error</mat-icon>
+          <span>முக்கிய குறிப்பு: பணம் செலுத்தும் போது உங்கள் பெயரையும் ஊரையும் பதிவிடவும்.</span>
+        </p>
       </td>
     </tr>
   </table>
 
-  <button mat-raised-button (click)="showHistory = !showHistory">
+  <button mat-raised-button class="de-m-tbase" (click)="showHistory = !showHistory">
     <mat-icon>history</mat-icon>
     {{showHistory ? 'Hide Payment History' : 'Show Payment History'}}
   </button>
