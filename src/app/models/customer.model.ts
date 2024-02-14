@@ -123,9 +123,9 @@ export class CustomerModel extends BaseModel implements Record<string, any> {
 
     return `Hello *${this.Name}*,
 
-A friendly reminder for your ${pendingMonths.map(m => '_' + m + '_').join(', ')} cable payment. Total *Rs.${pendingMonths.length * this.monthlyBill()}/-*.
+தங்களுடைய ${pendingMonths.map(m => '_' + m + '_').join(', ')} கேபிள் பில் நிலுவை தொகை *Rs.${pendingMonths.length * this.monthlyBill()}/-*. மேலும் விவரங்களுக்கு _https://portal.dheeranenterprise.in/cablebill/${encodeURIComponent(btoa(this.ID))}_.
 
-Click _https://portal.dheeranenterprise.in/cablebill/${encodeURIComponent(btoa(this.ID))}_ for details and make payment.
+A friendly reminder for your ${pendingMonths.map(m => '_' + m + '_').join(', ')} cable payment. Total *Rs.${pendingMonths.length * this.monthlyBill()}/-*. For more details, click _https://portal.dheeranenterprise.in/cablebill/${encodeURIComponent(btoa(this.ID))}_.
 
 Customer Details:
 - Name: ${this.Name || ''}
