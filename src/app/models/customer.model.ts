@@ -132,7 +132,7 @@ Customer Details:
 - Area: ${this.Area || ''}
 - Mobile: ${this.getMobileNumbers().join(', ')}
 
-Regards,
+Best Regards,
 *_Dheeran Enterprise_*`;
   }
 

@@ -136,11 +136,16 @@
         <p>Amount</p>
         <p>தொகை</p>
       </th>
+      <th>
+        <p>Notes</p>
+        <p>குறிப்புக்கள்</p>
+      </th>
     </tr>
     <tr *ngFor="let month of customer.getMonthsInRange(4)">
       <td>{{month}}</td>
       <td>{{customer.getCollectionDateStrFormat(month)}}</td>
       <td>{{customer.get(month)}}</td>
+      <td>{{customer.getNotes(month)}}</td>
     </tr>
   </table>
 
