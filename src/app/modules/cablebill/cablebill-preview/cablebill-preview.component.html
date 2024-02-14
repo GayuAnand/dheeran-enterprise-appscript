@@ -1,6 +1,6 @@
 <div *ngIf="customer" class="de-f-aligncenter de-f-column">
   <p class="title de-p-vbase">Dheeran Enterprise</p>
-  <p class="subtitle bold-text">Cable Bill</p>
+  <p class="subtitle">Cable Bill</p>
 
   <table class="details-table">
     <tr class="de-textalign-center">
@@ -84,10 +84,13 @@
     </tr>
     <tr>
       <td>
-        <p>UPI</p>
-        <p>யூபிஐ</p>
+        <p>UPI ID</p>
+        <p>யூபிஐ எண்</p>
       </td>
-      <td class="bold-text">7204413241@paytm</td>
+      <td class="bold-text">
+        <p>7204413241@paytm</p>
+        <p class="normal-text hint-text de-m-tsmall--force">(GPay, PhonePe, PayTM and all UPI payments are accepted.)</p>
+      </td>
     </tr>
     <tr>
       <td>
@@ -96,9 +99,24 @@
       </td>
       <td class="bold-text">Dheeran A Minor</td>
     </tr>
+    <tr>
+      <td colspan="2" class="primary-text">
+        <p class="de-f-aligncenter"><mat-icon class="de-m-rsmall" color="primary">error</mat-icon>Important Note: Please type your name and area while making payment.</p>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" class="primary-text">
+        <p class="de-f-aligncenter"><mat-icon class="de-m-rsmall" color="primary">error</mat-icon>முக்கிய குறிப்பு: பணம் செலுத்தும் போது உங்கள் பெயரையும் ஊரையும் பதிவிடவும்.</p>
+      </td>
+    </tr>
   </table>
 
-  <table class="collection-table">
+  <button mat-raised-button (click)="showHistory = !showHistory">
+    <mat-icon>history</mat-icon>
+    {{showHistory ? 'Hide Payment History' : 'Show Payment History'}}
+  </button>
+
+  <table *ngIf="showHistory" class="collection-table">
     <tr>
       <th>
         <p>Month</p>

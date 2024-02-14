@@ -30,7 +30,7 @@ export class CustomerModel extends BaseModel implements Record<string, any> {
   Notes!: string;
 
   Latitude!: string | number;
-  
+
   Longitude!: string | number;
 
   Bill!: string | number;
@@ -68,7 +68,7 @@ export class CustomerModel extends BaseModel implements Record<string, any> {
   }
 
   hasPendingPayment(month?: keyof CustomerModel) {
-    return this.isLiveMonth(month, false) && !this[month || this.getCurrentMonth() as keyof CustomerModel];
+    return this.isLiveMonth(month, true) && this[month || this.getCurrentMonth() as keyof CustomerModel] === '';
   }
 
   isLiveMonth(month?: keyof CustomerModel, inclusive = false) {
@@ -123,19 +123,18 @@ export class CustomerModel extends BaseModel implements Record<string, any> {
 
     return `Hello *${this.Name}*,
 
+Greetings from *_Dheeran Enterprise_*.
+
 A friendly reminder for your ${pendingMonths.map(m => '_' + m + '_').join(', ')} cable payment. Total *Rs.${pendingMonths.length * this.monthlyBill()}/-*.
 
-> _https://portal.dheeranenterprise.in/cablebill/${encodeURIComponent(btoa(this.ID))}_
+Click _https://portal.dheeranenterprise.in/cablebill/${encodeURIComponent(btoa(this.ID))}_ for details and make payment.
 
 Customer Details:
 - Name: ${this.Name || ''}
 - Area: ${this.Area || ''}
 - Mobile: ${this.getMobileNumbers().join(', ')}
 
-Best Regards,
-*_Dheeran Enterprise_*
-_HighSpeed BroadBand internet and Cable service provider_
-_https://dheeranenterprise.in_`;
+Thanks.`;
   }
 
   qrCodeUrl() {
@@ -194,14 +193,20 @@ _https://dheeranenterprise.in_`;
     }
     return monthsOrder;
   }
-  
+
   getMonthsInOrder(): (keyof CustomerModel)[] {
     if (this._monthsOrder) return this._monthsOrder;
-    
-    let monthsOrder = Object.keys(this).filter(x => moment(x).isValid()).map(x => moment(x).toDate().getTime());
+
+    let monthsOrder = Object.keys(this)
+      .filter(x => {
+        const momentObj = moment(x, 'MMMYYYY');
+        return momentObj.isValid() && momentObj.format('MMMYYYY') === x;
+      })
+      .map(x => moment(x, 'MMMYYYY').toDate().getTime());
     monthsOrder.sort();
     this._monthsOrder = monthsOrder.map(x => moment(x).format('MMMYYYY') as keyof CustomerModel);
-    
+
+    console.log(this._monthsOrder);
     return this._monthsOrder;
   }
 
@@ -223,7 +228,7 @@ _https://dheeranenterprise.in_`;
         let infoTypeMonth: string = month;
         const collection = this[month];
         const agent = this.getCollectionBy(month);
-        
+
         if (collection && agent) {
           if (infoType === 'collectionDate') {
             infoTypeMonth = this.formatDate(this.getCollectionDate(month), 'MMMYYYY') as string;

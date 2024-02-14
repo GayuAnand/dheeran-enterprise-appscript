@@ -183,14 +183,10 @@
             </button>
 
             <a mat-mini-fab color="accent" href="https://api.whatsapp.com/send?text={{encodeURIComponent(element.getInfoAsText(true))}}" target="_blank">
-              <mat-icon svgIcon="whatsappwhite"></mat-icon>
+              <mat-icon matPrefix>share</mat-icon>
             </a>
 
             <button mat-mini-fab color="accent" (click)="utilService.copyToClipboard(element.getInfoAsText(true))">
-              <mat-icon matPrefix>perm_media</mat-icon>
-            </button>
-
-            <button mat-mini-fab color="accent" (click)="utilService.copyToClipboard(element.getInfoAsText())">
               <mat-icon matPrefix>content_copy</mat-icon>
             </button>
           </div>
@@ -311,7 +307,7 @@
           <mat-option *ngFor="let option of [[TKey.COMMON.YES, '1'], [TKey.COMMON.NO, '0']]" [value]="option[1]">{{option[0]}}</mat-option>
         </mat-select>
       </mat-form-field>
-      
+
       <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
         <mat-label>{{TKey.COMMON.CONNECTION_ON}}</mat-label>
         <input matInput [matDatepicker]="picker" [(ngModel)]="editCustomer['Connection On']">
