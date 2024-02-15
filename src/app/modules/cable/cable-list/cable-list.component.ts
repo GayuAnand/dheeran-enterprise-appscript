@@ -212,7 +212,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     } else {
       this.monthsFilter.control.setValue(appliedMonthsFilters);
     }
-    
+
     let agents: any = {};
     const appliedAgentsFilters = this.agentsFilter.control.value;
     this.fullData.forEach((data) => agents = Object.assign(agents, data.getCollectionAgents()));
@@ -256,7 +256,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     this.showPendingSettlement = false;
     this.agentsFilter.selectAll = false;
     this.agentsFilter.control.setValue([]);
-    
+
     this.showCollectedCustomers = false;
     this.monthsFilter.selectAll = false;
     this.monthsFilter.control.setValue([]);
@@ -271,7 +271,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     }
     this.onFilterChange();
   }
-  
+
   onShowCollectedCustomersFilterChange() {
     if (this.showCollectedCustomers) {
       this.showPendingSettlement = false;
@@ -407,7 +407,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
   }
 
   getCellClassNames(data: any, columnName: string) {
-    const centerAlign = ((columnName === this.customerColumns?.NAME?.label) || 
+    const centerAlign = ((columnName === this.customerColumns?.NAME?.label) ||
                          (columnName === this.customerColumns?.AREA?.label)) ? '' : 'align-center';
     const isActiveCustomer = (columnName === this.customerColumns?.NAME?.label) ? (data.isActive() ? 'success-text' : 'danger-text') : '';
     const mobileColumnFlow = (columnName === this.customerColumns?.MOBILE?.label) ? 'de-f-column' : '';
@@ -417,7 +417,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
 
   canEditMonth(month: keyof CustomerModel): boolean {
     const editCustomerOrig: CustomerModel = this.editCustomerOrig as CustomerModel;
-    
+
     // No collection yet, no collection by and settlement information
     return (!editCustomerOrig[month] && !editCustomerOrig.getCollectionBy(month) && !editCustomerOrig.getSettlementDate(month));
   }
@@ -425,7 +425,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
   isCableAdmin() {
     return this.nklAccount ? this.authService.isNklCableAdmin() : this.authService.isCableAdmin();
   }
-  
+
   checkUpdateCollections(offlineUpdate = false) {
     try {
       const editCustomerOrig: CustomerModel = this.editCustomerOrig as CustomerModel;
@@ -488,7 +488,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
         this.hideEditDetailsDialog();
       } else {
         this.settingsService.processingText = `Updating '${editCustomerOrig?.Name}'...`;
-        
+
         this.cableService.saveCollectionUpdates(payload, false, (err: any) => {
           this.settingsService.processingText = '';
           if (err) {

@@ -32,8 +32,9 @@
         <de-mobile-number [mobile]="mobile" displayType="TEXT"></de-mobile-number>
         <div class="de-f-aligncenter de-sm-rbase-nolast">
           <de-mobile-number [mobile]="mobile" displayType="CALL"></de-mobile-number>
+          <de-mobile-number *ngIf="settingsService.isNative && authService.isCableAdmin() && customer.hasPendingPayment()" [mobile]="mobile" [message]="customer.getSmsReminderText()" displayType="SMS_REMINDER"></de-mobile-number>
           <de-mobile-number [mobile]="mobile" displayType="WHATSAPP"></de-mobile-number>
-          <de-mobile-number *ngIf="authService.isCableAdmin() && customer.hasPendingPayment()" [mobile]="mobile" [whatsAppMessage]="customer.getReminderText()" displayType="WHATSAPP_REMINDER"></de-mobile-number>
+          <de-mobile-number *ngIf="authService.isCableAdmin() && customer.hasPendingPayment()" [mobile]="mobile" [message]="customer.getReminderText()" displayType="WHATSAPP_REMINDER"></de-mobile-number>
         </div>
       </div>
     </td>

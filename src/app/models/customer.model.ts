@@ -68,7 +68,7 @@ export class CustomerModel extends BaseModel implements Record<string, any> {
   }
 
   hasPendingPayment(month?: keyof CustomerModel) {
-    return this.isLiveMonth(month, true) && this[month || this.getCurrentMonth() as keyof CustomerModel] === '';
+    return this.isLiveMonth(month, false) && this[month || this.getCurrentMonth() as keyof CustomerModel] === '';
   }
 
   isLiveMonth(month?: keyof CustomerModel, inclusive = false) {
@@ -76,7 +76,7 @@ export class CustomerModel extends BaseModel implements Record<string, any> {
 
     if (this['Connection On']) {
       let connectionDate = this.getMomentDate(this['Connection On']);
-      if (inclusive || connectionDate.get('date') <= 16) connectionDate = connectionDate.startOf('month');
+      if (inclusive || connectionDate.get('date') <= 20) connectionDate = connectionDate.startOf('month');
       retval = connectionDate.diff(this.getMomentDate(month as string)) <= 0;
     }
     return retval;
@@ -123,9 +123,9 @@ export class CustomerModel extends BaseModel implements Record<string, any> {
 
     return `Hello *${this.Name}*,
 
-தங்களுடைய ${pendingMonths.map(m => '_' + m + '_').join(', ')} கேபிள் பில் நிலுவை தொகை *Rs.${pendingMonths.length * this.monthlyBill()}/-*. மேலும் விவரங்களுக்கு _https://portal.dheeranenterprise.in/cablebill/${encodeURIComponent(btoa(this.ID))}_.
+தங்களுடைய ${pendingMonths.map(m => '_' + m + '_').join(', ')} கேபிள் பில் நிலுவை தொகை *Rs.${pendingMonths.length * this.monthlyBill()}/-*. ஏற்கனவே பணம் செலுத்தியிருந்தால் புறக்கணிக்கவும். மேலும் விவரங்களுக்கு _https://portal.dheeranenterprise.in/cablebill/${encodeURIComponent(btoa(this.ID))}_.
 
-A friendly reminder for your ${pendingMonths.map(m => '_' + m + '_').join(', ')} cable payment. Total *Rs.${pendingMonths.length * this.monthlyBill()}/-*. For more details, click _https://portal.dheeranenterprise.in/cablebill/${encodeURIComponent(btoa(this.ID))}_.
+A friendly reminder for your ${pendingMonths.map(m => '_' + m + '_').join(', ')} cable payment. Total *Rs.${pendingMonths.length * this.monthlyBill()}/-*. Please ignore if already paid. For more details, click _https://portal.dheeranenterprise.in/cablebill/${encodeURIComponent(btoa(this.ID))}_.
 
 Customer Details:
 - Name: ${this.Name || ''}
@@ -134,6 +134,12 @@ Customer Details:
 
 Best Regards,
 *_Dheeran Enterprise_*`;
+  }
+
+  getSmsReminderText() {
+    const pendingMonths = this.getPendingMonths();
+    return `Hi ${this.Name || ''},
+தங்களுடைய ${pendingMonths.join(', ')} கேபிள் பில் நிலுவை தொகை Rs.${pendingMonths.length * this.monthlyBill()}/-. ஏற்கனவே பணம் செலுத்தியிருந்தால் புறக்கணிக்கவும்.`;
   }
 
   qrCodeUrl() {

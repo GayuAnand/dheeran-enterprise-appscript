@@ -237,7 +237,7 @@
           <td>
             <ng-container [ngSwitch]="isCableAdmin() || canEditMonth(month)">
               <ng-container *ngSwitchCase="true">
-                <input type="number" [(ngModel)]="editCustomer[month]">
+                <input type="text" [(ngModel)]="editCustomer[month]">
               </ng-container>
               <ng-container *ngSwitchCase="false">{{editCustomerOrig.get(month)}}</ng-container>
             </ng-container>
