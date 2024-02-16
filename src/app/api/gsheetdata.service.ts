@@ -40,6 +40,13 @@ export class ApiGSheetDataService {
       );
   }
 
+  getCableCustomerAndPaymentDetails(customerId: string): Observable<{ customer: CustomerModel, paymentInfo: { upiId: string, isMerchant: boolean, merchantCode: string, bankingName: string, companyName: string } }> {
+    return this.appScriptService.exec<CustomerModel>('getCableCustomerAndPaymentDetails', [customerId])
+      .pipe(
+        map((res: any) => ({ customer: new CustomerModel(res.customer), paymentInfo: res.paymentInfo }))
+      );
+  }
+
   discoveryInfo(force = false): Observable<IMetadata & { activeUser: IUser } | null> {
     return this.storageService.getData<string>(this.apiAuthService.authTokenName)
       .pipe(

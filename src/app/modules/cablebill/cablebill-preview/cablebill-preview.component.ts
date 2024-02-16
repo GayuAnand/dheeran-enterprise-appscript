@@ -1,9 +1,9 @@
-import { ActivatedRoute, Route, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 
 import { BaseComponent } from '../../../common';
 import { CustomerModel } from 'src/app/models';
-import { of } from 'rxjs';
+import { IPaymentInfo } from 'src/app/common/interfaces';
 
 @Component({
   selector: 'de-cablebill-preview',
@@ -44,6 +44,8 @@ export class CableBillComponent extends BaseComponent implements OnInit {
     Dec2024: 'டிசம்பர் 2024',
   };
 
+  paymentInfo: IPaymentInfo = {};
+
   showHistory = false;
 
   pendingMonths = '';
@@ -65,9 +67,9 @@ export class CableBillComponent extends BaseComponent implements OnInit {
 
     try {
       this.customerId = atob(this.route.snapshot.params?.id);
-      this.apiGSheetDataService.getCableCustomerDetails(this.customerId)
+      this.apiGSheetDataService.getCableCustomerAndPaymentDetails(this.customerId)
         .subscribe({
-          next: (res) => this.initialize(res),
+          next: (res) => this.initialize(res.customer, res.paymentInfo),
           error: (err) => this.setProcessingError(err),
         });
     } catch (e) {
@@ -75,8 +77,9 @@ export class CableBillComponent extends BaseComponent implements OnInit {
     }
   }
 
-  initialize(customer: CustomerModel) {
-    (window as any).c = customer;
+  initialize(customer: CustomerModel, paymentInfo: IPaymentInfo) {
+    this.settingsService.metadata.paymentInfo = paymentInfo;
+    this.paymentInfo = paymentInfo;
     this.customer = customer;
     this.utilService.getTranslation([this.customer.Name, this.customer.Area]).subscribe((r) => {
       this.tamilCustomer.Name = r[0];
@@ -94,5 +97,21 @@ export class CableBillComponent extends BaseComponent implements OnInit {
     this.error = err;
     this.settingsService.processingText = '';
     console.log(err);
+  }
+
+  openUpiUrl() {
+    this.utilService.openUrl(this.customer.upiUrl());
+  }
+
+  openGpayUrl() {
+    this.utilService.openUrl(this.customer.gpayUrl());
+  }
+
+  openPhonePeUrl() {
+    this.utilService.openUrl(this.customer.phonePeUrl());
+  }
+
+  openPaytmUrl() {
+    this.utilService.openUrl(this.customer.paytmUrl());
   }
 }

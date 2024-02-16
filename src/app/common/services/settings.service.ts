@@ -112,6 +112,17 @@ export class SettingsService implements OnDestroy {
     return this.isOnline = (await Network.getStatus()).connected;
   }
 
+  getPaymentInfo() {
+    const paymentInfo = this.metadata.paymentInfo || {};
+    return {
+      upiId: paymentInfo.upiId || '7204413241@paytm',
+      isMerchant: paymentInfo.isMerchant || false,
+      merchantCode: paymentInfo.merchantCode || '',
+      bankingName: paymentInfo.bankingName || '',
+      companyName: paymentInfo.companyName || '',
+    };
+  }
+
   checkAndPopulateNavigationData() {
     const navigationData: NavMenuItem[] = [
       {
@@ -119,7 +130,7 @@ export class SettingsService implements OnDestroy {
         routerLink: ['/app/dashboard']
       },
     ];
-    
+
     if (this.authService.hasAnyCablePermission()) {
       navigationData.push({
         name: EN_MAPPING.COMMON.CABLE,

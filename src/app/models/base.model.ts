@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { AuthService } from '../common';
+import { AuthService, SettingsService } from '../common';
 
 export class BaseModel {
   constructor(data: any) {
@@ -37,4 +37,5 @@ export class BaseModel {
   }
 
   static AuthService: AuthService;
+  static SettingsService: SettingsService;
 }

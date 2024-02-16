@@ -82,37 +82,53 @@
         <p>வங்கி விவரங்கள்</p>
       </th>
     </tr>
-    <tr>
+
+    <tr *ngIf="!paymentInfo?.isMerchant">
       <td>
         <p>UPI ID</p>
         <p>யூபிஐ எண்</p>
       </td>
       <td class="bold-text">
-        <p>7204413241@paytm</p>
+        <p>{{paymentInfo.upiId}}</p>
         <p class="normal-text hint-text de-m-tsmall--force">(GPay, PhonePe, PayTM and all UPI payments are accepted.)</p>
       </td>
     </tr>
+
     <tr>
       <td>
         <p>Banking Name</p>
-        <p>வங்கி பெயர்</p>
+        <p>வங்கி கணக்கு பெயர்</p>
       </td>
-      <td class="bold-text">Dheeran A Minor</td>
+      <td class="bold-text">{{paymentInfo.bankingName}}</td>
     </tr>
-    <tr class="disclaimer">
-      <td colspan="2" class="primary-text">
-        <p class="de-f-aligncenter">
-          <mat-icon class="de-m-rsmall" color="primary">error</mat-icon>
-          <span>Important Note: Please type your name and area while making payment.</span>
-        </p>
-      </td>
-    </tr>
-    <tr class="disclaimer">
-      <td colspan="2" class="primary-text">
-        <p class="de-f-aligncenter">
-          <mat-icon class="de-m-rsmall" color="primary">error</mat-icon>
-          <span>முக்கிய குறிப்பு: பணம் செலுத்தும் போது உங்கள் பெயரையும் ஊரையும் பதிவிடவும்.</span>
-        </p>
+
+    <ng-container *ngIf="!paymentInfo?.isMerchant">
+      <tr class="disclaimer">
+        <td colspan="2" class="primary-text">
+          <p class="de-f-aligncenter">
+            <mat-icon class="de-m-rsmall" color="primary">error</mat-icon>
+            <span>Important Note: Please type your name and area while making payment.</span>
+          </p>
+        </td>
+      </tr>
+      <tr class="disclaimer">
+        <td colspan="2" class="primary-text">
+          <p class="de-f-aligncenter">
+            <mat-icon class="de-m-rsmall" color="primary">error</mat-icon>
+            <span>முக்கிய குறிப்பு: பணம் செலுத்தும் போது உங்கள் பெயரையும் ஊரையும் பதிவிடவும்.</span>
+          </p>
+        </td>
+      </tr>
+    </ng-container>
+
+    <tr *ngIf="paymentInfo?.isMerchant">
+      <td colspan="2">
+        <div class="de-f-wrap de-f-justifycenter">
+          <a class="paylink" id="upipaylink" (click)="openUpiUrl()"></a>
+          <a class="paylink" id="gpaylink" (click)="openGpayUrl()"></a>
+          <a class="paylink" id="phonepaylink" (click)="openPhonePeUrl()"></a>
+          <a class="paylink" id="paytmlink" (click)="openPaytmUrl()"></a>
+        </div>
       </td>
     </tr>
   </table>

@@ -72,3 +72,44 @@ table.collection-table {
   min-height: 24px;
   min-width: 24px;
 }
+
+.paylink {
+  align-items: center;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  border: 0px solid black;
+  border-radius: 4px;
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  font-size: 16px;
+  height: 50px;
+  justify-content: center;
+  margin: 6px;
+  padding: 6px 10px;
+  text-decoration: none;
+  width: 160px;
+}
+
+#upipaylink {
+  background-image: url('./../../../../assets/images/upi.png');
+  background-size: 70% 55%;
+}
+
+#gpaylink {
+  background-image: url('./../../../../assets/images/gpay.png');
+  background-size: 85% 55%;
+}
+
+#phonepaylink {
+  background-image: url('./../../../../assets/images/phonepe.png');
+  background-size: 81% 68%;
+}
+
+#paytmlink {
+  background-image: url('./../../../../assets/images/paytm.png');
+  background-size: 65% 55%;
+}

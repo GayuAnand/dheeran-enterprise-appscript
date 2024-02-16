@@ -147,11 +147,26 @@ Best Regards,
   }
 
   upiUrl() {
-    return `upi://pay?pa=7204413241@paytm&pn=Dheeran Enterprise&cu=INR&tn=${this.processedPaymentNote()}`;
+    const paymentInfo = BaseModel.SettingsService.getPaymentInfo();
+    const merchantCode = paymentInfo.merchantCode ? `&mc=${paymentInfo.merchantCode}` : '';
+    const companyName = paymentInfo.companyName || '';
+    return `upi://pay?pa=${paymentInfo.upiId}&pn=${companyName}&cu=INR&tn=${this.processedPaymentNote()}${merchantCode}`;
+  }
+
+  gpayUrl() {
+    return this.upiUrl().replace(/^upi:\/\//, 'tez://upi/');
+  }
+
+  phonePeUrl() {
+    return this.upiUrl().replace(/^upi:\/\//, 'phonepe://');
+  }
+
+  paytmUrl() {
+    return this.upiUrl().replace(/^upi:\/\//, 'paytmmp://');
   }
 
   processedPaymentNote() {
-    return this.rawPaymentNote().slice(0, 49);
+    return this.rawPaymentNote().slice(0, 48);
   }
 
   rawPaymentNote() {
@@ -203,11 +218,15 @@ Best Regards,
     if (this._monthsOrder) return this._monthsOrder;
 
     let monthsOrder = Object.keys(this)
-      .filter(x => {
+      .filter(x => x.length === 7 && /[a-zA-Z]{3,3}\d{4,4}/.test(x)) // Filter only Jan2023, Jan2024 like headers
+      .map(x => {
         const momentObj = moment(x, 'MMMYYYY');
-        return momentObj.isValid() && momentObj.format('MMMYYYY') === x;
+        if (momentObj.isValid() && momentObj.format('MMMYYYY') === x) {
+          return momentObj.toDate().getTime();
+        }
+        return null;
       })
-      .map(x => moment(x, 'MMMYYYY').toDate().getTime());
+      .filter(x => x);
     monthsOrder.sort();
     this._monthsOrder = monthsOrder.map(x => moment(x).format('MMMYYYY') as keyof CustomerModel);
 

@@ -24,6 +24,7 @@ export class AppComponent extends BaseComponent {
   ) {
     super();
     BaseModel.AuthService = this.authService;
+    BaseModel.SettingsService = this.settingsService;
     this.uiBundleUpdaterService.initialize();
     this.fileSystemService.cleanupUnknownFiles();
 

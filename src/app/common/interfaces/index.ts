@@ -365,6 +365,14 @@ export interface IOltInfo {
   externalAddr: string,
 }
 
+export interface IPaymentInfo {
+  upiId?: string,
+  isMerchant?: boolean,
+  merchantCode?: string,
+  bankingName?: string,
+  companyName?: string,
+};
+
 export interface IMetadata {
   area?: string[],
   deployIds?: string[],
@@ -377,4 +385,5 @@ export interface IMetadata {
   loginUsers?: { name: string, mobile: string | number }[],
   ugWorkType?: string[],
   oltInfo?: IOltInfo[],
+  paymentInfo?: IPaymentInfo,
 }

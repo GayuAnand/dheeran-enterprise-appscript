@@ -75,7 +75,7 @@
   <tr *ngIf="showPaymentQrCode">
     <td colspan="2">
       <img [src]="customer.qrCodeUrl()" class="de-block" />
-      <a mat-raised-button [href]="customer.upiUrl()" target="_blank">{{TKey.COMMON.PAY_BILL}}</a>
+      <a mat-raised-button *ngIf="settingsService.getPaymentInfo().isMerchant" [href]="customer.upiUrl()" target="_blank">{{TKey.COMMON.PAY_BILL}}</a>
     </td>
   </tr>
 </table>

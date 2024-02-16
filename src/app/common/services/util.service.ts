@@ -39,6 +39,10 @@ export class UtilService {
     this.openSnackBar(message, action, defaultOptions);
   }
 
+  openUrl(url: string, target = '_blank') {
+    window.open(url, target);
+  }
+
   formatDate(dateStr: string, format?: string) {
     const d = this.moment(dateStr);
     return d.isValid() ? d.format(format || "DD MMM'YY") : dateStr;
@@ -121,7 +125,7 @@ export class UtilService {
 
   async tactvActivation(customer: CustomerModel) {
     await this.copyToClipboard(`${customer.STB}`);
-    window.open('https://sms.tactv.in','_blank');
+    window.open('https://sms.tactv.in', '_blank');
   }
 
   getTranslation(text: string | string[]) {
