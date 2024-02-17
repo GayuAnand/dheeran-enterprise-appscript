@@ -442,7 +442,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
         customerCols?.STB_STATUS.label as any,
         customerCols?.MOBILE.label as any,
         customerCols?.ALLOW_CREDIT.label as any,
-        customerCols?.OWN_NOTES.label as any,
+        customerCols?.NOTES.label as any,
         customerCols?.CONNECTION_ON.label as any,
         customerCols?.LATITUDE.label as any,
         customerCols?.LONGITUDE.label as any,
@@ -529,7 +529,7 @@ export class CableListComponent extends BaseComponent implements OnInit, AfterVi
     this.utilService.exportObjectsToCSV(
       this.data.data,
       'Cable Customers',
-      ['ID', 'Name', 'Mobile', 'Area', 'Status', 'NoCredit', 'Bulk Payment', 'STB', 'STB Status', 'STB Type', 'Own Notes']
+      ['ID', 'Name', 'Mobile', 'Area', 'Status', 'NoCredit', 'Bulk Payment', 'STB', 'STB Status', 'STB Type', 'Notes']
     );
   }
 

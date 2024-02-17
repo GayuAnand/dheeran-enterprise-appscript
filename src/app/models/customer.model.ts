@@ -25,8 +25,6 @@ export class CustomerModel extends BaseModel implements Record<string, any> {
 
   'Connection On'!: string;
 
-  'Own Notes'!: string;
-
   Notes!: string;
 
   Latitude!: string | number;
@@ -201,7 +199,7 @@ Best Regards,
   }
 
   freeTextSearch(searchTextRegexp = new RegExp('')) {
-    return [this.ID || '', this.Name || '', this.Mobile || '', this.STB || '', this['Own Notes'] || '', this.Notes || ''].some(value => searchTextRegexp.test(value));
+    return [this.ID || '', this.Name || '', this.Mobile || '', this.STB || '', this.Notes || ''].some(value => searchTextRegexp.test(value));
   }
 
   getMonthsInRange(pastMonths = 100, futureMonths = 100) {

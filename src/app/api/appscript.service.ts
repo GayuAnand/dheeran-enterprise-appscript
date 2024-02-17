@@ -12,6 +12,14 @@ export class ApiAppScriptService {
   devDeployId = 'AKfycbwXGymXyx7sQjCVwqZVvkP6nMiRfAA_cVZ_YCiuiJs';
 
   prodDeployId = 'AKfycbxWZJNA0ToPZBIx7Qofz8s7nr_mng_hxkPF64pDimZNVfkpl7p1eBhpBBQqY0BExiXI';
+  // prodDeployId = 'AKfycbwDsefczXlET9Nxw--Qv4qOExbIRP5jyOrtWBv6JnaQ05ml4QfuBoq6zM5tEy3_RXst';
+
+  franchiseSciptId = '';
+
+  functionsToUseProdDeployId: Record<string, boolean> = {
+    discoveryInfo: true,
+    login: true,
+  };
 
   execPromises: Record<string, { subject: Subject<any>, observable?: Observable<any> }> = {};
 
@@ -38,6 +46,13 @@ export class ApiAppScriptService {
     }
   }
 
+  getScriptIdForFunction(functionName: string) {
+    if (this.functionsToUseProdDeployId[functionName]) {
+      return this.useProd ? this.prodDeployId : this.devDeployId;
+    }
+    return this.franchiseSciptId;
+  }
+
   exec<T>(functionName: string, parameters: any[] = [], callbackId = Date.now().toString()): Observable<T> {
     this.execPromises[callbackId] = { subject: new Subject() };
     this.execPromises[callbackId].observable = this.execPromises[callbackId].subject.pipe(
@@ -59,7 +74,7 @@ export class ApiAppScriptService {
       this.storageService.getData('x-auth-token')
         .subscribe(token => {
           let s = document.createElement('script');
-          s.setAttribute('src', `https://script.google.com/macros/s/${this.useProd ? this.prodDeployId : this.devDeployId}/${this.useProd ? 'exec' : 'dev'}?api=1&functionName=${functionName}&functionParameters=${encodeURIComponent(JSON.stringify(parameters))}&callbackId=${callbackId}`);
+          s.setAttribute('src', `https://script.google.com/macros/s/${this.getScriptIdForFunction(functionName)}/${this.useProd ? 'exec' : 'dev'}?api=1&functionName=${functionName}&functionParameters=${encodeURIComponent(JSON.stringify(parameters))}&callbackId=${callbackId}`);
           s.setAttribute('id', callbackId);
           document.head.appendChild(s);
         });

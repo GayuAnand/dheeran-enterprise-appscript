@@ -317,8 +317,8 @@
 
       <mat-form-field [ngClass]="{ 'readonly': !isCableAdmin() }">
         <mat-label>{{TKey.COMMON.NOTES}}</mat-label>
-        <textarea matInput type="text" [(ngModel)]="editCustomer['Own Notes']"></textarea>
-        <button *ngIf="editCustomer['Own Notes'] && isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer['Own Notes']=''"><mat-icon>close</mat-icon></button>
+        <textarea matInput type="text" [(ngModel)]="editCustomer.Notes"></textarea>
+        <button *ngIf="editCustomer.Notes && isCableAdmin()" matSuffix mat-icon-button (click)="editCustomer.Notes=''"><mat-icon>close</mat-icon></button>
       </mat-form-field>
 
       <div class="location-container">

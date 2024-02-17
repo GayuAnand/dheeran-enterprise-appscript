@@ -53,10 +53,18 @@ export class ApiGSheetDataService {
         map((token) => this.apiAuthService.authToken = token),
         concatMap(() => this.storageService.getData<string>('prodDeployId')
           .pipe(
-            map((prodDeployId) => this.appScriptService.prodDeployId = prodDeployId || this.appScriptService.prodDeployId),
+            map((prodDeployId) => {
+              this.appScriptService.prodDeployId = prodDeployId || this.appScriptService.prodDeployId;
+            }),
           )),
         concatMap(() => this.checkCacheAndGet<IMetadata & { activeUser: IUser }>('discoveryInfo', 'discoveryInfo', [this.apiAuthService.authToken], force)),
         concatMap((res) => {
+          if (res.activeUser.Franchise) {
+            this.appScriptService.franchiseSciptId = res.franchiseInfo?.find((fi) => fi.name === res?.activeUser?.Franchise)?.scriptId || '';
+          } else {
+            this.appScriptService.franchiseSciptId = this.appScriptService.prodDeployId;
+          }
+
           let refreshDiscovery = of(res);
           const prodDeployId = res?.deployIds?.[0] || this.appScriptService.prodDeployId;
           if (prodDeployId !== this.appScriptService.prodDeployId) {

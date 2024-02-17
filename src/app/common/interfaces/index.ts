@@ -25,6 +25,7 @@ export interface IRole {
 export interface IUser {
   Username: string;
   Role: IRole;
+  Franchise: string;
 }
 
 export interface ICustomersSheet {
@@ -42,7 +43,6 @@ export interface ICustomersSheet {
     LONGITUDE: { label:	'Longitude' },
     BILL: { label: 'Bill' },
     NOTES: { label: 'Notes' },
-    OWN_NOTES: { label: 'Own Notes' },
     CONNECTION_ON: { label: 'Connection On' },
     STB_STATUS: {
       label: 'STB Status',
@@ -214,6 +214,9 @@ export interface ISheetsInfo {
     label: 'Reference Data',
     cols: {
       AREA: { label: 'Area' },
+      PAYMENTINFO: { label: 'PaymentInfo' },
+      FRANCHISE: { label: 'Franchise' },
+      SCRIPTID: { label: 'ScriptID' },
       LATITUDE: { label: 'Latitude' },
       LONGITUDE: { label:	'Longitude' },
       OLTNAME: { label: 'OLTName' },
@@ -354,6 +357,9 @@ export interface ISheetsInfo {
     cols: {
       USERNAME: { label: 'Username' },
       PASSWORD: { label: 'Password' },
+      MOBILE: { label: 'Mobile' },
+      FRANCHISE: { label: 'Franchise' },
+      ROLE: { label: 'Role' },
       TOKEN: { label: 'Token' },
     },
   },
@@ -363,7 +369,7 @@ export interface IOltInfo {
   name: string,
   internalAddr: string,
   externalAddr: string,
-}
+};
 
 export interface IPaymentInfo {
   upiId?: string,
@@ -371,6 +377,11 @@ export interface IPaymentInfo {
   merchantCode?: string,
   bankingName?: string,
   companyName?: string,
+};
+
+export interface IFranchiseInfo {
+  name?: string,
+  scriptId?: string,
 };
 
 export interface IMetadata {
@@ -386,4 +397,5 @@ export interface IMetadata {
   ugWorkType?: string[],
   oltInfo?: IOltInfo[],
   paymentInfo?: IPaymentInfo,
+  franchiseInfo?: IFranchiseInfo[],
 }
