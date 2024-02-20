@@ -12,7 +12,6 @@ export class ApiAppScriptService {
   devDeployId = 'AKfycbwXGymXyx7sQjCVwqZVvkP6nMiRfAA_cVZ_YCiuiJs';
 
   prodDeployId = 'AKfycbxWZJNA0ToPZBIx7Qofz8s7nr_mng_hxkPF64pDimZNVfkpl7p1eBhpBBQqY0BExiXI';
-  // prodDeployId = 'AKfycbwDsefczXlET9Nxw--Qv4qOExbIRP5jyOrtWBv6JnaQ05ml4QfuBoq6zM5tEy3_RXst';
 
   franchiseSciptId = '';
 

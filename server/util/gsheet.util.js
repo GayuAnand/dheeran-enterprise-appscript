@@ -1,6 +1,6 @@
 const CommonImportUtil = require("./common-import.util");
 
-const GSHEET_SERVICE_TOKEN = 'X1++0uYoy8qe02m7OHrKbpKMhHZ7JlFsx4xD+Xqir3eVT5uCcSb';
+let GSHEET_SERVICE_TOKEN = 'U2FsdGVkX1+qTcfY9EjPLKtUK2HCbVLE9twJX7q+87LoLp8gVQIucfCCLGAHKeDtBD3OryMc5IPfZWQ+JawtdxyFgSuuUv4xc9114z+VzhkMP8Hqm8lvhLaHGDUsDj5E';
 const GSHEET_SCRIPT_ID = 'AKfycbxWZJNA0ToPZBIx7Qofz8s7nr_mng_hxkPF64pDimZNVfkpl7p1eBhpBBQqY0BExiXI';
 
 function getApiUrl() {
